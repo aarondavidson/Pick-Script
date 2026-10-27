@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Fix: template sticky note** — using (not looking at) the note on a fresh game said “You already took the key” while handing over the key. Responses can now be state functions that return a translation key, so gated copy stays translatable
+- **Dependencies** — `npm audit fix` (non-breaking): React Router 6.30.6, Capacitor 8.5.3, Vite 5.4.21 and transitive updates; 32 → 14 advisories, none critical in shipped code
 - **Asset credits** — `credits` on packs (TS + JSON), shown in Settings → Credits and on the default win screen; **Add credit to pack** in the art library; blending packs carries donor credits
 - **Custom palettes** — Pixels → Palette: Custom accepts pasted hex / GPL / Paint.NET palettes (e.g. from Lospec)
 - **Art library corrections** — fixed license labels (Pixel Adventure is CC-BY on OGA, Super Grotto unconfirmed, CraftPix not CC0, Gothicvania music needs credit); removed Pixor (a paid tool) and the Lospec gallery (a showcase) in favor of the Lospec palette list; Tiled → room art guide in `docs/STUDIO.md`
