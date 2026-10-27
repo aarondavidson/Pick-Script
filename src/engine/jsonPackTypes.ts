@@ -18,6 +18,7 @@ import type { JuicePresetId } from "./juice";
 import type { StuckAssistPackOpt } from "./stuckAssist";
 import type { I18nConfig } from "./i18n";
 import type { MapFogConfig } from "./mapFog";
+import type { CreditEntry } from "./credits";
 
 export const JSON_PACK_SCHEMA_VERSION = 1 as const;
 
@@ -449,6 +450,8 @@ export interface JsonPackDocument {
   id: string;
   title: string;
   subtitle?: string;
+  /** Asset credits (art / music / sound) — shown in Settings and on the default win screen */
+  credits?: CreditEntry[];
   version: string;
   startRoom: string;
   verbMode?: "simple" | "classic" | "coin";

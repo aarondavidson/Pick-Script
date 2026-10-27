@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   ASSET_PRESETS,
@@ -19,6 +19,7 @@ import {
   type PackArtTarget,
 } from "@/studio/packArtBridge";
 import { PixelLibraryPanel } from "@/studio/PixelLibraryPanel";
+import { parsePaletteText } from "@/studio/paletteParse";
 import { toast } from "@/hooks/use-toast";
 
 const PRESET_PROMPTS: Record<AssetPresetId, string> = {
@@ -40,6 +41,8 @@ async function blobUrlToDataUrl(url: string): Promise<string> {
   });
 }
 
+type PaletteMode = "game" | "custom" | "adaptive";
+
 const IMAGE_GEN_GUIDE_URL =
   "https://github.com/aarondavidson/Pick-Script/blob/main/docs/IMAGE-GEN-STARTER.md";
 
@@ -60,7 +63,18 @@ export function PixelTool() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [dither, setDither] = useState<DitherMode>("floyd-steinberg");
-  const [useGamePalette, setUseGamePalette] = useState(true);
+  const [paletteMode, setPaletteMode] = useState<PaletteMode>("game");
+  const [customPaletteText, setCustomPaletteText] = useState("");
+  const customPalette = useMemo(
+    () => parsePaletteText(customPaletteText),
+    [customPaletteText]
+  );
+  // A custom palette needs at least two colors; until then fall back to adaptive.
+  const palette = useMemo<string[] | null>(() => {
+    if (paletteMode === "game") return [...DEFAULT_GAME_PALETTE];
+    if (paletteMode === "custom" && customPalette.length >= 2) return customPalette;
+    return null;
+  }, [paletteMode, customPalette]);
   const [filename, setFilename] = useState("item.png");
   const [sendTarget, setSendTarget] = useState<PackArtTarget>(
     sendParam === "item" ? "item" : "room"
@@ -110,7 +124,7 @@ export function PixelTool() {
           ),
           dither,
           ditherStrength: 0.7,
-          palette: useGamePalette ? [...DEFAULT_GAME_PALETTE] : null,
+          palette,
           maxColors: 32,
           outputWidth: preset.outputWidth,
           outputHeight: preset.outputHeight,
@@ -129,7 +143,7 @@ export function PixelTool() {
         setBusy(false);
       }
     },
-    [preset, dither, useGamePalette]
+    [preset, dither, palette]
   );
 
   useEffect(() => {
@@ -339,15 +353,61 @@ export function PixelTool() {
                 <option value="none">None</option>
               </select>
             </label>
-            <label className="flex items-end gap-2 min-h-[40px] pb-2">
-              <input
-                type="checkbox"
-                checked={useGamePalette}
-                onChange={(e) => setUseGamePalette(e.target.checked)}
-              />
-              <span className="text-xs text-muted-foreground">Game palette</span>
+            <label className="block space-y-1">
+              <span className="pixel-font text-xs text-muted-foreground">
+                Palette
+              </span>
+              <select
+                className="w-full bg-background border border-border px-2 py-2 text-sm min-h-[40px]"
+                value={paletteMode}
+                onChange={(e) => setPaletteMode(e.target.value as PaletteMode)}
+              >
+                <option value="game">Game palette</option>
+                <option value="custom">Custom (paste)</option>
+                <option value="adaptive">Adaptive (from image)</option>
+              </select>
             </label>
           </div>
+
+          {paletteMode === "custom" && (
+            <label className="block space-y-1">
+              <span className="pixel-font text-xs text-muted-foreground">
+                Paste palette colors
+              </span>
+              <textarea
+                className="w-full bg-background border border-border px-3 py-2 text-xs font-mono min-h-[72px]"
+                placeholder={"#1a1c2c #5d275d #b13e53 …\nor a .hex / .gpl / .txt palette file"}
+                value={customPaletteText}
+                onChange={(e) => setCustomPaletteText(e.target.value)}
+              />
+              <span className="text-xs text-muted-foreground">
+                {customPalette.length >= 2
+                  ? `${customPalette.length} colors`
+                  : "Need at least 2 colors — using adaptive until then."}{" "}
+                Find palettes at{" "}
+                <a
+                  href="https://lospec.com/palette-list"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline"
+                >
+                  Lospec
+                </a>
+                . Use the same palette for every image so mixed art matches.
+              </span>
+              {customPalette.length >= 2 && (
+                <div className="flex flex-wrap gap-0.5" aria-hidden>
+                  {customPalette.slice(0, 64).map((c) => (
+                    <span
+                      key={c}
+                      className="inline-block w-3 h-3 border border-border"
+                      style={{ backgroundColor: c }}
+                    />
+                  ))}
+                </div>
+              )}
+            </label>
+          )}
 
           <label className="block space-y-1">
             <span className="pixel-font text-xs text-muted-foreground">

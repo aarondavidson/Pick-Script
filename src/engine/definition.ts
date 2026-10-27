@@ -15,6 +15,7 @@ import type { DefaultVerbResponses } from "./defaultResponses";
 import type { CutsceneDef } from "./cutscene";
 import type { HintDef } from "./hints";
 import type { VerbMode } from "./verbs";
+import type { CreditEntry } from "./credits";
 import type {
   ComicDef,
   ModalityWinResult,
@@ -53,6 +54,8 @@ export interface GameDefinition {
   title: string;
   /** Short tagline for UI chrome */
   subtitle?: string;
+  /** Asset credits (art / music / sound) — shown in Settings and on the default win screen */
+  credits?: CreditEntry[];
   /** Semver for content (independent of engine) */
   version: string;
   /** Starting room id */

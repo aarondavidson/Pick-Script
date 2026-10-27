@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Asset credits** — `credits` on packs (TS + JSON), shown in Settings → Credits and on the default win screen; **Add credit to pack** in the art library; blending packs carries donor credits
+- **Custom palettes** — Pixels → Palette: Custom accepts pasted hex / GPL / Paint.NET palettes (e.g. from Lospec)
+- **Art library corrections** — fixed license labels (Pixel Adventure is CC-BY on OGA, Super Grotto unconfirmed, CraftPix not CC0, Gothicvania music needs credit); removed Pixor (a paid tool) and the Lospec gallery (a showcase) in favor of the Lospec palette list; Tiled → room art guide in `docs/STUDIO.md`
 - **Engine-only repo** — removed the title-product modes (`dev:*` / `build:*` / `cap:sync:*` variants, `.env.*` files) and the repo-split tooling; launcher/Studio “edit shipped titles” panels removed
 - **Bring your own art** — removed the server-side AI image proxy (`api/`, dev middleware); Studio Pixels keeps upload + pixelate and offers copyable prompt suggestions for any image tool
 - **Fix** — `npm run new-pack` / `pack-from-json` no longer emit an invalid `registry.ts` when the last catalog entry has no trailing comma

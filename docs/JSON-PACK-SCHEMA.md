@@ -19,6 +19,7 @@ nesting caps, allowlisted specials, safe identifier keys, media URL checks.
 | `id` | string | Stable slug → save keys |
 | `title` / `subtitle` | string | Launcher + header |
 | `version` | string | Content semver |
+| `credits` | `{ work, author, license?, url? }[]` | Optional asset credits, shown in Settings → Credits and on the win screen. Non-https `url`s are dropped; max 100 rows |
 | `startRoom` | string | Must exist in `rooms` |
 | `verbMode` | `classic` \| `simple` \| `coin` | Optional |
 | `rooms` | `Record<id, JsonPackRoom>` | Required |

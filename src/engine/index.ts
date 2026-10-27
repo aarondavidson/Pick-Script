@@ -61,6 +61,9 @@ export type {
 } from "./definition";
 export { DEFAULT_VERBS } from "./definition";
 
+export { formatCredit, mergeCredits, sanitizeCredits } from "./credits";
+export type { CreditEntry } from "./credits";
+
 export { resolvePlayChrome } from "./playChrome";
 export type { PlayChromeFlags } from "./playChrome";
 

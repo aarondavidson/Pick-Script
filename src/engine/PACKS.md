@@ -77,6 +77,7 @@ Shared UI lives in `src/components/game/`. Engine code lives in `src/engine/` an
 | `id` | yes | Stable slug; used for save keys (`adventure_<id>_save_<n>`) |
 | `title` / `subtitle` | title yes | Shown in launcher + in-game header |
 | `version` | yes | Content semver (independent of engine) |
+| `credits` | no | `{ work, author, license?, url? }[]` — asset credits shown in the in-game Settings menu and on the default win screen (`url` must be https) |
 | `startRoom` | yes | Must exist in `rooms` |
 | `rooms` | yes | `Record<roomId, Room>` |
 | `combinations` | yes | May be `{}` |

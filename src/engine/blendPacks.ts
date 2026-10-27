@@ -11,6 +11,7 @@ import type {
   JsonPackRoom,
 } from "./jsonPack";
 import { parseJsonPack } from "./jsonPack";
+import { mergeCredits } from "./credits";
 
 export const BLEND_LAYERS = [
   "rooms",
@@ -389,6 +390,8 @@ export function blendPacks(
 
   const pack: JsonPackDocument = {
     ...basePack,
+    // Donor art comes along, so its credits must too
+    credits: mergeCredits(basePack.credits, donorPack.credits),
     rooms,
     items,
     actors: Object.keys(actors).length ? actors : basePack.actors,

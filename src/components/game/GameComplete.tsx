@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { GameState } from "@/engine";
 import { useGame } from "@/contexts/GameContext";
 import { getShellComplete } from "./shellUi";
+import { CreditsList } from "./CreditsList";
 
 interface GameCompleteProps {
   onRestart: () => void;
@@ -35,6 +36,15 @@ export const GameComplete = ({ onRestart, gameState }: GameCompleteProps) => {
           </p>
           <p className="text-sm text-muted-foreground">Thanks for playing!</p>
         </div>
+
+        {definition.credits && definition.credits.length > 0 && (
+          <section className="text-left text-xs text-muted-foreground space-y-1 max-h-40 overflow-y-auto border-t border-border pt-3">
+            <h2 className="pixel-font text-[10px] text-accent uppercase tracking-widest">
+              Credits
+            </h2>
+            <CreditsList credits={definition.credits} />
+          </section>
+        )}
 
         <Button
           onClick={onRestart}

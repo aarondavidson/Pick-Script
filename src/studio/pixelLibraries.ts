@@ -2,7 +2,10 @@
  * Curated free (CC0 / permissive) pixel-art galleries for Studio authors.
  * Links only — we do not redistribute third-party zips in the repo.
  * Prefer CC0; always re-check the license badge on the source page.
+ * Labels last checked Oct 2026 (via search — sites were not opened directly).
  */
+
+import type { CreditEntry } from "@/engine";
 
 export interface PixelLibraryEntry {
   id: string;
@@ -18,7 +21,14 @@ export interface PixelLibraryEntry {
   tip?: string;
   /** Gallery hub vs single pack */
   kind?: "gallery" | "pack";
+  /** License name for the credit line when it differs from the `license` label */
+  creditLicense?: string;
+  /** License requires credit (CC-BY etc.) — not just appreciated */
+  creditRequired?: boolean;
 }
+
+const TILED_TIP =
+  "Ships as tiles — build a room in Tiled, export one image, then upload (see docs/STUDIO.md → Tiles to room art).";
 
 /** Hand-picked galleries + packs that map well to point-and-click rooms / props / items. */
 export const PIXEL_LIBRARIES: PixelLibraryEntry[] = [
@@ -62,35 +72,24 @@ export const PIXEL_LIBRARIES: PixelLibraryEntry[] = [
     id: "craftpix-free",
     name: "CraftPix — Free assets",
     author: "CraftPix",
-    license: "Free license (check pack)",
+    license: "Free, commercial OK — not CC0",
     blurb:
       "Free 2D kits and backgrounds (many pixel). Good for quick room placeholders.",
     goodFor: ["rooms", "characters", "UI", "gallery"],
     url: "https://craftpix.net/freebies/",
-    tip: "Read each freebie’s license line — not everything is CC0.",
+    tip: "Using them in your game is fine; redistributing the raw files is not. Read each freebie’s license.",
     kind: "gallery",
   },
   {
-    id: "lospec",
-    name: "Lospec Palette & Gallery",
+    id: "lospec-palettes",
+    name: "Lospec Palette List",
     author: "Lospec",
-    license: "Varies per asset",
-    blurb: "Palettes + pixel gallery — great with Studio pixelate / color limits.",
-    goodFor: ["palettes", "inspiration", "gallery"],
-    url: "https://lospec.com/gallery",
-    tip: "Also browse lospec.com/palette-list for pixelate presets.",
-    kind: "gallery",
-  },
-  {
-    id: "pixor-library",
-    name: "Pixor — CC0 sprite packs",
-    author: "Pixor",
-    license: "CC0",
+    license: "Free palettes",
     blurb:
-      "Category ZIPs (pickups, interior, kitchen, dungeon…) with sprite sheets — ideal inventory icons.",
-    goodFor: ["items", "props", "furniture", "gallery"],
-    url: "https://pixor.art/library/packs/",
-    tip: "Start with Pickups or Interior. No account required.",
+      "Thousands of limited color palettes — one palette keeps mixed art looking like one game.",
+    goodFor: ["palettes", "gallery"],
+    url: "https://lospec.com/palette-list",
+    tip: "Open a palette → copy its hex codes (or download the HEX / GPL file) → paste into Pixels → Palette: Custom.",
     kind: "gallery",
   },
 
@@ -104,6 +103,7 @@ export const PIXEL_LIBRARIES: PixelLibraryEntry[] = [
       "16×16 floors, walls, furniture, doors — stitch into room backgrounds or prop sheets.",
     goodFor: ["rooms", "furniture", "props"],
     url: "https://opengameart.org/content/roguelikerpg-pack-1700-tiles",
+    tip: TILED_TIP,
     kind: "pack",
   },
   {
@@ -114,6 +114,7 @@ export const PIXEL_LIBRARIES: PixelLibraryEntry[] = [
     blurb: "Indoor furniture and kitchen pieces for attic / apartment / HQ rooms.",
     goodFor: ["rooms", "furniture"],
     url: "https://kenney.nl/assets/roguelike-indoors",
+    tip: TILED_TIP,
     kind: "pack",
   },
   {
@@ -134,6 +135,7 @@ export const PIXEL_LIBRARIES: PixelLibraryEntry[] = [
     blurb: "1000+ tiles/characters/items — rapid prototypes and silhouette style.",
     goodFor: ["prototype", "items", "characters"],
     url: "https://opengameart.org/content/1-bit-pack",
+    tip: TILED_TIP,
     kind: "pack",
   },
   {
@@ -144,6 +146,7 @@ export const PIXEL_LIBRARIES: PixelLibraryEntry[] = [
     blurb: "Dungeon tiles, weapons, items, characters — warehouse / basement vibes.",
     goodFor: ["rooms", "items", "characters"],
     url: "https://kenney-assets.itch.io/tiny-dungeon",
+    tip: TILED_TIP,
     kind: "pack",
   },
   {
@@ -159,43 +162,49 @@ export const PIXEL_LIBRARIES: PixelLibraryEntry[] = [
   },
   {
     id: "oga-cc0-backgrounds",
-    name: "CC0 Backgrounds (collection)",
-    author: "Technopeasant (curator)",
+    name: "CC0 Image Backgrounds (collection)",
+    author: "josepharaoh99 (curator)",
     license: "CC0 (listed)",
-    blurb: "Curated OGA list of CC0 scenery / room-like backdrops.",
+    blurb: "OGA collection of CC0 scenery — desert, city, landscape, sky, space.",
     goodFor: ["rooms", "gallery"],
-    url: "https://opengameart.org/content/cc0-backgrounds",
-    tip: "Open each linked pack and confirm CC0 on that page.",
+    url: "https://opengameart.org/content/cc0-image-backgrounds",
+    tip: "Mixed uploaders — open each piece, confirm CC0 and that the uploader made it.",
     kind: "gallery",
   },
   {
     id: "pixel-frog-adventure",
     name: "Pixel Adventure",
     author: "Pixel Frog",
-    license: "CC0",
+    license: "CC-BY 4.0 on OGA — verify",
+    creditLicense: "CC-BY 4.0",
+    creditRequired: true,
     blurb: "Characters, objects, tilesets — colorful adventure props and pickups.",
     goodFor: ["items", "characters", "props"],
     url: "https://pixelfrog-assets.itch.io/pixel-adventure-1",
+    tip: "OpenGameArt lists Pixel Adventure 1 as CC-BY 4.0 (credit required); only Pixel Adventure 2 is documented as CC0. Check the page and credit Pixel Frog.",
     kind: "pack",
   },
   {
     id: "ansimuz-grotto",
     name: "Super Grotto Escape Pack",
     author: "ansimuz",
-    license: "CC0",
+    license: "Unconfirmed — check page",
     blurb: "16×16 cave/ruins tiles, props, VFX — atmospheric adventure rooms.",
     goodFor: ["rooms", "props", "VFX"],
     url: "https://ansimuz.itch.io/super-grotto-escape-pack",
+    tip: "No license found when last checked — read the license on the page / in the readme before shipping.",
     kind: "pack",
   },
   {
     id: "ansimuz-gothicvania",
     name: "Gothicvania Town",
     author: "ansimuz",
-    license: "CC0",
+    license: "CC0 art · music needs credit",
+    creditLicense: "CC0",
     blurb: "Complete town scene kit — streets, buildings, props for outdoor rooms.",
     goodFor: ["rooms", "props"],
     url: "https://ansimuz.itch.io/gothicvania-town",
+    tip: "Art is CC0. The music (Pascal Belisle) requires credit if you use it.",
     kind: "pack",
   },
 ];
@@ -208,6 +217,16 @@ export function pixelLibrariesForTag(tag: string): PixelLibraryEntry[] {
       e.blurb.toLowerCase().includes(t) ||
       e.kind === t
   );
+}
+
+/** Credit line for a library pack (license falls back to the label). */
+export function creditForLibrary(lib: PixelLibraryEntry): CreditEntry {
+  return {
+    work: lib.name,
+    author: lib.author,
+    license: lib.creditLicense ?? lib.license,
+    url: lib.url,
+  };
 }
 
 /** Gallery hubs first — best “where do I start?” list for authors. */

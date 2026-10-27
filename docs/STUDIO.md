@@ -213,8 +213,33 @@ npm run dev
 
 1. Pick preset: room / item / character / portrait / comic
 2. Copy a suggested prompt into your own image tool (see [IMAGE-GEN-STARTER.md](./IMAGE-GEN-STARTER.md)), then **Upload** the result — or upload art you drew / downloaded
-3. Download → `src/games/<id>/assets/` (items under `assets/items/`)
-4. Continue in **Scene** or **Hotspots**
+3. Pick a **Palette**: the built-in game palette, **Custom** (paste colors), or **Adaptive** (taken from the image)
+4. **Send to pack**, or Download → `src/games/<id>/assets/` (items under `assets/items/`)
+5. Continue in **Scene** or **Hotspots**
+
+### One palette for every image
+
+Art from different sources (AI, packs, your own drawings) looks like one game when it shares a palette.
+
+1. Pick a palette on [Lospec](https://lospec.com/palette-list) — 16–32 colors is a good size for rooms.
+2. Copy its colors (or open the downloaded **HEX**, **GPL** or Paint.NET **TXT** file and copy everything).
+3. Pixels → **Palette: Custom** → paste. The swatches show what was read.
+4. Keep that palette for every room, item and character in the pack.
+
+### Tiles to room art (Tiled)
+
+Many free packs (Kenney's Roguelike/RPG, 1-Bit, Tiny Dungeon…) ship as **tiles** with Tiled sample maps. Rooms in this engine are one image, so assemble the room first:
+
+1. Install [Tiled](https://www.mapeditor.org/) (free) and open the pack's sample `.tmx` map, or make a new map using the pack's tilesheet.
+2. Size the map for 16:9 — with 16×16 tiles, **30×17 tiles** is about 480×272.
+3. Leave the lower part of the map as open floor so the player has room to walk.
+4. **File → Export As Image**. Turn on **Use current zoom level** and zoom to **400%** first, so the image comes out about 1920×1088. A smaller export gets stretched to 1920×1080 on upload and turns blurry.
+5. Upload it in Pack → room art (or Pixels with Dither **None** to remap colors to your palette).
+6. Draw hotspots and walkboxes on top — they are invisible click areas, so furniture in the image doesn't need to be separate sprites.
+
+### Credits
+
+Free asset packs ask for credit; CC-BY ones **require** it. In the art library (Pixels or Pack tab), **Add credit to pack** on each pack you use. Credits are saved in the pack (`credits`) and players see them in **Settings → Credits** (and on the win screen, for packs that end the game). TypeScript packs can set `credits` on the `GameDefinition` the same way.
 
 ---
 

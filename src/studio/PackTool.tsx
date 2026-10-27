@@ -589,7 +589,7 @@ export function PackTool() {
           }}
         />
 
-        <PixelLibraryPanel />
+        <PixelLibraryPanel doc={doc} onChange={(next) => persist(next)} />
 
         <PackLinksPanel
           doc={doc}

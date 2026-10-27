@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { MusicControls } from "@/components/game/MusicControls";
+import { CreditsList } from "@/components/game/CreditsList";
 import { Save, FolderOpen, Settings, RotateCcw } from "lucide-react";
 import {
   Popover,
@@ -263,6 +264,15 @@ export const SettingsMenu = ({
           )}
         </div>
       </div>
+
+      {definition.credits && definition.credits.length > 0 && (
+        <div className="border-t border-game-border pt-3">
+          <h3 className="pixel-font text-accent mb-2 text-sm">Credits</h3>
+          <div className="text-xs text-muted-foreground max-h-32 overflow-y-auto">
+            <CreditsList credits={definition.credits} />
+          </div>
+        </div>
+      )}
     </div>
   );
 

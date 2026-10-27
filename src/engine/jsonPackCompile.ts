@@ -3,6 +3,7 @@
  */
 
 import { safeJsonParse } from "./security";
+import { sanitizeCredits } from "./credits";
 import type { RoomTransition, RoomTransitionKind } from "./types";
 import {
   JSON_PACK_SCHEMA_VERSION,
@@ -99,6 +100,7 @@ export function parseJsonPack(raw: unknown): JsonPackDocument {
     id: doc.id.trim(),
     title: doc.title.trim(),
     subtitle: doc.subtitle,
+    credits: sanitizeCredits(doc.credits),
     version: doc.version.trim(),
     startRoom: doc.startRoom.trim(),
     verbMode:
