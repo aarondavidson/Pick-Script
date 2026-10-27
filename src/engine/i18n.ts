@@ -66,7 +66,10 @@ export function resolveLocString(
   state: GameState,
   catalog: MessageCatalog = {}
 ): string {
-  if (typeof value === "function") return value(state);
+  if (typeof value === "function") {
+    const v = value(state);
+    return typeof v === "string" ? v : translate(catalog, v.key, v.fallback);
+  }
   if (typeof value === "string") return value;
   return translate(catalog, value.key, value.fallback);
 }

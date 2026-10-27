@@ -57,6 +57,8 @@ export const templateGame: GameDefinition = {
       en: {
         "hotspot.note.look":
           "A sticky note: “Key under the note. Hall door is locked.” You pocket a brass key.",
+        "hotspot.note.look.done": "The note says the hall door is locked. You have the key.",
+        "hotspot.note.use.first": "You lift the note — a brass key was stuck underneath. You pocket it.",
         "hotspot.note.use": "You already took the key. Head east when ready.",
         "room.start.desc": "Replace this room with your own content.",
         "exit.hall.blocked": "The hall door is locked. Look at the sticky note.",
@@ -64,6 +66,8 @@ export const templateGame: GameDefinition = {
       es: {
         "hotspot.note.look":
           "Una nota: “La llave está debajo. La puerta del pasillo está cerrada.” Guardas una llave.",
+        "hotspot.note.look.done": "La nota dice que el pasillo está cerrado. Ya tienes la llave.",
+        "hotspot.note.use.first": "Levantas la nota: había una llave pegada debajo. La guardas.",
         "hotspot.note.use": "Ya tienes la llave. Sal por el este cuando quieras.",
         "room.start.desc": "Reemplaza esta sala con tu propio contenido.",
         "exit.hall.blocked":
@@ -113,15 +117,16 @@ export const templateGame: GameDefinition = {
           width: 20,
           height: 15,
           verbs: ["look", "use"],
+          // State-gated + translatable: before / after the key is taken
           responses: {
-            look: msg(
-              "hotspot.note.look",
-              "A sticky note mentions a key. You take it."
-            ),
-            use: msg(
-              "hotspot.note.use",
-              "You already took the key."
-            ),
+            look: (state) =>
+              state.flags.gotKey
+                ? msg("hotspot.note.look.done", "You already have the key.")
+                : msg("hotspot.note.look", "A sticky note mentions a key. You take it."),
+            use: (state) =>
+              state.flags.gotKey
+                ? msg("hotspot.note.use", "You already took the key.")
+                : msg("hotspot.note.use.first", "You find a key under the note. You take it."),
           },
           onInteract: (verb, state) => {
             if (verb !== "look" && verb !== "use") return {};

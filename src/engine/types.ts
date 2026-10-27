@@ -330,10 +330,11 @@ export type StateFn<T> = T | ((state: GameState) => T);
 /**
  * Localizable string for responses / copy:
  * plain text, state function, or message-catalog key.
+ * A state function may return a catalog key so state-gated copy stays translatable.
  */
 export type LocString =
   | string
-  | ((state: GameState) => string)
+  | ((state: GameState) => string | { key: string; fallback?: string })
   | { key: string; fallback?: string };
 
 export type DialogueOptionMode = "normal" | "once" | "onceGame" | "offForever";
