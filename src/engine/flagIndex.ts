@@ -14,6 +14,7 @@ export type FlagRefKind =
   | "exit_require"
   | "hint_until"
   | "hint_require"
+  | "win_flag"
   | "initial"
   | "action";
 
@@ -178,6 +179,14 @@ export function buildFlagIndex(doc: JsonPackDocument): FlagIndexEntry[] {
         label: `Hint “${hint.title}” requires ${hint.requireFlag}`,
       });
     }
+  }
+
+  if (doc.winFlag?.trim()) {
+    add(map, doc.winFlag, {
+      role: "read",
+      kind: "win_flag",
+      label: `Game ends when ${doc.winFlag.trim()} is set`,
+    });
   }
 
   return [...map.values()].sort((a, b) => a.flag.localeCompare(b.flag));

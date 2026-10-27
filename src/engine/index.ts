@@ -62,6 +62,7 @@ export type {
 export { DEFAULT_VERBS } from "./definition";
 
 export { formatCredit, mergeCredits, sanitizeCredits } from "./credits";
+export { sanitizeWinFlag, shouldCompleteGame } from "./winFlag";
 export type { CreditEntry } from "./credits";
 
 export { resolvePlayChrome } from "./playChrome";

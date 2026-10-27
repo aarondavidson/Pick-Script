@@ -94,6 +94,22 @@ export function PackProgressPanel({ doc, onChange }: PackProgressPanelProps) {
         </p>
       </div>
 
+      <label className="block text-xs space-y-1 max-w-md">
+        <span className="pixel-font text-xs text-primary">Game ends when flag</span>
+        <input
+          className="w-full bg-background border border-border px-2 py-2 font-mono text-[11px]"
+          value={doc.winFlag ?? ""}
+          onChange={(e) =>
+            onChange({ ...doc, winFlag: e.target.value.trim() || undefined })
+          }
+          placeholder="escaped_lighthouse"
+        />
+        <span className="text-muted-foreground block">
+          When this flag turns on, players see the win screen (with your
+          credits). Set it from the final puzzle, dialogue or cutscene.
+        </span>
+      </label>
+
       <div className="grid lg:grid-cols-2 gap-4">
         <div className="space-y-3">
           <h4 className="pixel-font text-xs text-primary">Achievements</h4>

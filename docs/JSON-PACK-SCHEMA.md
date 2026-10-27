@@ -19,6 +19,7 @@ nesting caps, allowlisted specials, safe identifier keys, media URL checks.
 | `id` | string | Stable slug → save keys |
 | `title` / `subtitle` | string | Launcher + header |
 | `version` | string | Content semver |
+| `winFlag` | string | Optional. When this flag turns on, the game ends and shows the win screen. Set it from any action, dialogue, cutscene, pickup (`got_<itemId>`) or minigame `winFlag` |
 | `credits` | `{ work, author, license?, url? }[]` | Optional asset credits, shown in Settings → Credits and on the win screen. Non-https `url`s are dropped; max 100 rows |
 | `startRoom` | string | Must exist in `rooms` |
 | `verbMode` | `classic` \| `simple` \| `coin` | Optional |

@@ -237,6 +237,10 @@ Many free packs (Kenney's Roguelike/RPG, 1-Bit, Tiny Dungeon…) ship as **tiles
 5. Upload it in Pack → room art (or Pixels with Dither **None** to remap colors to your palette).
 6. Draw hotspots and walkboxes on top — they are invisible click areas, so furniture in the image doesn't need to be separate sprites.
 
+### Ending the game
+
+Pack → **Quests & achievements** → **Game ends when flag**. When that flag turns on — from the final puzzle, a dialogue choice, a cutscene, a pickup (`got_<itemId>`) or a minigame win — players see the win screen. `pack-doctor` notes a pack with no ending, and warns if nothing ever sets the win flag.
+
 ### Credits
 
 Free asset packs ask for credit; CC-BY ones **require** it. In the art library (Pixels or Pack tab), **Add credit to pack** on each pack you use. Credits are saved in the pack (`credits`) and players see them in **Settings → Credits** (and on the win screen, for packs that end the game). TypeScript packs can set `credits` on the `GameDefinition` the same way.

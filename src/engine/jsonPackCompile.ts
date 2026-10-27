@@ -4,6 +4,7 @@
 
 import { safeJsonParse } from "./security";
 import { sanitizeCredits } from "./credits";
+import { sanitizeWinFlag } from "./winFlag";
 import type { RoomTransition, RoomTransitionKind } from "./types";
 import {
   JSON_PACK_SCHEMA_VERSION,
@@ -101,6 +102,7 @@ export function parseJsonPack(raw: unknown): JsonPackDocument {
     title: doc.title.trim(),
     subtitle: doc.subtitle,
     credits: sanitizeCredits(doc.credits),
+    winFlag: sanitizeWinFlag(doc.winFlag),
     version: doc.version.trim(),
     startRoom: doc.startRoom.trim(),
     verbMode:

@@ -13,6 +13,7 @@ import type {
   Quest,
 } from "../types";
 import { applyStatePatch } from "../state";
+import { shouldCompleteGame } from "../winFlag";
 import type { CutsceneRuntime } from "../cutscene";
 
 export interface UseProgressionHostArgs {
@@ -223,6 +224,16 @@ export function useProgressionHost({
     completeQuest,
     updateQuest,
   ]);
+
+  // Pack win flag → win screen (any source can set the flag)
+  useEffect(() => {
+    if (!shouldCompleteGame(definition, gameState)) return;
+    setGameState((prev) => {
+      if (!shouldCompleteGame(definition, prev)) return prev;
+      const next = applyStatePatch(prev, { gameComplete: true });
+      return runtime.runEvent({ type: "gameComplete" }, next);
+    });
+  }, [definition, gameState, runtime, setGameState]);
 
   return {
     combineItems,

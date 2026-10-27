@@ -56,6 +56,8 @@ export interface GameDefinition {
   subtitle?: string;
   /** Asset credits (art / music / sound) — shown in Settings and on the default win screen */
   credits?: CreditEntry[];
+  /** The game ends (win screen) when this flag turns on */
+  winFlag?: string;
   /** Semver for content (independent of engine) */
   version: string;
   /** Starting room id */

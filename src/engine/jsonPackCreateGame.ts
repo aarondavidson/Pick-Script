@@ -388,6 +388,7 @@ export function createGameFromJson(doc: JsonPackDocument): GameDefinition {
     title: pack.title,
     subtitle: pack.subtitle,
     credits: pack.credits,
+    winFlag: pack.winFlag,
     version: pack.version,
     startRoom: pack.startRoom,
     verbMode: pack.verbMode,

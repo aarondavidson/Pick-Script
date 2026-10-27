@@ -302,6 +302,16 @@ export function diagnosePack(doc: JsonPackDocument): PackDoctorReport {
       fix: "Pack → Quests & achievements → add a quest with objectiveFlags.",
     });
   }
+  if (roomCount > 0 && !doc.winFlag?.trim()) {
+    findings.push({
+      id: "win:missing",
+      severity: "info",
+      category: "meta",
+      title: "No ending",
+      detail: "The game never shows the win screen until you pick a win flag.",
+      fix: "Pack → Quests & achievements → Game ends when flag.",
+    });
+  }
 
   for (const [roomId, room] of Object.entries(doc.rooms ?? {})) {
     const boxes = room.walkboxes ?? [];
