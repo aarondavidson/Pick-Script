@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "win-demo",
+  "title": "Win Demo",
+  "version": "1.0.0",
+  "startRoom": "start",
+  "verbMode": "simple",
+  "winFlag": "got_trophy",
+  "credits": [
+    {
+      "work": "Tiny Dungeon",
+      "author": "Kenney",
+      "license": "CC0",
+      "url": "https://kenney-assets.itch.io/tiny-dungeon"
+    }
+  ],
+  "rooms": {
+    "start": {
+      "id": "start",
+      "name": "Trophy Room",
+      "description": "A trophy sits on a plinth.",
+      "image": "",
+      "hotspots": [
+        {
+          "id": "trophy",
+          "name": "Trophy",
+          "x": 10,
+          "y": 10,
+          "width": 80,
+          "height": 80,
+          "kind": "pickup",
+          "itemId": "trophy",
+          "itemName": "Trophy",
+          "lookText": "A shiny trophy."
+        }
+      ]
+    }
+  }
+}

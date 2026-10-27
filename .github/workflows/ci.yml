@@ -34,6 +34,9 @@ jobs:
       - name: Asset check
         run: npm run check-assets
 
+      - name: CLI smoke (pack-doctor)
+        run: npm run check:cli
+
       - name: Lint
         run: npm run lint
         continue-on-error: true
