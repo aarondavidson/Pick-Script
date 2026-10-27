@@ -1,0 +1,30 @@
+Copyright (C) 2025–2026 Aaron Davidson
+
+Portable Adventure Engine
+https://github.com/aarondavidson/Pick-Script
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 3 only (GPL-3.0-only).
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program (see the file LICENSE). If not, see
+<https://www.gnu.org/licenses/>.
+
+---------------------------------------------------------------------------
+Attribution
+
+Please preserve this copyright notice and credit Aaron Davidson when you
+distribute, fork, or ship products based on this engine or its packs.
+The GPL already requires that copyright notices remain intact; keeping
+this file (and the notices in README / the app UI) satisfies that and
+gives clear author credit.
+
+Contributions are licensed under GPL-3.0-only unless otherwise stated;
+see CONTRIBUTING.md.
+---------------------------------------------------------------------------

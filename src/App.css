@@ -1,0 +1,95 @@
+/* App Root Styles - Mobile/Median.co Optimized */
+#root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  /* Use dynamic viewport height for mobile */
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Desktop: constrain width with padding */
+@media (min-width: 768px) {
+  #root {
+    max-width: 1280px;
+    padding: 1rem;
+  }
+}
+
+/* Mobile: minimal padding, full width */
+@media (max-width: 767px) {
+  #root {
+    padding: 0;
+  }
+}
+
+/* Ensure proper sizing for game container on mobile */
+.game-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Mobile-specific game adjustments */
+@media (max-width: 767px) {
+  .game-container {
+    /* Account for safe areas */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* Prevent iOS bounce/rubber-banding in game areas */
+.no-bounce {
+  position: fixed;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* Ensure buttons are easily tappable on mobile */
+@media (max-width: 767px) {
+  button {
+    min-height: 44px;
+  }
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}

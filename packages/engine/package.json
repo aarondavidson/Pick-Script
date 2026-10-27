@@ -1,0 +1,37 @@
+{
+  "name": "@portable-adventure/engine",
+  "version": "0.1.0",
+  "description": "S.C.R.I.P.T. portable adventure runtime (scaffold — source still lives in monorepo src/engine)",
+  "license": "GPL-3.0-only",
+  "type": "module",
+  "private": true,
+  "author": {
+    "name": "Aaron Davidson",
+    "url": "https://github.com/aarondavidson"
+  },
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aarondavidson/Pick-Script.git",
+    "directory": "packages/engine"
+  },
+  "keywords": [
+    "adventure",
+    "point-and-click",
+    "scumm",
+    "script",
+    "pick-script"
+  ]
+}

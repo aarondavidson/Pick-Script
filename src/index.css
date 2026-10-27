@@ -1,0 +1,1077 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hotspot discovery animations */
+@keyframes hotspot-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+.hotspot-idle {
+  animation: hotspot-pulse 2s ease-in-out infinite;
+}
+
+.hotspot-active {
+  animation: none;
+  opacity: 1;
+}
+
+/* Stuck-assist: draw attention to the hinted hotspot */
+@keyframes hotspot-stuck-assist {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 hsla(var(--game-hotspot), 0.55);
+    border-color: hsl(var(--game-hotspot));
+  }
+  50% {
+    box-shadow: 0 0 18px 4px hsla(var(--game-hotspot), 0.75);
+    border-color: hsl(var(--accent));
+  }
+}
+
+.hotspot-stuck-pulse {
+  animation: hotspot-stuck-assist 1.4s ease-in-out infinite;
+  border-style: solid !important;
+  border-width: 3px !important;
+  background: hsla(var(--game-hotspot), 0.28) !important;
+  opacity: 1;
+  z-index: 5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hotspot-stuck-pulse {
+    animation: none;
+    box-shadow: 0 0 12px 2px hsla(var(--game-hotspot), 0.65);
+  }
+}
+
+/* Safe-area insets (Capacitor / iOS notch / home indicator; 0 on desktop) */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+}
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Retro game palette */
+    --background: 30 8% 12%;
+    --foreground: 45 15% 85%;
+
+    --card: 30 10% 18%;
+    --card-foreground: 45 15% 85%;
+
+    --popover: 30 10% 15%;
+    --popover-foreground: 45 15% 85%;
+
+    --primary: 180 25% 35%;
+    --primary-foreground: 45 15% 95%;
+
+    --secondary: 35 20% 25%;
+    --secondary-foreground: 45 15% 90%;
+
+    --muted: 30 8% 20%;
+    --muted-foreground: 45 10% 60%;
+
+    --accent: 50 60% 55%;
+    --accent-foreground: 30 10% 15%;
+
+    --destructive: 0 50% 45%;
+    --destructive-foreground: 45 15% 95%;
+
+    --border: 30 10% 25%;
+    --input: 30 10% 22%;
+    --ring: 180 25% 45%;
+
+    --radius: 0.125rem;
+
+    /* Game UI specific */
+    --game-ui-bg: 30 8% 10%;
+    --game-ui-border: 45 20% 40%;
+    --game-verb-hover: 50 60% 50%;
+    --game-hotspot: 180 60% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    /* Prevent pull-to-refresh and overscroll on mobile */
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Courier New', monospace;
+    /* Apply safe area padding for notch/home indicator */
+    padding-top: var(--sat);
+    padding-right: var(--sar);
+    padding-bottom: var(--sab);
+    padding-left: var(--sal);
+    /* Prevent text selection on mobile for game elements */
+    -webkit-user-select: none;
+    user-select: none;
+    /* Prevent context menu on long press */
+    -webkit-touch-callout: none;
+    /* Full viewport height including safe areas */
+    min-height: 100dvh;
+  }
+
+  /* Allow text selection in specific areas */
+  .selectable-text {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  .game-container {
+    image-rendering: crisp-edges;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+  }
+
+  .pixel-font {
+    font-family: 'Courier New', 'Consolas', monospace;
+    font-weight: bold;
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Hotspot hover and click animations */
+  @keyframes hotspot-glow {
+    0%, 100% { box-shadow: 0 0 10px rgba(91, 185, 189, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(91, 185, 189, 0.6); }
+  }
+
+  @keyframes click-feedback {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+  }
+
+  /* Character Animation Effects */
+  @keyframes character-idle {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-2px); }
+  }
+
+  @keyframes character-blink {
+    0%, 90%, 100% { opacity: 1; }
+    95% { opacity: 0.3; }
+  }
+
+  @keyframes character-talk {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(1.05); }
+  }
+
+  @keyframes character-gesture {
+    0%, 100% { transform: rotate(0deg) translateX(0); }
+    25% { transform: rotate(-2deg) translateX(-2px); }
+    75% { transform: rotate(2deg) translateX(2px); }
+  }
+
+  @keyframes character-tap {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-3px) rotate(-5deg); }
+  }
+
+
+  /* NPC sprite overlay animations */
+  @keyframes npc-skater-bob {
+    0%   { transform: translateY(0px) rotate(0deg); }
+    20%  { transform: translateY(-6px) rotate(-2deg); }
+    40%  { transform: translateY(-2px) rotate(1deg); }
+    60%  { transform: translateY(-8px) rotate(1.5deg); }
+    80%  { transform: translateY(-1px) rotate(-0.5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+  }
+
+  @keyframes npc-louie-fidget {
+    0%   { transform: translateX(0px) rotate(0deg); }
+    15%  { transform: translateX(-4px) rotate(-1.5deg); }
+    30%  { transform: translateX(0px) rotate(0deg); }
+    50%  { transform: translateX(3px) rotate(1deg); }
+    65%  { transform: translateX(-2px) rotate(-0.5deg); }
+    80%  { transform: translateX(1px) rotate(0.3deg); }
+    100% { transform: translateX(0px) rotate(0deg); }
+  }
+
+  .npc-sprite-tony {
+    animation: npc-skater-bob 2.2s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+
+  .npc-sprite-louie {
+    animation: npc-louie-fidget 3s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+
+  /* Tier B actor sprites (CSS stand-ins until art costumes ship) */
+  .actor-sprite {
+    width: 28px;
+    height: 48px;
+  }
+
+  /* Bitmap costumes — imported PNG/JPG standing figures (feet at bottom) */
+  .actor-sprite.actor-bitmap {
+    width: 48px;
+    height: 72px;
+  }
+  .actor-bitmap-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.45));
+  }
+  .actor-bitmap-idle .actor-bitmap-img {
+    animation: character-idle 2.8s ease-in-out infinite;
+  }
+  .actor-bitmap-walk .actor-bitmap-img {
+    animation: actor-walk-bob 0.35s ease-in-out infinite;
+  }
+  .actor-bitmap-talk .actor-bitmap-img {
+    animation: character-talk 0.28s ease-in-out infinite;
+  }
+  @media (min-width: 768px) {
+    .actor-sprite.actor-bitmap {
+      width: 56px;
+      height: 84px;
+    }
+  }
+
+  .actor-body {
+    width: 22px;
+    height: 40px;
+    margin: 0 auto;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--actor-color, #9fd4d8) 85%, white) 0%,
+      var(--actor-color, #9fd4d8) 45%,
+      color-mix(in srgb, var(--actor-color, #9fd4d8) 70%, black) 100%
+    );
+    border: 2px solid color-mix(in srgb, var(--actor-color, #9fd4d8) 50%, black);
+    border-radius: 6px 6px 3px 3px;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+    position: relative;
+  }
+
+  .actor-body::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--actor-color, #9fd4d8) 70%, white);
+    border: 2px solid color-mix(in srgb, var(--actor-color, #9fd4d8) 50%, black);
+  }
+
+  .actor-is-ego .actor-body {
+    animation: character-idle 2.4s ease-in-out infinite;
+  }
+
+  .actor-face-left .actor-body {
+    transform: scaleX(-1);
+  }
+
+  .actor-label {
+    font-size: 9px;
+    text-align: center;
+    color: hsl(var(--accent));
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    margin-top: 2px;
+    white-space: nowrap;
+  }
+
+  .actor-ego .actor-body {
+    --actor-color: #f5e6a8;
+  }
+
+  .npc-sprite-tony .actor-body,
+  .actor-sprite.npc-sprite-tony .actor-body {
+    --actor-color: #7ec8e3;
+  }
+
+  /* Costume animation states */
+  .actor-anim-idle .actor-body {
+    animation: character-idle 2.8s ease-in-out infinite;
+  }
+
+  .actor-anim-walk .actor-body {
+    animation: actor-walk-bob 0.35s ease-in-out infinite;
+  }
+
+  .actor-anim-talk .actor-body {
+    animation: character-talk 0.28s ease-in-out infinite;
+  }
+
+  .actor-anim-talk .actor-body::before {
+    animation: actor-talk-head 0.28s ease-in-out infinite;
+  }
+
+  /* Rhubarb mouth shapes (A–F open, X rest) — CSS stand-in + portrait overlay */
+  .actor-body::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 52%;
+    width: 8px;
+    height: 2px;
+    border-radius: 1px;
+    background: color-mix(in srgb, var(--actor-color, #9fd4d8) 35%, black);
+    transform: translateX(-50%) scaleY(1);
+    transform-origin: center top;
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  .mouth-shape-x .actor-body::after,
+  .mouth-shape-a .actor-body::after {
+    height: 2px;
+    width: 7px;
+    transform: translateX(-50%) scaleY(1);
+  }
+  .mouth-shape-b .actor-body::after {
+    height: 5px;
+    width: 6px;
+    border-radius: 40%;
+    transform: translateX(-50%) scaleY(1.1);
+  }
+  .mouth-shape-c .actor-body::after,
+  .mouth-shape-d .actor-body::after {
+    height: 7px;
+    width: 7px;
+    border-radius: 45%;
+    transform: translateX(-50%) scaleY(1.25);
+  }
+  .mouth-shape-e .actor-body::after,
+  .mouth-shape-f .actor-body::after {
+    height: 4px;
+    width: 9px;
+    border-radius: 2px;
+    transform: translateX(-50%) scaleY(0.95);
+  }
+
+  .speech-portrait::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 22%;
+    width: 28%;
+    height: 6%;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.45);
+    transform: translateX(-50%) scaleY(1);
+    transform-origin: center top;
+    pointer-events: none;
+  }
+  .speech-portrait.mouth-shape-b::after {
+    height: 12%;
+    border-radius: 40%;
+  }
+  .speech-portrait.mouth-shape-c::after,
+  .speech-portrait.mouth-shape-d::after {
+    height: 16%;
+    width: 30%;
+    border-radius: 45%;
+  }
+  .speech-portrait.mouth-shape-e::after,
+  .speech-portrait.mouth-shape-f::after {
+    height: 8%;
+    width: 36%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .actor-body::after,
+    .speech-portrait::after {
+      height: 2px !important;
+      transform: translateX(-50%) scaleY(1) !important;
+    }
+  }
+
+  @keyframes actor-walk-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+
+  @keyframes actor-talk-head {
+    0%, 100% { transform: translateX(-50%) scaleY(1); }
+    50% { transform: translateX(-50%) scaleY(0.92); }
+  }
+
+  /* Room transitions */
+  .room-transition {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    pointer-events: none;
+    background: #050505;
+  }
+
+  .room-transition-fade.room-transition-out {
+    animation: rt-fade-out var(--rt-ms, 350ms) ease forwards;
+  }
+  .room-transition-fade.room-transition-in {
+    animation: rt-fade-in var(--rt-ms, 350ms) ease forwards;
+  }
+
+  .room-transition-slide-left.room-transition-out,
+  .room-transition-slide-right.room-transition-out,
+  .room-transition-slide-up.room-transition-out,
+  .room-transition-slide-down.room-transition-out {
+    animation: rt-fade-out var(--rt-ms, 320ms) ease forwards;
+  }
+  .room-transition-slide-left.room-transition-in {
+    animation: rt-slide-in-left var(--rt-ms, 320ms) ease forwards;
+    background: transparent;
+    box-shadow: inset 0 0 0 100vmax rgba(5, 5, 5, 0.35);
+  }
+  .room-transition-slide-right.room-transition-in {
+    animation: rt-slide-in-right var(--rt-ms, 320ms) ease forwards;
+    background: transparent;
+    box-shadow: inset 0 0 0 100vmax rgba(5, 5, 5, 0.35);
+  }
+  .room-transition-slide-up.room-transition-in {
+    animation: rt-slide-in-up var(--rt-ms, 320ms) ease forwards;
+    background: transparent;
+    box-shadow: inset 0 0 0 100vmax rgba(5, 5, 5, 0.35);
+  }
+  .room-transition-slide-down.room-transition-in {
+    animation: rt-slide-in-down var(--rt-ms, 320ms) ease forwards;
+    background: transparent;
+    box-shadow: inset 0 0 0 100vmax rgba(5, 5, 5, 0.35);
+  }
+
+  @keyframes rt-fade-out {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes rt-fade-in {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes rt-slide-in-left {
+    from { transform: translateX(8%); opacity: 0.6; }
+    to { transform: translateX(0); opacity: 0; }
+  }
+  @keyframes rt-slide-in-right {
+    from { transform: translateX(-8%); opacity: 0.6; }
+    to { transform: translateX(0); opacity: 0; }
+  }
+  @keyframes rt-slide-in-up {
+    from { transform: translateY(8%); opacity: 0.6; }
+    to { transform: translateY(0); opacity: 0; }
+  }
+  @keyframes rt-slide-in-down {
+    from { transform: translateY(-8%); opacity: 0.6; }
+    to { transform: translateY(0); opacity: 0; }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes zoom-in {
+    from { transform: scale(0.8); }
+    to { transform: scale(1); }
+  }
+
+  .character-animated {
+    animation: character-idle 3s ease-in-out infinite;
+  }
+
+
+  .character-talking {
+    animation: character-talk 0.3s ease-in-out infinite, character-idle 3s ease-in-out infinite;
+  }
+
+  .character-gesturing {
+    animation: character-gesture 2s ease-in-out infinite;
+  }
+
+  .character-annoyed {
+    animation: character-tap 0.8s ease-in-out infinite;
+  }
+
+  .animate-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  .fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  .zoom-in {
+    animation: zoom-in 0.2s ease-out;
+  }
+
+  /* Pixelated image rendering */
+  .pixelated {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+  }
+
+  /* Intro sequence animations */
+  @keyframes intro-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .intro-flicker {
+    animation: intro-flicker 2s ease-in-out infinite;
+  }
+
+  .intro-scanlines {
+    background: linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(255, 255, 255, 0.03) 51%
+    );
+    background-size: 100% 4px;
+  }
+
+  .intro-vignette {
+    box-shadow: inset 0 0 100px 20px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Pixel art background animations */
+  @keyframes pixel-stars {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes pixel-drift {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  @keyframes pixel-glitch {
+    0%, 90%, 100% { transform: translate(0, 0); }
+    92% { transform: translate(-2px, 2px); }
+    94% { transform: translate(2px, -2px); }
+    96% { transform: translate(-2px, -2px); }
+    98% { transform: translate(2px, 2px); }
+  }
+
+  .pixel-stars {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: hsl(var(--accent));
+    box-shadow: 
+      100px 50px 0 0 hsl(var(--accent)),
+      200px 100px 0 0 hsl(var(--accent)),
+      300px 150px 0 0 hsl(var(--muted-foreground)),
+      400px 200px 0 0 hsl(var(--accent)),
+      500px 80px 0 0 hsl(var(--muted-foreground)),
+      600px 120px 0 0 hsl(var(--accent)),
+      700px 180px 0 0 hsl(var(--muted-foreground)),
+      150px 250px 0 0 hsl(var(--accent)),
+      250px 300px 0 0 hsl(var(--muted-foreground)),
+      350px 350px 0 0 hsl(var(--accent)),
+      450px 280px 0 0 hsl(var(--muted-foreground)),
+      550px 320px 0 0 hsl(var(--accent)),
+      650px 260px 0 0 hsl(var(--accent)),
+      750px 340px 0 0 hsl(var(--muted-foreground)),
+      80px 400px 0 0 hsl(var(--accent)),
+      180px 450px 0 0 hsl(var(--muted-foreground)),
+      280px 420px 0 0 hsl(var(--accent)),
+      380px 480px 0 0 hsl(var(--muted-foreground)),
+      480px 440px 0 0 hsl(var(--accent)),
+      580px 490px 0 0 hsl(var(--accent));
+    animation: pixel-stars 3s ease-in-out infinite;
+  }
+
+  .pixel-cityscape {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.5));
+  }
+
+  .pixel-building {
+    position: absolute;
+    bottom: 0;
+    background: hsl(var(--muted));
+    opacity: 0.4;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.5);
+  }
+
+  .pixel-cloud {
+    position: absolute;
+    background: hsl(var(--muted));
+    opacity: 0.2;
+    border-radius: 2px;
+    animation: pixel-drift 60s linear infinite;
+  }
+
+  .intro-bg-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    animation: pixel-glitch 8s ease-in-out infinite;
+  }
+}
+
+/* Touch-specific styles for Median.co mobile app */
+@layer utilities {
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  .touch-none {
+    touch-action: none;
+  }
+  
+  /* Minimum touch target size (44x44px per Apple HIG) */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  /* Active/pressed state for touch feedback */
+  .touch-feedback:active {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+  
+  /* Safe area utilities */
+  .safe-top {
+    padding-top: var(--sat);
+  }
+  
+  .safe-bottom {
+    padding-bottom: var(--sab);
+  }
+  
+  .safe-left {
+    padding-left: var(--sal);
+  }
+  
+  .safe-right {
+    padding-right: var(--sar);
+  }
+  
+  .safe-x {
+    padding-left: var(--sal);
+    padding-right: var(--sar);
+  }
+  
+  .safe-y {
+    padding-top: var(--sat);
+    padding-bottom: var(--sab);
+  }
+  
+  .safe-all {
+    padding-top: var(--sat);
+    padding-right: var(--sar);
+    padding-bottom: var(--sab);
+    padding-left: var(--sal);
+  }
+}
+
+/* Visual Effects Animations */
+@keyframes pulse-ambient {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+.animate-pulse-ambient {
+  animation: pulse-ambient 3s ease-in-out infinite;
+}
+
+/* Fog effect for eerie locations */
+.fog-effect {
+  background: 
+    linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.03) 50%, transparent 100%),
+    linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.02) 50%, transparent 100%);
+  animation: fog-drift 15s ease-in-out infinite alternate;
+}
+
+@keyframes fog-drift {
+  0% {
+    transform: translateX(-5%) translateY(-5%);
+  }
+  100% {
+    transform: translateX(5%) translateY(5%);
+  }
+}
+
+/* Room atmosphere particle beds */
+.atmosphere-particles {
+  z-index: 8;
+  mix-blend-mode: screen;
+}
+.atmosphere-rain {
+  background-image: repeating-linear-gradient(
+    -12deg,
+    transparent 0,
+    transparent 8px,
+    rgba(180, 210, 230, 0.18) 8px,
+    rgba(180, 210, 230, 0.18) 10px
+  );
+  background-size: 24px 48px;
+  animation: atmosphere-rain-fall 0.7s linear infinite;
+  opacity: 0.55;
+}
+.atmosphere-dust {
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 230, 180, 0.35) 0 1px,
+    transparent 1.5px
+  );
+  background-size: 40px 40px;
+  animation: atmosphere-dust-drift 12s ease-in-out infinite alternate;
+  opacity: 0.4;
+}
+.atmosphere-sparks {
+  background-image: radial-gradient(
+      circle,
+      rgba(255, 160, 60, 0.7) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(circle, rgba(255, 220, 120, 0.5) 0 1px, transparent 2px);
+  background-size: 55px 55px, 90px 70px;
+  animation: atmosphere-spark-flicker 1.4s steps(2) infinite;
+  opacity: 0.45;
+}
+.atmosphere-fog {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(200, 210, 220, 0.12) 40%,
+    transparent 80%
+  );
+  animation: fog-drift 18s ease-in-out infinite alternate;
+  opacity: 0.65;
+}
+@keyframes atmosphere-rain-fall {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 12px 48px;
+  }
+}
+@keyframes atmosphere-dust-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 30px -20px;
+  }
+}
+@keyframes atmosphere-spark-flicker {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* Night sky — sparse pixel stars that twinkle */
+.atmosphere-stars {
+  mix-blend-mode: screen;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 240, 0.95) 0 0.8px, transparent 1.2px),
+    radial-gradient(circle, rgba(220, 230, 255, 0.75) 0 0.6px, transparent 1px),
+    radial-gradient(circle, rgba(255, 250, 220, 0.55) 0 0.5px, transparent 0.9px);
+  background-size: 90px 70px, 140px 110px, 60px 95px;
+  background-position: 0 0, 40px 20px, 15px 50px;
+  animation: atmosphere-stars-twinkle 2.4s steps(3) infinite;
+  opacity: 0.7;
+  /* Keep stars in the upper sky band */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 62%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 62%);
+}
+@keyframes atmosphere-stars-twinkle {
+  0%,
+  100% {
+    opacity: 0.45;
+    filter: brightness(0.9);
+  }
+  33% {
+    opacity: 0.85;
+    filter: brightness(1.25);
+  }
+  66% {
+    opacity: 0.55;
+    filter: brightness(1.05);
+  }
+}
+
+/* Dense sparkle glints (water / magic dust) */
+.atmosphere-sparkle {
+  mix-blend-mode: screen;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(180, 220, 255, 0.6) 0 0.7px, transparent 1.2px);
+  background-size: 48px 48px, 72px 64px;
+  animation: atmosphere-sparkle-pop 1.1s steps(2) infinite;
+  opacity: 0.5;
+}
+@keyframes atmosphere-sparkle-pop {
+  0%,
+  100% {
+    opacity: 0.25;
+    background-position: 0 0, 20px 10px;
+  }
+  50% {
+    opacity: 0.65;
+    background-position: 8px -6px, 12px 18px;
+  }
+}
+
+/* Soft floating fireflies */
+.atmosphere-fireflies {
+  mix-blend-mode: screen;
+  background-image:
+    radial-gradient(circle, rgba(255, 230, 120, 0.85) 0 1.2px, transparent 2.5px),
+    radial-gradient(circle, rgba(255, 200, 80, 0.55) 0 1px, transparent 2px);
+  background-size: 110px 90px, 160px 130px;
+  animation: atmosphere-firefly-drift 7s ease-in-out infinite alternate;
+  opacity: 0.55;
+}
+@keyframes atmosphere-firefly-drift {
+  from {
+    background-position: 0 10%, 30px 40%;
+    opacity: 0.35;
+  }
+  to {
+    background-position: 20px 25%, -10px 55%;
+    opacity: 0.7;
+  }
+}
+
+/* Layer / hotspot CSS motion presets */
+.scene-anim-twinkle {
+  animation: scene-twinkle 1.8s ease-in-out infinite;
+}
+.scene-anim-bob {
+  animation: scene-bob 2.4s ease-in-out infinite;
+}
+.scene-anim-sway {
+  animation: scene-sway 3.2s ease-in-out infinite;
+  transform-origin: 50% 0%;
+}
+.scene-anim-flicker {
+  animation: scene-flicker 0.9s steps(2) infinite;
+}
+.scene-anim-pulse {
+  animation: scene-pulse 2s ease-in-out infinite;
+}
+@keyframes scene-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes scene-bob {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -1.5%;
+  }
+}
+@keyframes scene-sway {
+  0%,
+  100% {
+    rotate: -1.5deg;
+  }
+  50% {
+    rotate: 1.5deg;
+  }
+}
+@keyframes scene-flicker {
+  0%,
+  100% {
+    opacity: 0.55;
+    filter: brightness(0.85);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.2);
+  }
+}
+@keyframes scene-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    filter: brightness(0.95);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.15);
+  }
+}
+
+/* Light rays for upbeat locations */
+.light-rays {
+  background: 
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 50px,
+      rgba(255, 255, 255, 0.03) 50px,
+      rgba(255, 255, 255, 0.03) 100px
+    );
+  animation: light-sweep 4s linear infinite;
+}
+
+@keyframes light-sweep {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(45deg);
+  }
+}
+
+/* Glitch effect for mysterious moments */
+@keyframes glitch-shift {
+  0%, 100% {
+    transform: translate(0);
+  }
+  33% {
+    transform: translate(-2px, 2px);
+  }
+  66% {
+    transform: translate(2px, -2px);
+  }
+}
+
+.glitch-effect {
+  animation: glitch-shift 0.3s ease-in-out infinite;
+}
+
+/* Breathing glow effect */
+@keyframes breathing-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.6);
+  }
+}
+
+.breathing-glow {
+  animation: breathing-glow 3s ease-in-out infinite;
+}
+
+/* Haptic feedback simulation via CSS */
+@keyframes tap-feedback {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.tap-feedback:active {
+  animation: tap-feedback 0.1s ease-out;
+}
+
+/* Prevent zoom on double tap for game area */
+.no-zoom {
+  touch-action: manipulation;
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Event juice bursts (not ambient room particles) */
+.juice-burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+  transform: translate(-50%, -50%);
+}
+
+.juice-spark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: hsl(var(--accent));
+  opacity: 0.9;
+  animation: juice-spark-out 0.5s ease-out forwards;
+  --ang: calc(var(--i) * (360deg / var(--n)));
+  transform: rotate(var(--ang)) translateY(0);
+}
+
+.juice-burst[data-kind="dust"] .juice-spark {
+  background: hsl(40 20% 70%);
+  width: 4px;
+  height: 4px;
+}
+
+.juice-burst[data-kind="stars"] .juice-spark {
+  background: hsl(48 90% 70%);
+  width: 5px;
+  height: 5px;
+}
+
+.juice-burst[data-kind="pickup"] .juice-spark {
+  background: hsl(150 60% 55%);
+}
+
+@keyframes juice-spark-out {
+  0% {
+    transform: rotate(var(--ang)) translateY(0) scale(1);
+    opacity: 0.95;
+  }
+  100% {
+    transform: rotate(var(--ang)) translateY(-36px) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .juice-spark {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Hold-to-reveal hotspot outlines (mobile) */
+.hotspot-reveal-all.hotspot-idle {
+  border: 2px solid hsla(var(--game-hotspot), 0.85) !important;
+  background: hsla(var(--game-hotspot), 0.18) !important;
+}
