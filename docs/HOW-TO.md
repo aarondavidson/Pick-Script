@@ -44,14 +44,15 @@ You do **not** need to memorize those. Just remember: **Studio = make**, **Play 
 
 **Goal:** Feel how a finished game plays.
 
-1. On your computer, open a terminal in this project folder.
-2. Run:
+1. Install [Node.js](https://nodejs.org/) 22 or newer (the LTS download is fine).
+2. On your computer, open a terminal in this project folder.
+3. Run:
    ```sh
    npm install
    npm run dev
    ```
-3. Open **http://localhost:8080** in your browser.
-4. Start with **Attic Study** (one room, two puzzles). Then try **Harbor Fog** (bigger mystery).
+4. Open **http://localhost:8080** in your browser.
+5. Start with **Attic Study** (one room, two puzzles). Then try **Harbor Fog** (bigger mystery).
 
 | Game | What it’s for |
 |---|---|

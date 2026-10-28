@@ -10,6 +10,8 @@ Teaching demos: Attic Study + Harbor Fog.
 
 ## Develop
 
+Needs **Node.js 22.12+** (`nvm use` reads `.nvmrc`).
+
 ```sh
 npm install
 npm run dev

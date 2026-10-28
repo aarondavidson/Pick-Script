@@ -7,6 +7,8 @@ Licensed under **[GPL-3.0-only](./LICENSE)** — contributions are under the sam
 
 ## Setup
 
+Node.js 22.12+ (see `.nvmrc`).
+
 ```sh
 npm install
 npm run verify       # typecheck + test + check-assets
