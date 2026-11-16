@@ -407,17 +407,17 @@ export function PackTool() {
         <section className="border-2 border-accent/50 bg-accent/5 p-4 space-y-3">
           <h3 className="pixel-font text-sm text-accent">Start a new game</h3>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Recommend <code className="text-accent text-[11px]">short-mystery</code>{" "}
-            (5 rooms, harbor key → lighthouse). The wizard also offers blank,
-            key→door, and two-room kits — real inventory / use-with / locked
-            exits, not copy-paste scripts.
+            Pick a starting point. The short mystery (five rooms, one key
+            puzzle) is the quickest way to something playable; blank,
+            key-and-door and two-room starters are there too. Everything in a
+            template can be renamed, redrawn or deleted.
           </p>
           <button
             type="button"
             onClick={() => openWizard("short-mystery")}
             className="pixel-font text-xs min-h-[44px] px-4 border-2 border-accent text-accent"
           >
-            New game wizard · short-mystery
+            Choose a template
           </button>
         </section>
       )}

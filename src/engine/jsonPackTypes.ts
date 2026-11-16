@@ -449,6 +449,8 @@ export interface JsonPackActor {
   defaultCostume?: string;
   costumes?: Record<string, ActorAnimSheet>;
   animations?: Partial<Record<"idle" | "walk" | "talk", ActorAnimSheet>>;
+  /** On-stage size multiplier (1 = default). Clamped to 0.25–4 */
+  scale?: number;
 }
 
 export interface JsonPackDocument {

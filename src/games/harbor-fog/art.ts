@@ -10,9 +10,9 @@ import pierAlley from "./assets/pier-alley.jpg";
 import lighthouse from "./assets/lighthouse.jpg";
 import key from "./assets/items/key.jpg";
 import coin from "./assets/items/coin.jpg";
-import playerSprite from "./assets/actors/player.jpg";
-import harborMasterSprite from "./assets/actors/harbor_master.jpg";
-import traderSprite from "./assets/actors/trader.jpg";
+import playerSprite from "./assets/actors/player.png";
+import harborMasterSprite from "./assets/actors/harbor_master.png";
+import traderSprite from "./assets/actors/trader.png";
 
 function utf8ToBase64(str: string): string {
   const bytes = new TextEncoder().encode(str);

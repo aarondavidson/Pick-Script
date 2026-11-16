@@ -1,3 +1,4 @@
+import { ACTOR_SCALE_MIN, resolveActorScale } from "@/engine/actorArt";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { suggestId } from "@/authoring/codegen";
@@ -187,6 +188,35 @@ export function PackActorsPanel({ doc, onChange }: PackActorsPanelProps) {
                 value={selected?.name || ""}
                 onChange={(e) => upsert(selectedId, { name: e.target.value })}
               />
+            </label>
+            <label className="block text-xs space-y-1">
+              <span className="text-muted-foreground flex justify-between">
+                <span>Size on stage</span>
+                <span className="text-accent" data-testid="actor-scale-value">
+                  {Math.round(resolveActorScale(selected?.scale) * 100)}%
+                </span>
+              </span>
+              <input
+                type="range"
+                className="w-full min-h-[32px] accent-[hsl(var(--accent))]"
+                min={ACTOR_SCALE_MIN * 100}
+                max={300}
+                step={5}
+                value={Math.round(resolveActorScale(selected?.scale) * 100)}
+                onChange={(e) => {
+                  const pct = Number(e.target.value);
+                  upsert(selectedId, {
+                    scale: pct === 100 ? undefined : pct / 100,
+                  });
+                }}
+                aria-label="Character size on stage"
+              />
+              <span className="block text-[10px] text-muted-foreground leading-relaxed">
+                100% is about a quarter of the room height. Characters keep
+                this size relative to the room on every screen. Check it in
+                the preview — walk areas can also shrink characters with
+                distance.
+              </span>
             </label>
             <label className="block text-xs space-y-1">
               <span className="text-muted-foreground">

@@ -7,6 +7,29 @@ The **host shell** is the reusable UI around the portable engine: verb bar, sent
 
 ---
 
+## Play layouts
+
+The host picks one arrangement per screen (`usePlayLayout`, `src/hooks/usePlayLayout.ts`)
+and every play component reads it from context instead of guessing from width:
+
+| Layout | When | Arrangement |
+|---|---|---|
+| `desktop` | Everything else | Toolbar header, scene, actions + exits beside the scene on wide screens (below it otherwise) |
+| `phone-portrait` | Width under 768px | Slim header, edge-to-edge scene, caption under the scene, one row of actions, exits grid |
+| `phone-landscape` | Landscape and height ≤ 540px (any width) | Scene fills the screen height; title, menu, goal, actions and exits in a side rail |
+| `preview` | Studio live preview | Compact frame; never follows the viewport |
+
+Rules a custom shell should keep:
+
+- **The scene is always 16:9** (`.play-stage` in `index.css`) — the shape rooms are
+  authored on in Studio. Hotspot percentages only line up with the art at that shape;
+  never size the scene box by height and width independently.
+- On phones nothing covers the scene permanently: the room caption sits under it
+  (portrait) or is a small name chip (landscape), and the sentence line appears over
+  the bottom edge only while a verb or item is armed.
+- Touch targets stay ≥ 44px. Treat `phone-landscape` as touch-first even when the
+  viewport is wider than the mobile breakpoint.
+
 ## Player flow
 
 1. **Tap to start** — unlocks a **shared** Web Audio context (required on iOS)

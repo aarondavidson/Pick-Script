@@ -8,7 +8,28 @@ anything, you need to change.
 
 ## Unreleased
 
-_Nothing yet._
+### Upgrade notes
+
+- **The play scene is now always 16:9**, the same shape rooms are drawn on in Studio. Before, the scene box changed shape with the screen and cropped the art, so hotspots could sit slightly off the picture. Room art that is not 16:9 is still shown (cropped to fill) — check it once. No pack data changes
+- **Character size on screen changes**: check your characters in the preview and adjust **Size on stage** if needed. On a phone they are a little smaller than before, on desktop noticeably larger
+- Host shells that render their own play UI: `useGameDimensions` is removed; use `usePlayLayout` (`src/hooks/usePlayLayout.ts`)
+
+### Added
+
+- **Character size** — `scale` on actors (TS + JSON, 0.25–4); Studio: Pack → Actors → **Size on stage** slider. `resolveActorScale` / `stageSpriteScale` exported from `@/engine`
+
+### Changed
+
+- **Characters scale with the room** — sprites used to be a fixed pixel size, so the player looked tiny on a large screen and oversized on a phone. They now keep the same size relative to the scene everywhere (speech bubbles and name labels stay a readable size). Default bitmap height is about a quarter of the room
+- **Phone play, sideways** — the scene fills the full screen height with actions, exits, goal and menu in a side rail. Applies to any short landscape screen, including phones wider than the old 768px mobile cut-off
+- **Phone play, upright** — slim header, edge-to-edge scene, room caption under the scene instead of over it, one row of labelled action buttons, no explanatory panels, no empty sentence box; fits one screen without scrolling
+- **Desktop play** — actions and exits sit beside the scene on wide screens, so the whole game fits one screen
+- **Studio wording** — the first-game guide and new-game prompt are in plain language (no raw URLs or template ids); the guide can be hidden and stays hidden
+
+### Fixed
+
+- Harbor Fog characters were drawn on a baked-in checkerboard box; the sprites are now transparent PNGs
+- Phone menu sheet could run off a short screen; it scrolls and uses two columns when the screen is short
 
 ## 0.2.0 — 2026-11-16
 

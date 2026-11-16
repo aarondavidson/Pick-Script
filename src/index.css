@@ -222,9 +222,11 @@ All colors MUST be HSL.
   }
 
   /* Bitmap costumes — imported PNG/JPG standing figures (feet at bottom) */
+  /* Base size for a 640px-wide stage — ActorSprite scales it with the stage
+     (and the actor's `scale`), so characters keep their size relative to the room. */
   .actor-sprite.actor-bitmap {
-    width: 48px;
-    height: 72px;
+    width: 64px;
+    height: 96px;
   }
   .actor-bitmap-img {
     display: block;
@@ -243,12 +245,6 @@ All colors MUST be HSL.
   }
   .actor-bitmap-talk .actor-bitmap-img {
     animation: character-talk 0.28s ease-in-out infinite;
-  }
-  @media (min-width: 768px) {
-    .actor-sprite.actor-bitmap {
-      width: 56px;
-      height: 84px;
-    }
   }
 
   .actor-body {
@@ -1074,4 +1070,26 @@ All colors MUST be HSL.
 .hotspot-reveal-all.hotspot-idle {
   border: 2px solid hsla(var(--game-hotspot), 0.85) !important;
   background: hsla(var(--game-hotspot), 0.18) !important;
+}
+
+/* ── Play stage ──────────────────────────────────────────────────────────
+   Rooms are authored on a 16:9 stage (Studio), so the play stage keeps that
+   shape everywhere: hotspots stay on the art and nothing is cropped.        */
+.play-stage {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  margin-inline: auto;
+}
+/* Desktop: as wide as fits while leaving room for the panels below */
+.play-stage--desktop {
+  width: min(100%, calc(62vh * 16 / 9));
+  width: min(100%, calc(62dvh * 16 / 9));
+}
+/* Sideways phone: the largest 16:9 box that fits the stage area */
+.play-stage-area {
+  container-type: size;
+}
+.play-stage--landscape {
+  width: min(100cqw, calc(100cqh * 16 / 9));
+  flex: none;
 }

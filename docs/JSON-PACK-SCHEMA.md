@@ -36,7 +36,7 @@ nesting caps, allowlisted specials, safe identifier keys, media URL checks.
 | `cutscenes` | `JsonPackCutscene[]` | |
 | `hints` | `JsonPackHint[]` | Progressive + optional `hotspotId` pulse |
 | `quests` / `achievements` | arrays | Journal |
-| `actors` | optional | Ego / NPC art (incl. facing sheets) |
+| `actors` | optional | Ego / NPC art (incl. facing sheets). Each actor may set `scale` (0.25–4, default 1) to resize it on stage |
 | `audio` | `PackAudio` | Music / ambient / voice / SFX maps |
 | `comics` | `Record<id, JsonPackComic>` | Allowlisted pages |
 | `flagCutscenes` | `{ [flag]: cutsceneId }` | Auto-start |

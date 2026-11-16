@@ -58,7 +58,7 @@ export const SpeechBar = () => {
   return (
     <button
       type="button"
-      className="fixed bottom-20 md:bottom-24 left-1/2 -translate-x-1/2 z-[60] w-[min(36rem,calc(100%-1.5rem))] bg-game-ui/95 border-2 border-primary px-3 py-2 md:px-4 md:py-3 flex gap-3 items-start text-left shadow-lg animate-in fade-in slide-in-from-bottom-2"
+      className="fixed bottom-20 md:bottom-24 [@media(max-height:540px)]:bottom-2 left-1/2 -translate-x-1/2 z-[60] w-[min(36rem,calc(100%-1.5rem))] bg-game-ui/95 border-2 border-primary px-3 py-2 md:px-4 md:py-3 flex gap-3 items-start text-left shadow-lg animate-in fade-in slide-in-from-bottom-2"
       onClick={skipSpeech}
       aria-label="Speech — click to skip"
     >

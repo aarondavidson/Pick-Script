@@ -476,6 +476,8 @@ export function buildHarborFogPack(): JsonPackDocument {
         sprite: harborArt.player,
         portrait: harborArt.player,
         talkColor: "#f5e6a8",
+        // Teaching example: resize a character without redrawing it
+        scale: 1.3,
       },
       harbor_master: {
         name: "Harbor Master",

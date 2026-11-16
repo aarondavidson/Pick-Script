@@ -611,6 +611,11 @@ export interface Actor {
   costumes?: Record<string, ActorAnimSheet>;
   /** Optional per-anim-state CSS class / URL / per-facing sheet */
   animations?: Partial<Record<ActorAnimState, ActorAnimSheet>>;
+  /**
+   * On-stage size multiplier (1 = default, 2 = twice as tall). Clamped to
+   * 0.25–4 by `resolveActorScale`. Multiplies with walkbox depth scale.
+   */
+  scale?: number;
   dialogue?: DialogueTree;
 }
 

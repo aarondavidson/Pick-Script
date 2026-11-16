@@ -290,6 +290,10 @@ export {
   normalizeFacing,
   pickFacingSheet,
   resolveActorCostumeUrl,
+  resolveActorScale,
+  stageSpriteScale,
+  ACTOR_SCALE_MIN,
+  ACTOR_SCALE_MAX,
 } from "./actorArt";
 export type { ResolvedActorCostume } from "./actorArt";
 export { getCurrentObjective } from "./currentObjective";

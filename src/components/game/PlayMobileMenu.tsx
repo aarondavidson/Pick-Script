@@ -66,7 +66,7 @@ export function PlayMobileMenu({
         </SheetTrigger>
         <SheetContent
           side="bottom"
-          className="bg-game-ui border-t-2 border-game-border rounded-t-lg"
+          className="bg-game-ui border-t-2 border-game-border rounded-t-lg max-h-[100dvh] overflow-y-auto"
           style={{
             paddingLeft:
               "max(1rem, var(--sal, env(safe-area-inset-left, 0px)))",
@@ -82,7 +82,10 @@ export function PlayMobileMenu({
               Menu
             </SheetTitle>
           </SheetHeader>
-          <nav className="flex flex-col gap-2" aria-label="Game extras">
+          <nav
+            className="flex flex-col gap-2 [@media(max-height:540px)]:grid [@media(max-height:540px)]:grid-cols-2"
+            aria-label="Game extras"
+          >
             {chrome.home && (
               <Link
                 to="/"

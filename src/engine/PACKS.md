@@ -267,7 +267,8 @@ actors: {
 Facing aliases: `up|down|left|right` or `n|s|e|w`. Runtime picks facing from walk delta.
 
 - Hotspots are hit-rects in **%**; paint interactables into the background
-- Depth: `Walkbox.scale` shrinks actors upstage
+- Size: `Actor.scale` (0.25–4, default 1) resizes one character; Studio: Pack → Actors → **Size on stage**. At 1 a bitmap character is about a quarter of the room height, on every screen
+- Depth: `Walkbox.scale` shrinks actors upstage (multiplies with `Actor.scale`)
 - Comics: `definition.comics` + special `{ modality: { type: "comic", comicId } }`
 - Lip-sync: put Rhubarb-style `mouthCues: [{ t, shape }]` on dialogue / `sayLine` (shapes `A`–`F`, `X`). Shell animates ActorSprite / SpeechBar when cues exist.
 

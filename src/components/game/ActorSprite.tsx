@@ -1,6 +1,7 @@
 import { useGame } from "@/contexts/GameContext";
 import type { ActorInstance } from "@/engine";
-import { resolveActorCostumeUrl } from "@/engine/actorArt";
+import { resolveActorCostumeUrl, resolveActorScale } from "@/engine/actorArt";
+import { useStageScale } from "@/hooks/useStageScale";
 import { mouthShapeClass } from "@/engine/speech";
 import { safeCssColor } from "@/engine/security";
 import { useMouthShape } from "@/hooks/useMouthShape";
@@ -41,6 +42,9 @@ export const ActorSprite = ({ actor }: ActorSpriteProps) => {
 
   const room = runtime.getRoom(gameState.currentLocation);
   const depth = runtime.depthScaleAt(actor.x, actor.y, room?.walkboxes);
+  // Same size relative to the room on every screen × the author's size setting
+  const stageScale = useStageScale();
+  const size = depth * stageScale * resolveActorScale(def?.scale);
 
   const bubble = sayLines.find((l) => l.actorId === actor.id);
   const mouthShape = useMouthShape(bubble);
@@ -57,7 +61,7 @@ export const ActorSprite = ({ actor }: ActorSpriteProps) => {
       style={{
         left: `${actor.x}%`,
         top: `${actor.y}%`,
-        transform: `translate(-50%, -90%) scale(${depth})`,
+        transform: `translate(-50%, -90%) scale(${size})`,
         zIndex: Math.round(actor.y * depth),
         transformOrigin: "bottom center",
       }}
@@ -69,8 +73,14 @@ export const ActorSprite = ({ actor }: ActorSpriteProps) => {
     >
       {bubble && !bubble.portrait && (
         <div
-          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 max-w-[140px] px-2 py-1 text-[10px] md:text-xs pixel-font text-center rounded border border-game-border bg-card/95 leading-tight"
-          style={{ color: talkColor, borderColor: talkColor }}
+          className="absolute bottom-full left-1/2 mb-1 w-max max-w-[140px] px-2 py-1 text-[10px] md:text-xs pixel-font text-center rounded border border-game-border bg-card/95 leading-tight"
+          style={{
+            color: talkColor,
+            borderColor: talkColor,
+            // Speech stays a readable size however the character is scaled
+            transform: `translateX(-50%) scale(${1 / size})`,
+            transformOrigin: "bottom center",
+          }}
         >
           {bubble.text}
         </div>
@@ -92,7 +102,10 @@ export const ActorSprite = ({ actor }: ActorSpriteProps) => {
           />
         )}
       </div>
-      <div className="actor-label pixel-font">
+      <div
+        className="actor-label pixel-font"
+        style={{ transform: `scale(${1 / size})`, transformOrigin: "top center" }}
+      >
         {isEgo ? "" : def?.name ?? ""}
       </div>
     </div>

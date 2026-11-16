@@ -8,6 +8,9 @@ If you change the stage size in UI code, update this doc.
 
 ---
 
+> **Rooms are shown at 16:9 everywhere** (Studio stage, desktop, phones). Draw room
+> art at 1920×1080 or 1280×720; other shapes are cropped to fill.
+
 ## Runtime / tooling requirements
 
 | Requirement | Spec |
@@ -106,6 +109,13 @@ actors: {
   },
 }
 ```
+
+**Size.** Sprites are scaled with the room, so a character takes the same share of
+the scene on a phone and on a desktop (about a quarter of the room height for a
+bitmap at the default). Set `scale` on the actor (0.25–4) — or Studio → Pack →
+Actors → **Size on stage** — when the art reads too small or too large. The
+drawing's own pixel size does not change how big it appears; keep sprites around
+128×192 with a transparent background (PNG).
 
 Character hotspots may also set `sprite` / `portrait` — compile stamps the sprite onto the hotspot overlay and the actor registry.
 
