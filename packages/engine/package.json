@@ -1,6 +1,6 @@
 {
   "name": "@portable-adventure/engine",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "S.C.R.I.P.T. portable adventure runtime (scaffold — source still lives in monorepo src/engine)",
   "license": "GPL-3.0-only",
   "type": "module",

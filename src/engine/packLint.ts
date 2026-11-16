@@ -125,11 +125,43 @@ export function lintTinyHotspots(doc: JsonPackDocument): string[] {
   return warnings;
 }
 
+/** True for image formats that cannot carry transparency (→ boxed characters). */
+export function isOpaqueOnlyImageUrl(url: string | undefined): boolean {
+  if (!url) return false;
+  const u = url.trim().toLowerCase();
+  if (u.startsWith("data:")) return /^data:image\/(jpe?g|bmp)[;,]/.test(u);
+  return /\.(jpe?g|bmp)(\?|#|$)/.test(u);
+}
+
+/**
+ * Character walk sprites saved as JPEG/BMP always have a background, so they
+ * show as a rectangle on stage.
+ */
+export function lintBoxedCharacterSprites(doc: JsonPackDocument): string[] {
+  const warnings: string[] = [];
+  const say = (where: string) =>
+    warnings.push(
+      `${where} sprite is a JPEG/BMP — it will show as a box on stage. Use a transparent PNG (Studio: Pack → Actors → Remove background)`
+    );
+  for (const [id, actor] of Object.entries(doc.actors ?? {})) {
+    if (isOpaqueOnlyImageUrl(actor?.sprite)) say(`actor "${id}"`);
+  }
+  for (const [roomId, room] of Object.entries(doc.rooms ?? {})) {
+    for (const h of room.hotspots ?? []) {
+      if (h.kind === "character" && isOpaqueOnlyImageUrl(h.sprite)) {
+        say(`character "${roomId}/${h.id}"`);
+      }
+    }
+  }
+  return warnings;
+}
+
 /** All pack lint warnings (non-blocking). */
 export function lintJsonPack(doc: JsonPackDocument): string[] {
   return [
     ...lintSilentHotspots(doc),
     ...lintDeadItemRefs(doc),
     ...lintTinyHotspots(doc),
+    ...lintBoxedCharacterSprites(doc),
   ];
 }

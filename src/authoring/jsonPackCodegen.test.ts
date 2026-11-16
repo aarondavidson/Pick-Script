@@ -40,6 +40,34 @@ describe("jsonPackCodegen", () => {
     expect(listJsonPackAssetFiles(doc)).toEqual(["assets/start.jpg"]);
   });
 
+  it("keeps the whole pack (items, hints, quests, win flag, credits)", () => {
+    const doc = {
+      ...createEmptyJsonPack({
+        id: "full-pack",
+        title: "Full",
+        items: { lamp: { id: "lamp", name: "Lamp", description: "Bright" } },
+        hints: [{ id: "h1", title: "Stuck?", tiers: ["Try the lamp"] }],
+        quests: [
+          { id: "q1", title: "Escape", description: "Out", objectives: ["Go"] },
+        ],
+      }),
+      winFlag: "escaped",
+      minEngineVersion: "0.2.0",
+      credits: [{ work: "Tiles", author: "Someone" }],
+    };
+    const ts = formatJsonPackAsManifestTs(doc);
+    for (const needle of [
+      '"lamp"',
+      "Try the lamp",
+      '"q1"',
+      '"winFlag": "escaped"',
+      '"minEngineVersion": "0.2.0"',
+      "Someone",
+    ]) {
+      expect(ts).toContain(needle);
+    }
+  });
+
   it("formatJsonPackAsGameFolder includes manifest + registry snippet", () => {
     const doc = createEmptyJsonPack({
       id: "haunted-diner",

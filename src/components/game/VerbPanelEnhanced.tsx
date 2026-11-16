@@ -6,6 +6,7 @@ import { haptics } from "@/utils/haptics";
 import { useEffect, useMemo, useState } from "react";
 import { EnhancedInventory } from "@/components/game/EnhancedInventory";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { isPhoneLayout, usePlayLayout } from "@/hooks/usePlayLayout";
 
 /** Presentation icons — engine provides labels/shortcuts via GameDefinition.verbs */
 const VERB_ICONS: Partial<Record<VerbId, string>> = {
@@ -28,7 +29,10 @@ export const VerbPanelEnhanced = () => {
     verbMode,
   } = useGame();
   const [inventoryOpen, setInventoryOpen] = useState(false);
-  const isMobile = useIsMobile();
+  const layout = usePlayLayout();
+  const phone = isPhoneLayout(layout);
+  const narrowViewport = useIsMobile();
+  const isMobile = phone || narrowViewport;
   const coinMode = verbMode === "coin";
 
   const verbs = useMemo(
@@ -81,17 +85,40 @@ export const VerbPanelEnhanced = () => {
     inventoryKey,
   ]);
 
+  // Few verbs on a portrait phone: room for icon + word on one row
+  const roomyRow = layout === "phone-portrait" && verbs.length <= 3;
   const cols =
-    verbs.length <= 2
-      ? "grid-cols-3 md:grid-cols-3"
-      : "grid-cols-4 md:grid-cols-2";
+    layout === "phone-landscape"
+      ? "grid-cols-2"
+      : roomyRow
+        ? verbs.length === 3
+          ? "grid-cols-4"
+          : verbs.length === 2
+            ? "grid-cols-3"
+            : "grid-cols-2"
+        : verbs.length <= 2
+          ? "grid-cols-3 md:grid-cols-3"
+          : "grid-cols-4 md:grid-cols-2";
+  /** Icon-only on phones unless the row is roomy; width-driven elsewhere */
+  const iconCls = phone ? (roomyRow ? "hidden" : "") : "md:hidden";
+  const labelCls = phone ? (roomyRow ? "" : "sr-only") : "hidden md:inline";
 
   return (
-    <div className="bg-game-ui border-2 border-game-border p-2 md:p-4">
-      <h3 className="pixel-font text-accent mb-2 md:mb-3 text-sm md:text-base">
+    <div
+      className={
+        phone ? "" : "bg-game-ui border-2 border-game-border p-2 md:p-4"
+      }
+    >
+      <h3
+        className={
+          phone
+            ? "sr-only"
+            : "pixel-font text-accent mb-2 md:mb-3 text-sm md:text-base"
+        }
+      >
         {coinMode ? "Verb coin" : "Actions"}
       </h3>
-      {coinMode && (
+      {coinMode && !phone && (
         <p className="text-[11px] text-muted-foreground mb-2 leading-relaxed">
           Click a hotspot to open the Look / Talk / Use coin. Inventory still
           arms Use-with.
@@ -116,8 +143,10 @@ export const VerbPanelEnhanced = () => {
                 : "bg-secondary/50 hover:bg-game-verb/20 active:bg-game-verb/30"
             }`}
           >
-            <span className="md:hidden">{verb.shortLabel}</span>
-            <span className="hidden md:inline">{verb.label}</span>
+            <span className={iconCls}>{verb.shortLabel}</span>
+            <span className={labelCls}>
+              {verb.label}
+            </span>
             {!isMobile && (
               <span className="absolute top-0 right-1 text-[10px] opacity-50">
                 {verb.key}
@@ -135,8 +164,10 @@ export const VerbPanelEnhanced = () => {
           size="sm"
           className="pixel-font text-xs relative bg-secondary/50 hover:bg-game-verb/20 active:bg-game-verb/30 min-h-[44px] touch-manipulation tap-feedback"
         >
-          <span className="md:hidden">🎒</span>
-          <span className="hidden md:inline">🎒 Inventory</span>
+          <span className={iconCls}>🎒</span>
+          <span className={labelCls}>
+            🎒 {roomyRow ? "Bag" : "Inventory"}
+          </span>
           {!isMobile && (
             <span className="absolute top-0 right-1 text-[10px] opacity-50">
               {inventoryKey}

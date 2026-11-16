@@ -182,3 +182,23 @@ export function resolveActorCostumeUrl(opts: {
     flipX: face === "left",
   };
 }
+
+/** Stage width (px) at which sprite CSS sizes are 1:1 — see `stageSpriteScale`. */
+export const ACTOR_STAGE_REFERENCE_WIDTH = 640;
+export const ACTOR_SCALE_MIN = 0.25;
+export const ACTOR_SCALE_MAX = 4;
+
+/** Author-set actor size multiplier, clamped; anything invalid → 1. */
+export function resolveActorScale(raw: unknown): number {
+  if (typeof raw !== "number" || !Number.isFinite(raw) || raw <= 0) return 1;
+  return Math.min(ACTOR_SCALE_MAX, Math.max(ACTOR_SCALE_MIN, raw));
+}
+
+/**
+ * Factor that keeps a character the same size *relative to the room* on every
+ * screen: sprites are sized in px for a 640px-wide stage and scaled with it.
+ */
+export function stageSpriteScale(stageWidthPx: number): number {
+  if (!Number.isFinite(stageWidthPx) || stageWidthPx <= 0) return 1;
+  return stageWidthPx / ACTOR_STAGE_REFERENCE_WIDTH;
+}

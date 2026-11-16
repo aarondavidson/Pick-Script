@@ -1,0 +1,104 @@
+name: Release
+
+# Publishes a GitHub Release for the version in package.json.
+#
+# Two ways to start it (see docs/RELEASING.md):
+#   1. Actions → Release → "Run workflow" on main   (creates the tag for you)
+#   2. git tag -a vX.Y.Z && git push origin vX.Y.Z  (uses your tag)
+#
+# Either way the release only happens if every check passes, the tag matches
+# the version, and the changelog has a section for it.
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Verify, build and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Releases are cut from main
+        if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+        run: |
+          echo "Run this workflow on the main branch." >&2
+          exit 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Read version
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Tag matches version
+        if: github.event_name == 'push'
+        env:
+          TAG: ${{ github.ref_name }}
+        run: node scripts/check-release.mjs --tag "$TAG"
+
+      - name: Not already released
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists. Bump the version (docs/RELEASING.md) before releasing again." >&2
+            exit 1
+          fi
+
+      - name: Verify (typecheck, tests, assets, release consistency)
+        run: npm run verify
+
+      - name: CLI smoke
+        run: npm run check:cli
+
+      - name: Engine package dry-run
+        run: npm run pack:engine
+
+      - name: Build
+        run: npm run build
+
+      - name: Package the web build
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          mkdir -p release
+          (cd dist && zip -qr "../release/pick-script-web-$VERSION.zip" .)
+          (cd release && sha256sum * > SHA256SUMS.txt)
+          ls -la release
+
+      - name: Release notes from CHANGELOG
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: node scripts/release-notes.mjs "$VERSION" > release-notes.md
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh release create "v$VERSION" release/* \
+            --title "Pick-Script $VERSION" \
+            --notes-file release-notes.md \
+            --target "$GITHUB_SHA" \
+            --latest

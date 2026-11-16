@@ -89,14 +89,9 @@ export function formatJsonPackAsManifestTs(doc: JsonPackDocument): string {
 
   const packLiteral = JSON.stringify(
     {
-      schemaVersion: doc.schemaVersion,
-      id: doc.id,
-      title: doc.title,
-      subtitle: doc.subtitle,
-      version: doc.version,
-      startRoom: doc.startRoom,
-      verbMode: doc.verbMode,
-      audio: doc.audio,
+      // Carry every pack field (items, hints, cutscenes, quests, winFlag,
+      // credits, …) so the TS copy plays the same as the JSON draft.
+      ...doc,
       rooms: roomsForJson,
       links: doc.links ?? [],
       combinations: doc.combinations ?? {},

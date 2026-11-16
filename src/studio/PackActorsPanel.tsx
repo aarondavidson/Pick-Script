@@ -1,10 +1,18 @@
+import { ACTOR_SCALE_MIN, resolveActorScale } from "@/engine/actorArt";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { suggestId } from "@/authoring/codegen";
 import type { JsonPackActor, JsonPackDocument } from "@/engine/jsonPack";
 import { isBitmapCostume } from "@/engine/actorArt";
-import { isSafeMediaUrl } from "@/engine/security";
-import { toastFail } from "@/studio/toastError";
+import { assertImageFile, isSafeMediaUrl } from "@/engine/security";
+import { toastError, toastFail, toastOk } from "@/studio/toastError";
+import {
+  cutoutSpriteDataUrl,
+  describeCutoutOutcome,
+} from "@/studio/spriteCutout";
+
+/** Keep pack drafts small — a sprite never needs to be bigger than this */
+const MAX_SPRITE_DATA_URL_CHARS = 600_000;
 import { studioTabHref } from "@/engine/validationHelp";
 
 export interface PackActorsPanelProps {
@@ -41,6 +49,7 @@ export function PackActorsPanel({ doc, onChange }: PackActorsPanelProps) {
     listed[0]?.id ?? "player"
   );
   const [newId, setNewId] = useState("");
+  const [busy, setBusy] = useState(false);
 
   const selected: JsonPackActor | undefined = actors[selectedId];
 
@@ -92,6 +101,52 @@ export function PackActorsPanel({ doc, onChange }: PackActorsPanelProps) {
       isSafeMediaUrl(selected.portrait) &&
       selected.portrait) ||
     "";
+
+  const applyCutout = async (url: string) => {
+    setBusy(true);
+    try {
+      const cut = await cutoutSpriteDataUrl(url);
+      if (cut.dataUrl.length > MAX_SPRITE_DATA_URL_CHARS) {
+        toastFail(
+          "Image too large",
+          "Shrink the character to about 256×384 or smaller and try again."
+        );
+        return;
+      }
+      upsert(selectedId, { sprite: cut.dataUrl });
+      const note = describeCutoutOutcome(cut.outcome);
+      if (cut.outcome === "no-simple-background") toastFail("Check this image", note);
+      else toastOk("Character image set", note);
+    } catch (e) {
+      toastError("Could not use that image", e);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const importSprite = async (file: File) => {
+    try {
+      assertImageFile(file);
+    } catch (e) {
+      toastError("Could not use that file", e);
+      return;
+    }
+    const url = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    }).catch(() => "");
+    if (!url) {
+      toastFail("Could not read that file");
+      return;
+    }
+    await applyCutout(url);
+  };
+
+  const cutoutCurrent = async () => {
+    if (previewUrl) await applyCutout(previewUrl);
+  };
 
   return (
     <section className="border border-game-border bg-game-ui/90 p-4 space-y-3">
@@ -189,6 +244,35 @@ export function PackActorsPanel({ doc, onChange }: PackActorsPanelProps) {
               />
             </label>
             <label className="block text-xs space-y-1">
+              <span className="text-muted-foreground flex justify-between">
+                <span>Size on stage</span>
+                <span className="text-accent" data-testid="actor-scale-value">
+                  {Math.round(resolveActorScale(selected?.scale) * 100)}%
+                </span>
+              </span>
+              <input
+                type="range"
+                className="w-full min-h-[32px] accent-[hsl(var(--accent))]"
+                min={ACTOR_SCALE_MIN * 100}
+                max={300}
+                step={5}
+                value={Math.round(resolveActorScale(selected?.scale) * 100)}
+                onChange={(e) => {
+                  const pct = Number(e.target.value);
+                  upsert(selectedId, {
+                    scale: pct === 100 ? undefined : pct / 100,
+                  });
+                }}
+                aria-label="Character size on stage"
+              />
+              <span className="block text-[10px] text-muted-foreground leading-relaxed">
+                100% is about a quarter of the room height. Characters keep
+                this size relative to the room on every screen. Check it in
+                the preview — walk areas can also shrink characters with
+                distance.
+              </span>
+            </label>
+            <label className="block text-xs space-y-1">
               <span className="text-muted-foreground">
                 Sprite URL (idle default)
               </span>
@@ -199,6 +283,35 @@ export function PackActorsPanel({ doc, onChange }: PackActorsPanelProps) {
                 placeholder="data:image/… or /assets/…"
               />
             </label>
+            <div className="flex flex-wrap gap-2 items-center">
+              <label className="pixel-font text-[11px] min-h-[40px] px-3 border-2 border-accent text-accent inline-flex items-center cursor-pointer">
+                Upload character image
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  className="sr-only"
+                  data-testid="actor-sprite-upload"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    e.target.value = "";
+                    if (file) void importSprite(file);
+                  }}
+                />
+              </label>
+              <button
+                type="button"
+                className="pixel-font text-[11px] min-h-[40px] px-3 border border-game-border disabled:opacity-40"
+                disabled={!previewUrl || busy}
+                onClick={() => void cutoutCurrent()}
+              >
+                Remove background
+              </button>
+            </div>
+            <p className="text-[10px] text-muted-foreground leading-relaxed">
+              Characters need a see-through background. Uploads on a flat
+              colour or a grey checkerboard are cut out for you; a PNG that is
+              already transparent is kept as it is.
+            </p>
             <label className="block text-xs space-y-1">
               <span className="text-muted-foreground">Portrait URL</span>
               <input

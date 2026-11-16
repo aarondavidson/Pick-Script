@@ -216,9 +216,10 @@ const Studio = () => {
             <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">
               {guided ? (
                 <>
-                  Visual editor for {SCRIPT.acronym} packs. Guided mode keeps you
-                  on Pack → Pixels → Audio. Finish a playable loop, then Publish
-                  — no Copy TS required.
+                  Build a point-and-click game in your browser — no code.
+                  Guided mode shows three tools in order: Pack (rooms and
+                  puzzles), Pixels (art), Audio. Press Play draft any time to
+                  try it.
                 </>
               ) : (
                 <>

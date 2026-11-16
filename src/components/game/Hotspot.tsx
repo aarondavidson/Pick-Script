@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { haptics } from "@/utils/haptics";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { isPhoneLayout, usePlayLayout } from "@/hooks/usePlayLayout";
 import { isSafePlayMediaUrl } from "@/engine/security";
 import { sceneAnimClassName, useFrameCycle } from "@/hooks/useFrameCycle";
 
@@ -50,7 +51,9 @@ export const Hotspot = ({
   const [animationClass, setAnimationClass] = useState("");
   const [clickFeedback, setClickFeedback] = useState(false);
   const [isTouching, setIsTouching] = useState(false);
-  const isMobile = useIsMobile();
+  // Sideways phones can be wider than the mobile breakpoint — still touch-first
+  const narrowViewport = useIsMobile();
+  const isMobile = isPhoneLayout(usePlayLayout()) || narrowViewport;
 
   /** Pack-agnostic: actor flags or dialogue-bearing NPCs */
   const isCharacter = !!(

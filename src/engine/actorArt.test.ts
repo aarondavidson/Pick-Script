@@ -110,3 +110,33 @@ describe("actorArt", () => {
     });
   });
 });
+
+describe("actor size", () => {
+  it("clamps author scale and falls back to 1", async () => {
+    const { resolveActorScale, stageSpriteScale } = await import("./actorArt");
+    expect(resolveActorScale(undefined)).toBe(1);
+    expect(resolveActorScale("2")).toBe(1);
+    expect(resolveActorScale(-1)).toBe(1);
+    expect(resolveActorScale(NaN)).toBe(1);
+    expect(resolveActorScale(1.5)).toBe(1.5);
+    expect(resolveActorScale(0.01)).toBe(0.25);
+    expect(resolveActorScale(99)).toBe(4);
+    expect(stageSpriteScale(640)).toBe(1);
+    expect(stageSpriteScale(960)).toBe(1.5);
+    expect(stageSpriteScale(0)).toBe(1);
+  });
+
+  it("carries scale from a JSON pack onto the actor (clamped)", async () => {
+    const { createEmptyJsonPack, createGameFromJson } = await import("./jsonPack");
+    const def = createGameFromJson({
+      ...createEmptyJsonPack({ id: "size-game", title: "Size" }),
+      actors: { player: { scale: 1.8 }, giant: { name: "Giant", scale: 40 } },
+    });
+    expect(def.actors?.player.scale).toBe(1.8);
+    expect(def.actors?.giant.scale).toBe(4);
+    const plain = createGameFromJson(
+      createEmptyJsonPack({ id: "size-plain", title: "Plain" })
+    );
+    expect(plain.actors?.player.scale).toBeUndefined();
+  });
+});

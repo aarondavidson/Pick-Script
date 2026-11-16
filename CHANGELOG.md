@@ -1,6 +1,79 @@
 # Changelog
 
+All notable changes to Pick-Script. Versions follow
+[semantic versioning](https://semver.org); the policy and release checklist are
+in [`docs/RELEASING.md`](./docs/RELEASING.md). **Upgrading a game?** Read
+[`docs/UPGRADING.md`](./docs/UPGRADING.md) — each release lists what, if
+anything, you need to change.
+
 ## Unreleased
+
+### Added
+
+- **GitHub Releases** — `Release` workflow publishes a GitHub Release (notes from this changelog, built web zip + checksums) from `main` via **Actions → Release → Run workflow** or a pushed `v*` tag; `scripts/release-notes.mjs`; release rules in [`docs/RELEASING.md`](./docs/RELEASING.md)
+
+## 0.3.0 — 2026-11-16
+
+Play screen rework for phones, character sizing and automatic character cut-outs.
+
+### Upgrade notes
+
+- **The play scene is now always 16:9**, the same shape rooms are drawn on in Studio. Before, the scene box changed shape with the screen and cropped the art, so hotspots could sit slightly off the picture. Room art that is not 16:9 is still shown (cropped to fill) — check it once. No pack data changes
+- **Character size on screen changes**: check your characters in the preview and adjust **Size on stage** if needed. On a phone they are a little smaller than before, on desktop noticeably larger
+- Host shells that render their own play UI: `useGameDimensions` is removed; use `usePlayLayout` (`src/hooks/usePlayLayout.ts`)
+
+### Added
+
+- **Character size** — `scale` on actors (TS + JSON, 0.25–4); Studio: Pack → Actors → **Size on stage** slider. `resolveActorScale` / `stageSpriteScale` exported from `@/engine`
+
+- **Character background removal** — character images brought into the Studio (Pixels → Send to pack as *Character costume*, or Pack → Actors → **Upload character image** / **Remove background**) are cut out automatically when they sit on a flat colour, a grey "fake transparency" checkerboard, or have letterbox bars. Already-transparent PNGs are untouched; busy backgrounds are left alone and the author is told. `pack-doctor` / pack lint warn about JPEG character sprites
+
+### Changed
+
+- **Characters scale with the room** — sprites used to be a fixed pixel size, so the player looked tiny on a large screen and oversized on a phone. They now keep the same size relative to the scene everywhere (speech bubbles and name labels stay a readable size). Default bitmap height is about a quarter of the room
+- **Phone play, sideways** — the scene fills the full screen height with actions, exits, goal and menu in a side rail. Applies to any short landscape screen, including phones wider than the old 768px mobile cut-off
+- **Phone play, upright** — slim header, edge-to-edge scene, room caption under the scene instead of over it, one row of labelled action buttons, no explanatory panels, no empty sentence box; fits one screen without scrolling
+- **Desktop play** — actions and exits sit beside the scene on wide screens, so the whole game fits one screen
+- **Studio wording** — the first-game guide and new-game prompt are in plain language (no raw URLs or template ids); the guide can be hidden and stays hidden
+
+### Fixed
+
+- Harbor Fog characters were drawn on a baked-in checkerboard box; the sprites are now transparent PNGs (made with the new background removal)
+- Phone menu sheet could run off a short screen; it scrolls and uses two columns when the screen is short
+
+## 0.2.0 — 2026-11-16
+
+First release with a stated update policy: the engine now reports its version,
+packs can require a minimum engine, and saves survive pack updates.
+
+### Upgrade notes
+
+No pack changes are required. Details and examples: [`docs/UPGRADING.md`](./docs/UPGRADING.md#010--020).
+
+- `migrateSave` now receives the save **as written** (before it is clamped to the pack); its result is clamped afterwards. Migrators that rename room / item ids now work. Migrators that assumed pre-sanitized input should be re-checked
+- Loaded saves are reconciled with the pack: new achievements, quests, actors and initial flags appear in old saves. Remove hand-written workarounds in `migrateSave`
+- Re-export any TS pack produced by Studio's **Copy TS pack** / **Download game folder** under 0.1.0 — it was missing most pack content (see Fixed)
+- Requires **Node.js 22.12+** for the dev toolchain (`engines`, `.nvmrc`)
+
+### Added
+
+- **Engine version** — `ENGINE_VERSION` and `checkEngineCompatibility()` exported from `@/engine`; saves record the `engineVersion` that wrote them
+- **`minEngineVersion`** on packs (TS + JSON) — an older engine refuses the pack with a clear "update the engine" error; blending packs keeps the stricter requirement
+- **Pack schema upgrade path** — `migrateJsonPackDocument` / `JSON_PACK_MIGRATIONS` / `JSON_PACK_MIN_SCHEMA_VERSION`; packs made with a newer engine now say so instead of a bare "unsupported schemaVersion"
+- **`reconcileStateWithDefinition`** — brings a loaded save up to date with pack content
+- **Release tooling** — `npm run check:release` (versions in sync + changelog section; part of `npm run verify` and CI), CI on `v*` tags checks the tag matches the version, CI runs the engine package dry-run
+- **Docs** — [`docs/UPGRADING.md`](./docs/UPGRADING.md) (authors) and [`docs/RELEASING.md`](./docs/RELEASING.md) (maintainers: semver policy, compatibility rules, release checklist)
+
+### Fixed
+
+- **Stale save restored after reload** — when IndexedDB and localStorage held different copies of a slot (e.g. after a localStorage quota failure), the localStorage copy always won, even if older. The copy with the newer in-save timestamp now wins and the other store is repaired
+- **Saves "vanishing" after a pack update** — a `migrateSave` that threw made the slot look empty (and open to being overwritten). It is now shown as incompatible
+- **New achievements / quests never unlockable on old saves** — see Upgrade notes
+- **TS export dropped pack content** — "Copy TS pack" and "Download game folder" omitted items, actors, hints, cutscenes, quests, achievements, comics, i18n, `winFlag` and `credits`, so the exported game could differ from the Studio draft and could not be won
+- Saves whose `gameId` is malformed (not just different) are rejected; non-object save data is rejected
+- `flagIndex.ts` used an `@/engine` alias import inside the engine folder, breaking copies of `src/engine` in repos without that alias
+
+### Also in 0.2.0 (since 0.1.0)
 
 - **Win flag** — packs (JSON + TS) can set `winFlag`; the game ends and shows the win screen when it turns on. Studio: Quests & achievements → Game ends when flag; `pack-doctor` reports packs with no ending and win flags nothing sets. Previously Studio-made packs could never reach the win screen
 - **Fix: template sticky note** — using (not looking at) the note on a fresh game said “You already took the key” while handing over the key. Responses can now be state functions that return a translation key, so gated copy stays translatable

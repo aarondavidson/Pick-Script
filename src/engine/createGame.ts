@@ -19,7 +19,10 @@ import { resolveInteraction } from "./interact";
 import { doSentence, formatSentence, type Sentence } from "./sentence";
 import { createSaveAdapter, type SaveAdapter } from "./save";
 import { isStrictPlayEnabled } from "./deployLock";
-import { sanitizePlayState } from "./stateIntegrity";
+import {
+  reconcileStateWithDefinition,
+  sanitizePlayState,
+} from "./stateIntegrity";
 import { emitAndPatch, runScripts } from "./scripts";
 import {
   getObjectState,
@@ -223,10 +226,13 @@ export function createGame(rawDefinition: GameDefinition): AdventureRuntime {
     migrateSave: definition.migrateSave,
     legacyKeyPrefix: definition.legacySaveKeyPrefix,
     sanitizeState: (state) =>
-      sanitizePlayState(state, definition, {
-        strictKnownItems:
-          isStrictPlayEnabled() && definition.strictInventory === true,
-      }),
+      reconcileStateWithDefinition(
+        sanitizePlayState(state, definition, {
+          strictKnownItems:
+            isStrictPlayEnabled() && definition.strictInventory === true,
+        }),
+        definition
+      ),
   });
 
   let activeLocale =

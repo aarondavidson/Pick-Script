@@ -5,11 +5,35 @@ import { getCurrentObjective } from "@/engine/currentObjective";
  * Always-visible current sub-goal (first incomplete objective on the first
  * active quest). Hidden when the pack has no quests or all are complete.
  */
-export function CurrentObjectiveBar() {
+export function CurrentObjectiveBar({ rail = false }: { rail?: boolean }) {
   const { gameState } = useGame();
   const objective = getCurrentObjective(gameState);
 
   if (!objective) return null;
+
+  // Side rail (sideways phone): goal text only, clamped
+  if (rail) {
+    return (
+      <div
+        className="border border-game-border bg-game-ui/95 px-1.5 py-1"
+        role="status"
+        aria-live="polite"
+        data-testid="current-objective"
+      >
+        <p className="pixel-font text-[8px] uppercase tracking-widest text-primary leading-none mb-0.5">
+          Goal
+          {objective.total > 1 && !objective.awaitingComplete
+            ? ` ${objective.step}/${objective.total}`
+            : ""}
+        </p>
+        <p className="text-[11px] leading-tight text-accent line-clamp-3">
+          {objective.awaitingComplete
+            ? `${objective.questTitle} — wrap up`
+            : objective.text}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div

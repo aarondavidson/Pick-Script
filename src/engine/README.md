@@ -17,6 +17,9 @@ Portable SCUMM-inspired runtime. **Game-agnostic** — it never imports any pack
 | **[ASSETS.md](./ASSETS.md)** | Image sizes, sprites, portraits, SFX/music requirements |
 | **[ENGINE.md](./ENGINE.md)** | Engine internals, SCUMM comparison, feature tiers |
 | **[../../docs/REFACTORING.md](../../docs/REFACTORING.md)** | Module extraction & split-safe practices |
+| **[../../docs/UPGRADING.md](../../docs/UPGRADING.md)** | Game authors — taking a new engine release; keeping saves working |
+| **[../../docs/RELEASING.md](../../docs/RELEASING.md)** | Maintainers — semver policy, compatibility rules, release checklist |
+| **[../../CHANGELOG.md](../../CHANGELOG.md)** | What changed in each release |
 
 ## Public entry points
 
@@ -66,7 +69,10 @@ The app host wraps this in `GameProvider` (`src/contexts/GameContext.tsx`) to wi
 | `jsonPack.ts` | Barrel for JSON pack API |
 | `jsonPackTypes.ts` / `jsonPackCompile.ts` / `jsonPackDialogue.ts` / `jsonPackCutscenes.ts` / `jsonPackValidate.ts` | JSON pack pipeline |
 | `validate.ts` | Structural pack checks (boot + CI) |
-| `save.ts` | Per-game slots + autosave + versioning |
+| `version.ts` | `ENGINE_VERSION` + `checkEngineCompatibility` (`minEngineVersion`) |
+| `save.ts` | Per-game slots + autosave + versioning / `migrateSave` |
+| `saveStorage.ts` | IndexedDB + localStorage dual store (newest copy wins) |
+| `stateIntegrity.ts` | Clamp loaded state to the pack; reconcile with new content |
 | `security.ts` | Media + packUrl allowlists, safe JSON |
 | `packActions.ts` | Declarative ActionList-lite chains |
 | `regions.ts` | Walk-region enter triggers (`Room.regions`) |
@@ -82,6 +88,9 @@ The app host wraps this in `GameProvider` (`src/contexts/GameContext.tsx`) to wi
 2. **Room changes** go through `travel` / `travelThroughExit` / `travelToRoom`
 3. **Saves** are keyed by `definition.id` and stamped with `definition.version`
 4. **Invalid packs throw** from `createGame` — see `validateGameDefinition`
+5. **No imports from outside this folder** (other than `react`) and no `@/` alias imports in non-test files — games copy this folder as a unit
+6. **Saves and `.pack.json` files from older releases keep loading** — rules in [`RELEASING.md`](../../docs/RELEASING.md#compatibility-rules)
+7. **`ENGINE_VERSION` matches `package.json`** — `npm run check:release`
 
 ## Tests
 

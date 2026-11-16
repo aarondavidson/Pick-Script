@@ -2,6 +2,7 @@
  * Compile a JSON pack document into a playable GameDefinition.
  */
 
+import { resolveActorScale } from "./actorArt";
 import type { PackAudio } from "./audio";
 import { isMusicFileBed } from "./audio";
 import type { GameDefinition } from "./definition";
@@ -187,6 +188,13 @@ function packFlag(raw: string | undefined): string | undefined {
  * Compile a JSON pack into a playable GameDefinition.
  * Functions (pickup grants, exit gates) are synthesized from declarative fields.
  */
+/** Keep `scale` only when the author set a usable one (clamped). */
+function packActorScale(raw: unknown): { scale?: number } {
+  return typeof raw === "number" && Number.isFinite(raw) && raw > 0
+    ? { scale: resolveActorScale(raw) }
+    : {};
+}
+
 export function createGameFromJson(doc: JsonPackDocument): GameDefinition {
   const pack = parseJsonPack(doc);
   const rooms: Record<string, Room> = {};
@@ -336,6 +344,7 @@ export function createGameFromJson(doc: JsonPackDocument): GameDefinition {
       costumes: playerOverride?.costumes,
       defaultCostume: playerOverride?.defaultCostume,
       animations: playerOverride?.animations,
+      ...packActorScale(playerOverride?.scale),
     },
   };
 
@@ -356,6 +365,7 @@ export function createGameFromJson(doc: JsonPackDocument): GameDefinition {
         costumes: fromPack?.costumes,
         defaultCostume: fromPack?.defaultCostume,
         animations: fromPack?.animations,
+        ...packActorScale(fromPack?.scale),
       };
     }
   }
@@ -373,6 +383,7 @@ export function createGameFromJson(doc: JsonPackDocument): GameDefinition {
       costumes: a.costumes,
       defaultCostume: a.defaultCostume,
       animations: a.animations,
+      ...packActorScale(a.scale),
     };
   }
 
@@ -390,6 +401,7 @@ export function createGameFromJson(doc: JsonPackDocument): GameDefinition {
     credits: pack.credits,
     winFlag: pack.winFlag,
     version: pack.version,
+    minEngineVersion: pack.minEngineVersion,
     startRoom: pack.startRoom,
     verbMode: pack.verbMode,
     autosave: true,

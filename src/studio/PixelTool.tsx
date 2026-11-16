@@ -1,3 +1,4 @@
+import { describeCutoutOutcome } from "@/studio/spriteCutout";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
@@ -196,7 +197,11 @@ export function PixelTool() {
     if (!resultUrl) return;
     try {
       const dataUrl = await blobUrlToDataUrl(resultUrl);
+      let cutoutNote = "";
       const next = await applyArtToPackDraft({
+        onCutout: (outcome) => {
+          cutoutNote = describeCutoutOutcome(outcome);
+        },
         dataUrl,
         target: sendTarget,
         roomId: roomId || undefined,
@@ -210,7 +215,7 @@ export function PixelTool() {
           sendTarget === "room"
             ? `Room art updated on ${roomId || next.startRoom}`
             : sendTarget === "character"
-              ? `Costume set on ${actorId || "player"}`
+              ? `Costume set on ${actorId || "player"}. ${cutoutNote}`.trim()
               : sendTarget === "portrait"
                 ? `Portrait set on ${actorId || "player"}`
                 : `Item icon saved (${itemId || itemName})`,

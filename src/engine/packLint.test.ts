@@ -84,3 +84,26 @@ describe("packLint", () => {
     expect(v.warnings.some((w) => /under 4%/.test(w))).toBe(true);
   });
 });
+
+describe("lintBoxedCharacterSprites", () => {
+  it("flags JPEG walk sprites and accepts PNG / CSS stand-ins", async () => {
+    const { lintBoxedCharacterSprites, isOpaqueOnlyImageUrl } = await import(
+      "./packLint"
+    );
+    const { createEmptyJsonPack } = await import("./jsonPack");
+    expect(isOpaqueOnlyImageUrl("data:image/jpeg;base64,xx")).toBe(true);
+    expect(isOpaqueOnlyImageUrl("/assets/hero.JPG?v=2")).toBe(true);
+    expect(isOpaqueOnlyImageUrl("data:image/png;base64,xx")).toBe(false);
+    expect(isOpaqueOnlyImageUrl("actor-ego")).toBe(false);
+    const doc = {
+      ...createEmptyJsonPack({ id: "boxed", title: "Boxed" }),
+      actors: {
+        player: { sprite: "data:image/jpeg;base64,xx" },
+        cat: { sprite: "data:image/png;base64,xx" },
+      },
+    };
+    const warnings = lintBoxedCharacterSprites(doc);
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toContain('actor "player"');
+  });
+});

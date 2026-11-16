@@ -6,6 +6,7 @@ import {
   STORAGE_LIMITS,
 } from "./security";
 import { normalizeLoadedState } from "./state";
+import { ENGINE_VERSION } from "./version";
 import {
   createDualSaveStore,
   type DualSaveStore,
@@ -27,6 +28,8 @@ export interface SaveSlot {
   locationName: string;
   /** Pack content version at time of save */
   version?: string;
+  /** Engine release that wrote the save (informational; absent before 0.2.0) */
+  engineVersion?: string;
   /** True when this is the autosave slot */
   autosave?: boolean;
   /** Set when load refused the slot (major mismatch, no migrator) */
@@ -122,8 +125,18 @@ function applyVersionPolicy(
   }
 
   if (migrateSave) {
-    const migrated = migrateSave(slot.data, slot.version, contentVersion);
-    if (!migrated) {
+    let migrated: GameState | null = null;
+    try {
+      migrated = migrateSave(slot.data, slot.version, contentVersion);
+    } catch (error) {
+      // A buggy migrator must not make the save look empty (and get
+      // overwritten) — keep the slot visible and refuse to load it.
+      console.error(
+        `[adventure:${slot.gameId}] migrateSave threw for v${slot.version} → v${contentVersion}`,
+        error
+      );
+    }
+    if (!migrated || typeof migrated !== "object") {
       return {
         ...slot,
         incompatible: true,
@@ -243,29 +256,44 @@ export function createSaveAdapter(
       if (!unwrapped) return null;
 
       const parsed = safeJsonParse<SaveSlot>(unwrapped);
-      if (!parsed || typeof parsed !== "object" || !parsed.data) {
+      if (
+        !parsed ||
+        typeof parsed !== "object" ||
+        !parsed.data ||
+        typeof parsed.data !== "object" ||
+        Array.isArray(parsed.data)
+      ) {
         return null;
       }
       // Refuse saves that claim a different pack id (cross-game injection)
-      if (
-        parsed.gameId != null &&
-        parsed.gameId !== gameId &&
-        isSafeIdentifierKey(parsed.gameId)
-      ) {
+      if (parsed.gameId != null && parsed.gameId !== gameId) {
         console.error(
-          `Save gameId mismatch: expected ${gameId}, got ${parsed.gameId}`
+          `Save gameId mismatch: expected ${gameId}, got ${
+            isSafeIdentifierKey(parsed.gameId) ? parsed.gameId : "(invalid id)"
+          }`
         );
         return null;
       }
-      let data = normalizeLoadedState(parsed.data);
-      if (sanitizeState) {
-        data = sanitizeState(data);
-      }
-      return applyVersionPolicy(
-        { ...parsed, data, slot, gameId },
+      // Order matters for content updates: the migrator sees the save as it
+      // was written (old room / item ids intact), THEN the result is clamped
+      // to what the current pack can represent.
+      const policy = applyVersionPolicy(
+        {
+          ...parsed,
+          data: normalizeLoadedState(parsed.data),
+          slot,
+          gameId,
+          version:
+            typeof parsed.version === "string" ? parsed.version : undefined,
+        },
         contentVersion,
         migrateSave
       );
+      if (!policy || policy.incompatible || !sanitizeState) return policy;
+      return {
+        ...policy,
+        data: sanitizeState(normalizeLoadedState(policy.data)),
+      };
     } catch (error) {
       console.error("Failed to parse save data", error);
       return null;
@@ -273,7 +301,7 @@ export function createSaveAdapter(
   };
 
   const writeSlot = (key: string, saveData: SaveSlot): boolean => {
-    const encoded = encodeSlot(saveData);
+    const encoded = encodeSlot({ ...saveData, engineVersion: ENGINE_VERSION });
     const result = store.set(key, encoded);
     return result.ok;
   };

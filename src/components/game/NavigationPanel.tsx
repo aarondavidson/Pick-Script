@@ -15,11 +15,14 @@ import {
 import { soundFX } from "@/utils/soundEffects";
 import { haptics } from "@/utils/haptics";
 import { useMemo } from "react";
+import { isPhoneLayout, usePlayLayout } from "@/hooks/usePlayLayout";
 
 export const NavigationPanel = () => {
   const { gameState, runtime, inputLocked, travelThroughExit, showMessage } =
     useGame();
   const location = runtime.getRoom(gameState.currentLocation);
+  const layout = usePlayLayout();
+  const phone = isPhoneLayout(layout);
 
   const exits = useMemo(() => {
     if (!location) return [];
@@ -76,6 +79,8 @@ export const NavigationPanel = () => {
   };
 
   if (exits.length === 0) {
+    // Phones: no placeholder panel — the space goes to the scene
+    if (phone) return null;
     return (
       <div className="bg-game-ui border-2 border-game-border p-2 md:p-4">
         <h3 className="pixel-font text-accent mb-1 text-sm md:text-base">
@@ -89,11 +94,29 @@ export const NavigationPanel = () => {
   }
 
   return (
-    <div className="bg-game-ui border-2 border-game-border p-2 md:p-4">
-      <h3 className="pixel-font text-accent mb-2 md:mb-3 text-sm md:text-base">
+    <div
+      className={
+        phone ? "" : "bg-game-ui border-2 border-game-border p-2 md:p-4"
+      }
+    >
+      <h3
+        className={
+          phone
+            ? "sr-only"
+            : "pixel-font text-accent mb-2 md:mb-3 text-sm md:text-base"
+        }
+      >
         Exits
       </h3>
-      <div className="grid grid-cols-2 gap-1 md:gap-2">
+      <div
+        className={`grid gap-1 md:gap-2 ${
+          layout === "phone-landscape"
+            ? "grid-cols-1"
+            : layout === "desktop"
+              ? "grid-cols-2 xl:grid-cols-1"
+              : "grid-cols-2"
+        }`}
+      >
         {exits.map((exit) => {
           const blocked = !!exit.blocked?.(gameState);
           const label =
@@ -105,9 +128,11 @@ export const NavigationPanel = () => {
               variant="outline"
               size="sm"
               disabled={inputLocked}
-              className={`pixel-font text-[10px] md:text-xs bg-secondary/50 hover:bg-primary/20 active:bg-primary/30 flex items-center gap-1 md:gap-2 min-h-[48px] touch-manipulation tap-feedback ${
-                blocked ? "opacity-60" : ""
-              }`}
+              className={`pixel-font bg-secondary/50 hover:bg-primary/20 active:bg-primary/30 flex items-center gap-1 md:gap-2 touch-manipulation tap-feedback ${
+                phone
+                  ? "text-[11px] min-h-[44px] justify-start px-2"
+                  : "text-[10px] md:text-xs min-h-[48px]"
+              } ${blocked ? "opacity-60" : ""}`}
             >
               {getDirectionIcon(exit.direction)}
               <span className="truncate text-left">

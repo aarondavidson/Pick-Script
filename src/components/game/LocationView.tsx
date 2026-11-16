@@ -10,8 +10,12 @@ import { ComicReader } from "./ComicReader";
 import { HotspotDebugOverlay } from "./HotspotDebugOverlay";
 import { useHotspotOverrides } from "@/hooks/useHotspotOverrides";
 import { useDebug } from "@/contexts/DebugContext";
-import { useGameDimensions } from "@/hooks/useGameDimensions";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { isPhoneLayout, usePlayLayout } from "@/hooks/usePlayLayout";
+import { SentenceLine } from "./SentenceLine";
+import {
+  StageScaleProvider,
+  useMeasuredStageScale,
+} from "@/hooks/useStageScale";
 import { cssPlayUrlValue } from "@/engine/security";
 import { lookupComic } from "@/engine/specials";
 import { pixelBackgroundStyle } from "@/engine/script";
@@ -59,8 +63,10 @@ export const LocationView = () => {
   const holdTimerRef = useRef<number | null>(null);
   /** True if this pointer gesture became a hold-reveal (suppress walk on up) */
   const heldRevealRef = useRef(false);
-  const isMobile = useIsMobile();
-  const { height: gameHeight } = useGameDimensions();
+  const layout = usePlayLayout();
+  const phone = isPhoneLayout(layout);
+  const [stageEl, setStageEl] = useState<HTMLDivElement | null>(null);
+  const stageScale = useMeasuredStageScale(stageEl);
 
   useEffect(() => {
     return () => {
@@ -76,7 +82,7 @@ export const LocationView = () => {
   const camTranslate = runtime.cameraToTranslate(gameState.camera, roomSize);
   const roomActors = useMemo(
     () => (location ? runtime.actorsInRoom(gameState, location.id) : []),
-    [runtime, gameState, location]
+    [runtime, gameState, location],
   );
 
   // Open pack modalities from specials via the modality registry
@@ -91,7 +97,7 @@ export const LocationView = () => {
         setActiveMinigameConfig(pendingModality.config);
       } else {
         showMessage(
-          `Unknown minigame “${pendingModality.minigameId}” — no player registered.`
+          `Unknown minigame “${pendingModality.minigameId}” — no player registered.`,
         );
       }
     }
@@ -104,7 +110,7 @@ export const LocationView = () => {
 
   const baseHotspots = runtime.getVisibleHotspots(
     gameState.currentLocation,
-    gameState
+    gameState,
   );
   const visibleHotspots = debugMode
     ? applyOverrides(baseHotspots)
@@ -114,7 +120,7 @@ export const LocationView = () => {
     hotspotName: string,
     tree: DialogueTree,
     actorId?: string,
-    hotspotId?: string
+    hotspotId?: string,
   ) => {
     const actorDef = actorId ? runtime.getActorDef(actorId) : null;
     setActiveDialogue({
@@ -128,15 +134,16 @@ export const LocationView = () => {
 
   const comic = lookupComic(definition.comics, comicId);
 
-  const containerHeight = isMobile
-    ? `${Math.min(gameHeight, 400)}px`
-    : "480px";
+  const stageClass =
+    layout === "desktop"
+      ? "play-stage play-stage--desktop border-2"
+      : layout === "phone-landscape"
+        ? "play-stage play-stage--landscape"
+        : layout === "phone-portrait"
+          ? "play-stage border-y"
+          : "play-stage border-2";
 
-  const pctFromClient = (
-    clientX: number,
-    clientY: number,
-    el: HTMLElement
-  ) => {
+  const pctFromClient = (clientX: number, clientY: number, el: HTMLElement) => {
     const r = el.getBoundingClientRect();
     // Convert viewport click → room % accounting for camera translate + room size
     const localX = ((clientX - r.left) / r.width) * 100;
@@ -154,12 +161,13 @@ export const LocationView = () => {
     setRevealHotspots(false);
   };
 
-  const handleFloorPointerDown = (
-    e: React.PointerEvent<HTMLDivElement>
-  ) => {
+  const handleFloorPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (inputLocked || debugMode) return;
     const target = e.target as HTMLElement;
-    if (target.closest("[data-hotspot]") || target.closest("[data-verb-coin]")) {
+    if (
+      target.closest("[data-hotspot]") ||
+      target.closest("[data-verb-coin]")
+    ) {
       return;
     }
     if (selectedVerb || selectedCombineItem) return;
@@ -174,7 +182,7 @@ export const LocationView = () => {
   };
 
   const handleFloorPointer = (
-    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
+    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
   ) => {
     if (inputLocked || debugMode) return;
     const wasReveal = heldRevealRef.current;
@@ -190,7 +198,10 @@ export const LocationView = () => {
     if (wasReveal) return;
 
     const target = e.target as HTMLElement;
-    if (target.closest("[data-hotspot]") || target.closest("[data-verb-coin]")) {
+    if (
+      target.closest("[data-hotspot]") ||
+      target.closest("[data-verb-coin]")
+    ) {
       return;
     }
 
@@ -223,147 +234,169 @@ export const LocationView = () => {
     : false;
 
   return (
-    <div
-      className="relative w-full bg-card border-2 border-game-border overflow-hidden touch-none"
-      style={{
-        height: containerHeight,
-        maxHeight: isMobile ? "50vh" : "480px",
-      }}
-    >
+    <>
       <div
-        className="absolute origin-top-left"
-        style={{
-          width: `${roomSize.width}%`,
-          height: `${roomSize.height}%`,
-          transform: `translate(${camTranslate.x}%, ${camTranslate.y}%) scale(${camTranslate.zoom ?? 1})`,
-          willChange: "transform",
-        }}
-        onClick={handleFloorPointer}
-        onTouchEnd={handleFloorPointer}
-        onPointerDown={handleFloorPointerDown}
-        onPointerUp={clearHoldReveal}
-        onPointerCancel={clearHoldReveal}
-        onPointerLeave={clearHoldReveal}
+        className={`relative bg-card border-game-border overflow-hidden touch-none ${stageClass}`}
+        ref={setStageEl}
+        data-testid="play-stage"
       >
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute origin-top-left"
           style={{
-            backgroundImage: cssPlayUrlValue(location.image),
-            ...pixelBackgroundStyle({
-              crisp: !!definition.presentation?.crispPixels,
-            }),
+            width: `${roomSize.width}%`,
+            height: `${roomSize.height}%`,
+            transform: `translate(${camTranslate.x}%, ${camTranslate.y}%) scale(${camTranslate.zoom ?? 1})`,
+            willChange: "transform",
           }}
-        />
-
-        <AtmosphereLayers
-          room={location}
-          camTranslate={camTranslate}
-          layer="behind"
-        />
-
-        {visibleHotspots.map((hotspot) => (
-          <Hotspot
-            key={hotspot.id}
-            hotspot={hotspot}
-            forceReveal={revealHotspots}
-            onDialogueOpen={
-              hotspot.dialogue
-                ? () =>
-                    handleDialogueOpen(
-                      hotspot.name,
-                      hotspot.dialogue!,
-                      hotspot.actorId,
-                      hotspot.id
-                    )
-                : undefined
-            }
-            onVerbCoinRequest={
-              verbMode === "coin"
-                ? (hs, openDialogue) => {
-                    setVerbCoin({
-                      hotspot: hs,
-                      x: hs.x + hs.width / 2,
-                      y: hs.y + hs.height / 2,
-                      onDialogueOpen: openDialogue,
-                    });
-                  }
-                : undefined
-            }
+          onClick={handleFloorPointer}
+          onTouchEnd={handleFloorPointer}
+          onPointerDown={handleFloorPointerDown}
+          onPointerUp={clearHoldReveal}
+          onPointerCancel={clearHoldReveal}
+          onPointerLeave={clearHoldReveal}
+        >
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: cssPlayUrlValue(location.image),
+              ...pixelBackgroundStyle({
+                crisp: !!definition.presentation?.crispPixels,
+              }),
+            }}
           />
-        ))}
 
-        {roomActors.map((actor) => (
-          <ActorSprite key={actor.id} actor={actor} />
-        ))}
+          <AtmosphereLayers
+            room={location}
+            camTranslate={camTranslate}
+            layer="behind"
+          />
 
-        <AtmosphereLayers
-          room={location}
-          camTranslate={camTranslate}
-          layer="front"
-        />
-
-        {verbCoin && (
-          <div data-verb-coin>
-            <VerbCoin
-              hotspot={verbCoin.hotspot}
-              x={verbCoin.x}
-              y={verbCoin.y}
-              onDialogueOpen={verbCoin.onDialogueOpen}
-              onClose={() => setVerbCoin(null)}
+          {visibleHotspots.map((hotspot) => (
+            <Hotspot
+              key={hotspot.id}
+              hotspot={hotspot}
+              forceReveal={revealHotspots}
+              onDialogueOpen={
+                hotspot.dialogue
+                  ? () =>
+                      handleDialogueOpen(
+                        hotspot.name,
+                        hotspot.dialogue!,
+                        hotspot.actorId,
+                        hotspot.id,
+                      )
+                  : undefined
+              }
+              onVerbCoinRequest={
+                verbMode === "coin"
+                  ? (hs, openDialogue) => {
+                      setVerbCoin({
+                        hotspot: hs,
+                        x: hs.x + hs.width / 2,
+                        y: hs.y + hs.height / 2,
+                        onDialogueOpen: openDialogue,
+                      });
+                    }
+                  : undefined
+              }
             />
+          ))}
+
+          <StageScaleProvider value={stageScale}>
+            {roomActors.map((actor) => (
+            <ActorSprite key={actor.id} actor={actor} />
+          ))}
+          </StageScaleProvider>
+
+          <AtmosphereLayers
+            room={location}
+            camTranslate={camTranslate}
+            layer="front"
+          />
+
+          {verbCoin && (
+            <div data-verb-coin>
+              <VerbCoin
+                hotspot={verbCoin.hotspot}
+                x={verbCoin.x}
+                y={verbCoin.y}
+                onDialogueOpen={verbCoin.onDialogueOpen}
+                onClose={() => setVerbCoin(null)}
+              />
+            </div>
+          )}
+
+          <HotspotDebugOverlay
+            hotspots={visibleHotspots}
+            locationId={gameState.currentLocation}
+          />
+        </div>
+
+        {/* Desktop / preview: caption over the scene. Phones keep the scene
+          clear — portrait shows the caption underneath, landscape a name chip. */}
+        {!phone && (
+          <div className="absolute bottom-0 left-0 right-0 bg-game-ui/90 border-t-2 border-game-border p-2 md:p-3 pointer-events-none z-10">
+            <h2 className="pixel-font text-accent text-sm md:text-lg">
+              {location.name}
+            </h2>
+            <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
+              {location.description}
+            </p>
           </div>
         )}
+        {layout === "phone-landscape" && (
+          <h2 className="absolute top-1 left-1 z-10 pointer-events-none pixel-font text-accent text-[11px] bg-game-ui/80 border border-game-border px-1.5 py-0.5 max-w-[60%] truncate">
+            {location.name}
+          </h2>
+        )}
+        {phone && <SentenceLine overlay />}
 
-        <HotspotDebugOverlay
-          hotspots={visibleHotspots}
-          locationId={gameState.currentLocation}
-        />
+        {activeDialogue && (
+          <DialogueBox
+            npcName={activeDialogue.npcName}
+            dialogueTree={activeDialogue.tree}
+            gameState={gameState}
+            talkColor={activeDialogue.talkColor}
+            actorId={activeDialogue.actorId}
+            treeKey={activeDialogue.treeKey}
+            onChoice={(newState) => updateGameState(newState)}
+            onClose={() => setActiveDialogue(null)}
+          />
+        )}
+
+        {comic && (
+          <ComicReader
+            isOpen={true}
+            onClose={() => setComicId(null)}
+            comic={comic}
+          />
+        )}
+
+        {ModalityPlayer && activeMinigameId && modalityEntry && (
+          <ModalityPlayer
+            isOpen={true}
+            onClose={() => {
+              setActiveMinigameId(null);
+              setActiveMinigameConfig(undefined);
+            }}
+            onWin={() =>
+              completeModality(activeMinigameId, activeMinigameConfig)
+            }
+            alreadyWon={modalityAlreadyWon}
+            config={activeMinigameConfig}
+          />
+        )}
       </div>
-
-      <div className="absolute bottom-0 left-0 right-0 bg-game-ui/90 border-t-2 border-game-border p-2 md:p-3 pointer-events-none safe-bottom z-10">
-        <h2 className="pixel-font text-accent text-sm md:text-lg">
-          {location.name}
-        </h2>
-        <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
-          {location.description}
-        </p>
-      </div>
-
-      {activeDialogue && (
-        <DialogueBox
-          npcName={activeDialogue.npcName}
-          dialogueTree={activeDialogue.tree}
-          gameState={gameState}
-          talkColor={activeDialogue.talkColor}
-          actorId={activeDialogue.actorId}
-          treeKey={activeDialogue.treeKey}
-          onChoice={(newState) => updateGameState(newState)}
-          onClose={() => setActiveDialogue(null)}
-        />
+      {layout === "phone-portrait" && (
+        <div className="px-2 pt-1.5">
+          <h2 className="pixel-font text-accent text-sm leading-tight">
+            {location.name}
+          </h2>
+          <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
+            {location.description}
+          </p>
+        </div>
       )}
-
-      {comic && (
-        <ComicReader
-          isOpen={true}
-          onClose={() => setComicId(null)}
-          comic={comic}
-        />
-      )}
-
-      {ModalityPlayer && activeMinigameId && modalityEntry && (
-        <ModalityPlayer
-          isOpen={true}
-          onClose={() => {
-            setActiveMinigameId(null);
-            setActiveMinigameConfig(undefined);
-          }}
-          onWin={() =>
-            completeModality(activeMinigameId, activeMinigameConfig)
-          }
-          alreadyWon={modalityAlreadyWon}
-          config={activeMinigameConfig}
-        />
-      )}
-    </div>
+    </>
   );
 };

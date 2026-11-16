@@ -8,7 +8,10 @@
  * the public API for existing `@/engine/jsonPack` imports.
  */
 
-export { JSON_PACK_SCHEMA_VERSION } from "./jsonPackTypes";
+export {
+  JSON_PACK_SCHEMA_VERSION,
+  JSON_PACK_MIN_SCHEMA_VERSION,
+} from "./jsonPackTypes";
 export type {
   JsonPackHotspotKind,
   JsonPackUseWithRule,
@@ -37,6 +40,8 @@ export type {
 
 export {
   createEmptyJsonPack,
+  JSON_PACK_MIGRATIONS,
+  migrateJsonPackDocument,
   parseJsonPack,
   JSON_PACK_PLACEHOLDER_IMAGE,
 } from "./jsonPackCompile";

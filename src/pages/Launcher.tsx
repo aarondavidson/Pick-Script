@@ -19,11 +19,9 @@ import {
   SCRIPT_POWERED_CREDIT,
 } from "@/product/branding";
 import {
-  FIRST_GAME_FUNNEL_STEPS,
   FirstGameFunnel,
 } from "@/studio/FirstGameFunnel";
 
-const GUIDED_STEPS = FIRST_GAME_FUNNEL_STEPS;
 
 /**
  * Product-aware home:
@@ -119,7 +117,7 @@ const Launcher = () => {
             <p className="text-[11px] text-muted-foreground leading-relaxed px-1">
               {PICK.expansion} — visual editor. {SCRIPT.acronym} runs packs
               (inventory, verbs, use-with, saves, map). Free &amp; open source.
-              Path: {GUIDED_STEPS.join(" → ")}. Advanced patterns in{" "}
+              Advanced patterns in{" "}
               <Link to="/pick/recipes" className="text-primary underline">
                 Recipes
               </Link>
