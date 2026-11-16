@@ -18,6 +18,8 @@ anything, you need to change.
 
 - **Character size** — `scale` on actors (TS + JSON, 0.25–4); Studio: Pack → Actors → **Size on stage** slider. `resolveActorScale` / `stageSpriteScale` exported from `@/engine`
 
+- **Character background removal** — character images brought into the Studio (Pixels → Send to pack as *Character costume*, or Pack → Actors → **Upload character image** / **Remove background**) are cut out automatically when they sit on a flat colour, a grey "fake transparency" checkerboard, or have letterbox bars. Already-transparent PNGs are untouched; busy backgrounds are left alone and the author is told. `pack-doctor` / pack lint warn about JPEG character sprites
+
 ### Changed
 
 - **Characters scale with the room** — sprites used to be a fixed pixel size, so the player looked tiny on a large screen and oversized on a phone. They now keep the same size relative to the scene everywhere (speech bubbles and name labels stay a readable size). Default bitmap height is about a quarter of the room
@@ -28,7 +30,7 @@ anything, you need to change.
 
 ### Fixed
 
-- Harbor Fog characters were drawn on a baked-in checkerboard box; the sprites are now transparent PNGs
+- Harbor Fog characters were drawn on a baked-in checkerboard box; the sprites are now transparent PNGs (made with the new background removal)
 - Phone menu sheet could run off a short screen; it scrolls and uses two columns when the screen is short
 
 ## 0.2.0 — 2026-11-16

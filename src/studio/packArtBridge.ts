@@ -3,6 +3,10 @@
  */
 
 import {
+  cutoutSpriteDataUrl,
+  type SpriteCutoutOutcome,
+} from "@/studio/spriteCutout";
+import {
   loadPackDraftAsync,
   savePackDraftAsync,
 } from "@/studio/packDraftIdb";
@@ -23,6 +27,8 @@ export async function applyArtToPackDraft(opts: {
   itemName?: string;
   /** Actor / character hotspot id when target is character|portrait */
   actorId?: string;
+  /** Told what happened to a character sprite's background (target "character") */
+  onCutout?: (outcome: SpriteCutoutOutcome) => void;
 }): Promise<JsonPackDocument> {
   const doc = await loadPackDraftAsync();
   if (opts.target === "room") {
@@ -35,6 +41,17 @@ export async function applyArtToPackDraft(opts: {
   }
 
   if (opts.target === "character" || opts.target === "portrait") {
+    // Walk sprites must be cut out — a baked-in background shows as a box
+    // around the character on stage. Portraits keep their background.
+    if (opts.target === "character") {
+      try {
+        const cut = await cutoutSpriteDataUrl(opts.dataUrl);
+        opts = { ...opts, dataUrl: cut.dataUrl };
+        opts.onCutout?.(cut.outcome);
+      } catch {
+        opts.onCutout?.("no-simple-background");
+      }
+    }
     const actorId = suggestId(opts.actorId || "player", "actor");
     const prev = doc.actors?.[actorId] ?? {};
     let next: JsonPackDocument = {

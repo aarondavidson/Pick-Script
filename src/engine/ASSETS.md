@@ -110,6 +110,16 @@ actors: {
 }
 ```
 
+**No boxes.** A character must have a see-through background, or it shows as a
+rectangle on stage. JPEG cannot be transparent — use PNG (or WebP). Watch for
+"fake transparency": a grey-and-white checkerboard that is really part of the
+picture, common in AI-generated and screenshotted art. The Studio removes flat
+colour, checkerboard and letterbox-bar backgrounds for you when you send or
+upload a character (Pack → Actors → **Upload character image** / **Remove
+background**), and tells you when it cannot (a photo or scene behind the
+character). For hand-authored TS packs, export a transparent PNG yourself;
+`npm run pack-doctor` warns about JPEG character sprites in `.pack.json` files.
+
 **Size.** Sprites are scaled with the room, so a character takes the same share of
 the scene on a phone and on a desktop (about a quarter of the room height for a
 bitmap at the default). Set `scale` on the actor (0.25–4) — or Studio → Pack →

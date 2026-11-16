@@ -212,6 +212,7 @@ npm run dev
 ```
 
 1. Pick preset: room / item / character / portrait / comic
+   - **Characters:** when you send a character to the pack, its background is removed for you if it is a flat colour or a grey checkerboard, so it does not show as a box in the room. If the Studio says it could not, use a PNG with a transparent background. Resize it under Pack → Actors → **Size on stage**.
 2. Copy a suggested prompt into your own image tool (see [IMAGE-GEN-STARTER.md](./IMAGE-GEN-STARTER.md)), then **Upload** the result — or upload art you drew / downloaded
 3. Pick a **Palette**: the built-in game palette, **Custom** (paste colors), or **Adaptive** (taken from the image)
 4. **Send to pack**, or Download → `src/games/<id>/assets/` (items under `assets/items/`)
