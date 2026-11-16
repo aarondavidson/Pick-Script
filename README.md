@@ -15,7 +15,7 @@ Current release: **0.3.0** — see [`CHANGELOG.md`](./CHANGELOG.md).
 - Building a game on the engine? [`docs/UPGRADING.md`](./docs/UPGRADING.md) explains how to take a new release and keep players' saves working.
 - Maintaining the engine? [`docs/RELEASING.md`](./docs/RELEASING.md) has the versioning policy and release checklist.
 
-Use tagged releases (`v0.3.0`), not `main`, as the base for a shipped game.
+Get releases from the [Releases page](https://github.com/aarondavidson/Pick-Script/releases) (notes, source, and a ready-to-host web build). Use tagged releases (`v0.3.0`), not `main`, as the base for a shipped game. To be notified of new versions: **Watch → Custom → Releases**.
 
 ## Develop
 

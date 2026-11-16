@@ -120,15 +120,51 @@ to put in `minEngineVersion`.
      per release for this) — it must load and continue.
    - Studio: create a pack from a template, playtest, download the `.pack.json`,
      import it again on the launcher.
-7. **Merge to `main`**, then tag the merge commit and push the tag:
+7. **Merge to `main`** through a pull request with green CI.
+8. **Publish:** on GitHub open **Actions → Release → Run workflow** and run it
+   on `main`. That is the whole step. The workflow
+   ([`release.yml`](../.github/workflows/release.yml)):
+   - re-runs every check and refuses to continue if any fails
+   - refuses if `vX.Y.Z` has already been released
+   - creates the tag `vX.Y.Z` on that commit
+   - publishes a **GitHub Release** whose notes are this version's
+     `CHANGELOG.md` section, marked as *Latest*
+   - attaches `pick-script-web-X.Y.Z.zip` (the built player + Studio, ready
+     for any static host) and `SHA256SUMS.txt`
+
+   Prefer tagging by hand? Pushing an annotated tag starts the same workflow:
    ```bash
    git tag -a v0.3.0 -m "Pick-Script 0.3.0"
    ```
    ```bash
    git push origin v0.3.0
    ```
-   CI runs on the tag and fails if the tag does not match the version.
-8. **GitHub release:** create it from the tag and paste the changelog section.
+9. **Check the result:** the [Releases page](https://github.com/aarondavidson/Pick-Script/releases)
+   shows the new version as *Latest* with its notes and files.
+
+## How people get a release
+
+| They want | They use |
+|---|---|
+| To see what changed | The [Releases page](https://github.com/aarondavidson/Pick-Script/releases) — or **Watch → Custom → Releases** to be notified |
+| The source at a tested point | The tag (`git checkout v0.3.0`) or the *Source code* archive on the release |
+| A ready-to-host build | `pick-script-web-X.Y.Z.zip` on the release — unzip onto any static host |
+| To update a game built on the engine | [`UPGRADING.md`](./UPGRADING.md) |
+
+## GitHub rules of the road
+
+- **`main` is always releasable.** Changes arrive by pull request with green
+  CI. Recommended repository setting: *Settings → Branches → protect `main`*
+  (require a pull request and the "Typecheck & test" check).
+- **Tags are permanent.** Never move or delete a published `vX.Y.Z` tag —
+  people pin to it. A bad release is fixed by a new patch release.
+  Recommended setting: *Settings → Tags → protect `v*`*.
+- **One naming scheme:** tags are `vMAJOR.MINOR.PATCH`, release titles are
+  `Pick-Script MAJOR.MINOR.PATCH`. Do not create releases by hand in the
+  GitHub UI — the workflow keeps the tag, version, notes and files in step.
+- **Pre-releases:** the early release tagged `Beta` (titled "v1.0.0 Beta")
+  predates this scheme and corresponds to **0.1.0**. Edit its title on GitHub
+  to "0.1.0 (first public beta)" so the version order reads correctly.
 
 ## Patch releases for an older line
 

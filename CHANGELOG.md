@@ -8,7 +8,9 @@ anything, you need to change.
 
 ## Unreleased
 
-_Nothing yet._
+### Added
+
+- **GitHub Releases** — `Release` workflow publishes a GitHub Release (notes from this changelog, built web zip + checksums) from `main` via **Actions → Release → Run workflow** or a pushed `v*` tag; `scripts/release-notes.mjs`; release rules in [`docs/RELEASING.md`](./docs/RELEASING.md)
 
 ## 0.3.0 — 2026-11-16
 
