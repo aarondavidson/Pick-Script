@@ -8,6 +8,12 @@ anything, you need to change.
 
 ## Unreleased
 
+_Nothing yet._
+
+## 0.3.0 — 2026-11-16
+
+Play screen rework for phones, character sizing and automatic character cut-outs.
+
 ### Upgrade notes
 
 - **The play scene is now always 16:9**, the same shape rooms are drawn on in Studio. Before, the scene box changed shape with the screen and cropped the art, so hotspots could sit slightly off the picture. Room art that is not 16:9 is still shown (cropped to fill) — check it once. No pack data changes

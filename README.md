@@ -10,12 +10,12 @@ Teaching demos: Attic Study + Harbor Fog.
 
 ## Versions & updates
 
-Current release: **0.2.0** — see [`CHANGELOG.md`](./CHANGELOG.md).
+Current release: **0.3.0** — see [`CHANGELOG.md`](./CHANGELOG.md).
 
 - Building a game on the engine? [`docs/UPGRADING.md`](./docs/UPGRADING.md) explains how to take a new release and keep players' saves working.
 - Maintaining the engine? [`docs/RELEASING.md`](./docs/RELEASING.md) has the versioning policy and release checklist.
 
-Use tagged releases (`v0.2.0`), not `main`, as the base for a shipped game.
+Use tagged releases (`v0.3.0`), not `main`, as the base for a shipped game.
 
 ## Develop
 

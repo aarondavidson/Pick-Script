@@ -10,7 +10,7 @@ Maintainers cutting a release: see [`RELEASING.md`](./RELEASING.md).
 
 ```ts
 import { ENGINE_VERSION } from "@/engine";
-console.log(ENGINE_VERSION); // "0.2.0"
+console.log(ENGINE_VERSION); // "0.3.0"
 ```
 
 Engine copies from before 0.2.0 have no `ENGINE_VERSION` export — treat them as
@@ -163,6 +163,19 @@ Rules of thumb:
   old saves cannot sensibly continue.
 
 ## Version notes
+
+### 0.2.0 → 0.3.0
+
+No pack data changes are required, but games **look different** — check each one once.
+
+| Change | Do you need to act? |
+|---|---|
+| The play scene is always 16:9 (the Studio stage shape) | Check room art that is not 16:9 — it is cropped to fill. Hotspots now line up with the art on every screen |
+| Characters scale with the room instead of being a fixed pixel size | Check character sizes: slightly smaller on phones, larger on desktop. Adjust with `scale` on the actor / Studio → Pack → Actors → **Size on stage** |
+| New phone layouts (upright and sideways) and desktop side panel | No. Custom shells: see "Play layouts" in `src/engine/SHELL.md` |
+| `useGameDimensions` hook removed | Only custom shells — use `usePlayLayout` |
+| Character images are cut out on import in the Studio | Characters that show in a box: Pack → Actors → **Remove background**, or replace with a transparent PNG |
+| New: actor `scale` | Optional. Set `minEngineVersion: "0.3.0"` if your pack relies on it |
 
 ### 0.1.0 → 0.2.0
 
