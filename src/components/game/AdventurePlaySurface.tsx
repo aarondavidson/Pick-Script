@@ -1,5 +1,4 @@
 import { Suspense, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { useGame } from "@/contexts/GameContext";
 import { useMusic } from "@/contexts/MusicContext";
 import { LocationView } from "@/components/game/LocationView";
@@ -27,7 +26,6 @@ import { StuckAssistBanner } from "@/components/game/StuckAssistBanner";
 import { ConsumeConfirmDialog } from "@/components/game/ConsumeConfirmDialog";
 import { AuthorDebugger } from "@/components/game/AuthorDebugger";
 import { PlayMobileMenu } from "@/components/game/PlayMobileMenu";
-import { getProductConfig } from "@/product/productConfig";
 import { getShellCanvasFx, getShellIntro } from "./shellUi";
 import { resolvePlayChrome } from "@/engine/playChrome";
 import {
@@ -43,6 +41,14 @@ export interface AdventurePlaySurfaceProps {
   variant?: AdventurePlayVariant;
   /** Called when the player restarts after game complete */
   onRestart?: () => void;
+  /**
+   * Leave the game (back to a launcher / menu). When omitted there is no
+   * home control — right for a single-game site. The play UI itself has no
+   * router dependency; the host decides what "home" means.
+   */
+  onHome?: () => void;
+  /** Label for the home control (default "Games") */
+  homeLabel?: string;
 }
 
 /**
@@ -51,6 +57,8 @@ export interface AdventurePlaySurfaceProps {
 export function AdventurePlaySurface({
   variant = "full",
   onRestart,
+  onHome,
+  homeLabel = "Games",
 }: AdventurePlaySurfaceProps) {
   const { gameState, definition } = useGame();
   const { isUnlocked, unlockAudio } = useMusic();
@@ -59,13 +67,12 @@ export function AdventurePlaySurface({
   const preview = variant === "preview";
   const viewportLayout = useViewportPlayLayout();
   const layout: PlayLayout = preview ? "preview" : viewportLayout;
-  const product = getProductConfig();
   const chrome = useMemo(
     () =>
       resolvePlayChrome(definition, {
-        showHomeLink: !product.isTitleProduct,
+        showHomeLink: !!onHome,
       }),
-    [definition, product.isTitleProduct],
+    [definition, onHome],
   );
 
   const handleRestart = () => {
@@ -141,7 +148,8 @@ export function AdventurePlaySurface({
 
   const phoneMenu = (
     <PlayMobileMenu
-      homeLabel={product.homeLinkLabel}
+      homeLabel={homeLabel}
+      onHome={onHome}
       chrome={chrome}
       onSaveClick={() => setSaveMenuOpen(true)}
       onLoadClick={() => setLoadMenuOpen(true)}
@@ -305,13 +313,14 @@ export function AdventurePlaySurface({
                 )}
               </div>
               <div className="flex flex-wrap gap-1 md:gap-2 items-center justify-center">
-                {chrome.home && (
-                  <Link
-                    to="/"
+                {chrome.home && onHome && (
+                  <button
+                    type="button"
+                    onClick={onHome}
                     className="pixel-font text-xs border border-game-border px-2 py-1 hover:bg-secondary/40"
                   >
-                    {product.homeLinkLabel}
-                  </Link>
+                    {homeLabel}
+                  </button>
                 )}
                 <EgoSwitcher />
                 {!preview && chrome.journal && <JournalDialog />}

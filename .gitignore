@@ -30,3 +30,14 @@ dist-ssr
 
 .vercel
 
+
+# Built package output
+packages/engine/dist
+packages/engine/*.tgz
+packages/engine/LICENSE
+packages/engine/LICENSE-EXCEPTION.md
+packages/engine/COPYRIGHT
+
+# Playwright
+test-results
+playwright-report

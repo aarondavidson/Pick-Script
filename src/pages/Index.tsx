@@ -1,8 +1,15 @@
+import { fetchJsonPack } from "@/engine/packAssets";
 import { useEffect, useState } from "react";
 import { GameProvider } from "@/contexts/GameContext";
 import { MusicProvider } from "@/contexts/MusicContext";
 import { AdventurePlaySurface } from "@/components/game/AdventurePlaySurface";
-import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  Navigate,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { resolvePlayableGame } from "@/games/resolveGame";
 import {
   createGameFromJson,
@@ -23,14 +30,22 @@ import type { GameDefinition } from "@/engine/definition";
 import { getProductConfig, isGameLocked } from "@/product/productConfig";
 
 /** Load a hosted .pack.json (same-origin or CORS-enabled HTTPS URL) into play. */
-async function fetchPackFromUrl(url: string): Promise<JsonPackDocument> {
-  const res = await fetch(url, { credentials: "omit" });
-  if (!res.ok) throw new Error(`Could not fetch pack (${res.status})`);
-  const text = await res.text();
-  if (text.length > STORAGE_LIMITS.maxInstalledPackChars) {
-    throw new Error("Pack file too large");
-  }
-  return parseJsonPack(safeJsonParse(text));
+/** Hosted packs may keep media in an assets/ folder next to pack.json. */
+function fetchPackFromUrl(url: string): Promise<JsonPackDocument> {
+  return fetchJsonPack(url, { maxChars: STORAGE_LIMITS.maxInstalledPackChars });
+}
+
+/** Play surface wired to this app's router + product config. */
+function RoutedPlaySurface() {
+  const navigate = useNavigate();
+  const product = getProductConfig();
+  return (
+    <AdventurePlaySurface
+      variant="full"
+      onHome={product.isTitleProduct ? undefined : () => navigate("/")}
+      homeLabel={product.homeLinkLabel}
+    />
+  );
 }
 
 const Index = () => {
@@ -129,7 +144,7 @@ const Index = () => {
         )}
         <MusicProvider initialLocation={remoteDef.startRoom}>
           <GameProvider definition={remoteDef}>
-            <AdventurePlaySurface variant="full" />
+            <RoutedPlaySurface />
           </GameProvider>
         </MusicProvider>
       </div>
@@ -181,7 +196,7 @@ const Index = () => {
     return (
       <MusicProvider initialLocation={definition.startRoom}>
         <GameProvider definition={definition}>
-          <AdventurePlaySurface variant="full" />
+          <RoutedPlaySurface />
         </GameProvider>
       </MusicProvider>
     );
@@ -216,7 +231,7 @@ const Index = () => {
   return (
     <MusicProvider initialLocation={definition.startRoom}>
       <GameProvider definition={definition}>
-        <AdventurePlaySurface variant="full" />
+        <RoutedPlaySurface />
       </GameProvider>
     </MusicProvider>
   );

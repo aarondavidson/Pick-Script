@@ -7,6 +7,12 @@ This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, version 3 only (GPL-3.0-only).
 
+Additional permission (GPLv3 section 7): games made with this engine do NOT
+have to use the same licence. Your game content — packs, art, audio, writing
+and your own code — may be released under any terms you choose. Changes to
+the engine itself stay under GPL-3.0-only. The exact terms are in the file
+LICENSE-EXCEPTION.md ("Pick-Script Game Exception").
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -25,6 +31,7 @@ The GPL already requires that copyright notices remain intact; keeping
 this file (and the notices in README / the app UI) satisfies that and
 gives clear author credit.
 
-Contributions are licensed under GPL-3.0-only unless otherwise stated;
+Contributions are licensed under GPL-3.0-only with the Pick-Script Game
+Exception unless otherwise stated;
 see CONTRIBUTING.md.
 ---------------------------------------------------------------------------

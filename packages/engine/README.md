@@ -1,25 +1,32 @@
-# `@portable-adventure/engine`
+# @portable-adventure/engine
 
-Scaffold for publishing the S.C.R.I.P.T. runtime as a package. **Source of truth is still `src/engine/` in this monorepo.**
+**Pick-Script** — a point-and-click adventure engine (S.C.R.I.P.T.) with a
+ready-made play UI for React. Phone, tablet and desktop layouts, touch, saves,
+audio, hints, journal and map are included.
 
-> **New here?**  
-> Product landing: [`docs/ENGINE-LANDING.md`](../../docs/ENGINE-LANDING.md) · AI art: [`docs/IMAGE-GEN-STARTER.md`](../../docs/IMAGE-GEN-STARTER.md)
+```bash
+npm install https://github.com/aarondavidson/Pick-Script/releases/download/v0.4.0/portable-adventure-engine-0.4.0.tgz
+```
 
-The packed entry (`src/index.js`) is a **stub** that throws until extract + publish — so `npm pack` succeeds with a valid manifest without shipping a broken deep re-export of `../../../src/engine`.
+```tsx
+import { PickScriptGame, createGameFromJson } from "@portable-adventure/engine";
+import "@portable-adventure/engine/style.css";
+import pack from "./my-game.pack.json";
 
-## Sync strategy (until publish)
+export default function App() {
+  return <PickScriptGame definition={createGameFromJson(pack)} />;
+}
+```
 
-| Consumer | How they get the engine |
-|---|---|
-| This repo (Studio, demos) | Import `@/engine` — do not switch to this package yet |
-| Games in their own repos | Vendored copy of `src/engine` |
-| Future npm consumers | Depend on `@portable-adventure/engine` once extracted and published |
+Make packs with the Studio (P.I.C.K.) in the
+[Pick-Script repository](https://github.com/aarondavidson/Pick-Script).
 
-Until the extract lands:
+- Full guide: [docs/ENGINE-PACKAGE.md](https://github.com/aarondavidson/Pick-Script/blob/main/docs/ENGINE-PACKAGE.md)
+- Releases and notes: <https://github.com/aarondavidson/Pick-Script/releases>
+- Upgrading: [docs/UPGRADING.md](https://github.com/aarondavidson/Pick-Script/blob/main/docs/UPGRADING.md)
 
-1. Develop engine APIs under `src/engine/` as today.
-2. Refresh games in other repos by replacing their `src/engine` with the copy from a tagged release — see [`docs/UPGRADING.md`](../../docs/UPGRADING.md).
-3. Treat `packages/engine` as docs + manifest + packable stub — root `package.json` does **not** declare npm workspaces, so Vite/CI stay unchanged.
-4. Validate the package shape with `npm run pack:engine` (dry-run).
+## Licence
 
-See [`docs/ENGINE-PACKAGE.md`](../../docs/ENGINE-PACKAGE.md).
+GPL-3.0-only **with the Pick-Script Game Exception**: games you make with the
+engine — packs, art, audio, writing, your own code — may use any licence, open
+or closed. Changes to the engine itself stay GPL. See `LICENSE-EXCEPTION.md`.

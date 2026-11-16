@@ -1,7 +1,7 @@
 {
   "name": "pick-script",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "engines": {
     "node": ">=22.12.0"
@@ -16,21 +16,24 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit",
     "new-pack": "node scripts/new-pack.mjs",
     "pack-doctor": "node scripts/pack-doctor.mjs",
     "pack-from-json": "node scripts/pack-from-json.mjs",
+    "pack-assets": "node scripts/pack-assets.mjs",
     "check-assets": "node scripts/check-assets.mjs",
     "check:capacitor": "node scripts/check-capacitor-ship.mjs",
     "check:cli": "npm run pack-doctor -- scripts/fixtures/smoke.pack.json",
-    "pack:engine": "node scripts/pack-engine-dry-run.mjs",
+    "build:package": "node scripts/build-engine-package.mjs",
+    "pack:engine": "node scripts/build-engine-package.mjs --pack",
     "check:release": "node scripts/check-release.mjs",
     "verify": "npm run typecheck && npm test && npm run check-assets && npm run check:release",
     "cap:sync": "npm run build && npx cap sync",
     "cap:ios": "npm run cap:sync && npx cap open ios",
     "cap:android": "npm run cap:sync && npx cap open android"
   },
-  "license": "GPL-3.0-only",
+  "license": "SEE LICENSE IN LICENSE-EXCEPTION.md",
   "author": {
     "name": "Aaron Davidson",
     "url": "https://github.com/aarondavidson"
@@ -41,6 +44,7 @@
     "@capacitor/core": "^8.0.1",
     "@capacitor/haptics": "^8.0.0",
     "@capacitor/ios": "^8.0.1",
+    "@capacitor/preferences": "^8.0.1",
     "@capacitor/splash-screen": "^8.0.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -92,6 +96,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
+    "@playwright/test": "1.63.0",
     "@types/node": "^22.16.5",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
@@ -108,6 +113,7 @@
     "typescript-eslint": "^8.38.0",
     "vite": "^8.3.5",
     "vite-node": "^6.0.0",
+    "vite-plugin-dts": "^5.1.2",
     "vitest": "^5.0.5"
   },
   "overrides": {

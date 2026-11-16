@@ -1,5 +1,4 @@
 import { useState, type ReactNode } from "react";
-import { Link } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,11 +31,13 @@ type ExtraPanel =
  */
 export function PlayMobileMenu({
   homeLabel,
+  onHome,
   chrome,
   onSaveClick,
   onLoadClick,
 }: {
   homeLabel: string;
+  onHome?: () => void;
   chrome: PlayChromeFlags;
   onSaveClick: () => void;
   onLoadClick: () => void;
@@ -86,14 +87,17 @@ export function PlayMobileMenu({
             className="flex flex-col gap-2 [@media(max-height:540px)]:grid [@media(max-height:540px)]:grid-cols-2"
             aria-label="Game extras"
           >
-            {chrome.home && (
-              <Link
-                to="/"
-                className="pixel-font text-sm min-h-[44px] inline-flex items-center border border-game-border px-3 hover:bg-secondary/40"
-                onClick={() => setSheetOpen(false)}
+            {chrome.home && onHome && (
+              <button
+                type="button"
+                className="pixel-font text-sm min-h-[44px] inline-flex items-center border border-game-border px-3 hover:bg-secondary/40 text-left"
+                onClick={() => {
+                  setSheetOpen(false);
+                  onHome();
+                }}
               >
                 ← {homeLabel}
-              </Link>
+              </button>
             )}
             {chrome.journal && (
               <MenuRow onClick={() => openPanel("journal")}>Journal</MenuRow>

@@ -13,6 +13,20 @@ is refused with an "update the engine" message — see
 Untrusted packs are sanitized at compile (`parseJsonPack` / `createGameFromJson`) —
 nesting caps, allowlisted specials, safe identifier keys, media URL checks.
 
+### Media: inline or in an `assets/` folder
+
+Any image or audio field accepts:
+
+| Form | Example | Use |
+|---|---|---|
+| Inline data URL | `data:image/png;base64,…` | Studio drafts, small packs you pass around as one file |
+| Relative asset | `assets/hall.png` | **Hosted packs.** Resolved against the URL `pack.json` was fetched from. Must start with `assets/`, no `..` |
+| Absolute URL | `https://cdn.example.com/hall.png` or `/art/hall.png` | Art on a CDN or on the player's own site |
+
+Relative assets only work for packs loaded by URL (`/play?packUrl=…`,
+`fetchJsonPack`). Convert an inline pack with Studio → **Download for web
+hosting (.zip)** or `npm run pack-assets -- game.pack.json out/dir`.
+
 ---
 
 ## Document root

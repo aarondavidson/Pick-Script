@@ -83,6 +83,8 @@ export interface SaveAdapter {
   /** Resolves when IndexedDB hydrate / migration finished */
   ready: Promise<void>;
   getBackend: () => SaveBackend;
+  /** Name of the durable host mirror (native storage), or null on plain web */
+  getMirrorName: () => string | null;
   getLastError: () => string | null;
   saveGame: (slot: number, state: GameState, locationName: string) => boolean;
   loadGame: (slot: number) => SaveSlot | null;
@@ -462,6 +464,7 @@ export function createSaveAdapter(
     contentVersion,
     ready: store.ready,
     getBackend: () => store.backend,
+    getMirrorName: () => store.mirrorName ?? null,
     getLastError: () => store.lastError,
     saveGame,
     loadGame,

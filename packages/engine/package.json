@@ -1,26 +1,30 @@
 {
   "name": "@portable-adventure/engine",
-  "version": "0.3.0",
-  "description": "S.C.R.I.P.T. portable adventure runtime (scaffold — source still lives in monorepo src/engine)",
-  "license": "GPL-3.0-only",
+  "version": "0.4.0",
+  "description": "Pick-Script — S.C.R.I.P.T. point-and-click adventure engine with a ready-made play UI (React)",
+  "license": "SEE LICENSE IN LICENSE-EXCEPTION.md",
   "type": "module",
-  "private": true,
   "author": {
     "name": "Aaron Davidson",
     "url": "https://github.com/aarondavidson"
   },
-  "main": "./src/index.js",
-  "types": "./src/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/packages/engine/src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
-      "import": "./src/index.js",
-      "default": "./src/index.js"
-    }
+      "types": "./dist/packages/engine/src/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./style.css": "./dist/style.css",
+    "./package.json": "./package.json"
   },
   "files": [
-    "src",
-    "README.md"
+    "dist",
+    "README.md",
+    "LICENSE",
+    "LICENSE-EXCEPTION.md",
+    "COPYRIGHT"
   ],
   "repository": {
     "type": "git",
@@ -33,5 +37,39 @@
     "scumm",
     "script",
     "pick-script"
-  ]
+  ],
+  "module": "./dist/index.js",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "peerDependencies": {
+    "react": ">=18.3.0 <20",
+    "react-dom": ">=18.3.0 <20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/aarondavidson/Pick-Script#readme",
+  "bugs": {
+    "url": "https://github.com/aarondavidson/Pick-Script/issues"
+  },
+  "dependencies": {
+    "@capacitor/core": "^8.0.1",
+    "@capacitor/haptics": "^8.0.0",
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-popover": "^1.1.14",
+    "@radix-ui/react-progress": "^1.1.7",
+    "@radix-ui/react-scroll-area": "^1.2.9",
+    "@radix-ui/react-slider": "^1.3.5",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-toast": "^1.2.14",
+    "@radix-ui/react-tooltip": "^1.2.7",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
+    "lucide-react": "^0.462.0",
+    "next-themes": "^0.3.0",
+    "sonner": "^1.7.4",
+    "tailwind-merge": "^2.6.0"
+  }
 }

@@ -1,11 +1,73 @@
 /**
- * Web save persistence — IndexedDB primary, localStorage mirror, memory fallback.
- * Designed for browser packs (Chrome / Firefox / Safari / Edge), not Capacitor.
+ * Save persistence — IndexedDB primary, localStorage mirror, memory fallback,
+ * plus an optional host-provided **durable mirror** (`setSaveMirror`).
+ *
+ * Browsers: IndexedDB + localStorage is enough.
+ * Native shells (Capacitor / Cordova / Tauri / Electron): the OS may evict a
+ * web view's storage, so register a mirror backed by native storage — see
+ * `createKeyValueSaveMirror` and CAPACITOR.md.
  */
 
 import { safeJsonParse, STORAGE_LIMITS } from "./security";
 
 export type SaveBackend = "indexeddb" | "localStorage" | "memory";
+
+/**
+ * Durable storage supplied by the host app (native key-value store, file,
+ * cloud…). Every save is written through to it, and on boot the newest copy
+ * (by the save's own timestamp) wins — so saves survive the web view's
+ * storage being cleared.
+ */
+export interface SaveMirror {
+  /** Shown in the save menu, e.g. "device" */
+  name?: string;
+  get: (key: string) => Promise<string | null>;
+  set: (key: string, payload: string) => Promise<void>;
+  remove: (key: string) => Promise<void>;
+}
+
+let activeMirror: SaveMirror | null = null;
+
+/**
+ * Register (or clear, with `null`) the durable save mirror. Call once at app
+ * start, **before** the first `createGame` / `<AdventureProvider>`.
+ */
+export function setSaveMirror(mirror: SaveMirror | null): void {
+  activeMirror = mirror;
+}
+
+export function getSaveMirror(): SaveMirror | null {
+  return activeMirror;
+}
+
+/**
+ * Build a mirror from any `{ get, set, remove }` key-value plugin that uses
+ * `{ key, value }` objects — the shape of `@capacitor/preferences`:
+ *
+ *   import { Preferences } from "@capacitor/preferences";
+ *   setSaveMirror(createKeyValueSaveMirror(Preferences));
+ *
+ * The plugin is passed in, so the engine itself has no native dependency.
+ */
+export function createKeyValueSaveMirror(
+  store: {
+    get: (o: { key: string }) => Promise<{ value: string | null }>;
+    set: (o: { key: string; value: string }) => Promise<unknown>;
+    remove: (o: { key: string }) => Promise<unknown>;
+  },
+  name = "device"
+): SaveMirror {
+  return {
+    name,
+    get: async (key) => (await store.get({ key })).value ?? null,
+    set: async (key, value) => {
+      await store.set({ key, value });
+    },
+    remove: async (key) => {
+      await store.remove({ key });
+    },
+  };
+}
 
 const IDB_NAME = "adventure-game-saves";
 const IDB_STORE = "slots";
@@ -175,6 +237,8 @@ async function idbDelete(key: string): Promise<void> {
 
 export interface DualSaveStore {
   backend: SaveBackend;
+  /** Name of the durable mirror in use, if any */
+  mirrorName?: string | null;
   ready: Promise<void>;
   lastError: string | null;
   /** Sync read of payload string (after hydrate; falls back to localStorage). */
@@ -195,6 +259,26 @@ export function createDualSaveStore(knownKeys: string[]): DualSaveStore {
   let lastError: string | null = null;
   const pending = new Map<string, SaveEnvelope>();
 
+  const mirror = activeMirror;
+  const mirrorPending = new Map<string, string | null>();
+  /** Write queued saves / deletes through to the durable mirror */
+  const flushMirror = async () => {
+    if (!mirror) return;
+    const jobs = [...mirrorPending.entries()];
+    mirrorPending.clear();
+    for (const [key, payload] of jobs) {
+      try {
+        if (payload === null) await mirror.remove(key);
+        else await mirror.set(key, payload);
+      } catch (e) {
+        lastError =
+          e instanceof Error ? e.message : "Device save storage failed";
+        // Keep the newest intent for a later retry
+        if (!mirrorPending.has(key)) mirrorPending.set(key, payload);
+      }
+    }
+  };
+
   const lsOk = canUseLocalStorage();
   if (lsOk) backend = "localStorage";
 
@@ -205,6 +289,37 @@ export function createDualSaveStore(knownKeys: string[]): DualSaveStore {
     if (raw.length > STORAGE_LIMITS.maxSaveRawChars) continue;
     memory.set(key, wrapPayload(key, raw));
   }
+
+  /** Take the durable copy when it is newer; otherwise repair the mirror. */
+  const hydrateMirror = async () => {
+    if (!mirror) return;
+    for (const key of knownKeys) {
+      try {
+        const fromMirror = await mirror.get(key);
+        const fromMem = memory.get(key);
+        const mirrorOk =
+          !!fromMirror && fromMirror.length <= STORAGE_LIMITS.maxSaveRawChars;
+        // A save or delete made while we were reading wins
+        if (mirrorPending.has(key)) continue;
+        if (
+          mirrorOk &&
+          (!fromMem ||
+            payloadTimestamp(fromMirror) > payloadTimestamp(fromMem.payload))
+        ) {
+          const env = wrapPayload(key, fromMirror);
+          memory.set(key, env);
+          if (lsOk) localSet(key, fromMirror);
+          if (backend === "indexeddb") pending.set(key, env);
+        } else if (fromMem && fromMem.payload !== fromMirror) {
+          mirrorPending.set(key, fromMem.payload);
+        }
+      } catch (e) {
+        lastError =
+          e instanceof Error ? e.message : "Device save storage unavailable";
+      }
+    }
+    await flushMirror();
+  };
 
   const ready = (async () => {
     try {
@@ -244,9 +359,19 @@ export function createDualSaveStore(knownKeys: string[]): DualSaveStore {
           "Persistent browser storage unavailable (private mode?). Use Export backup.";
       }
     }
+    await hydrateMirror();
+    if (mirror && lastError?.startsWith("Persistent browser storage")) {
+      lastError = null; // the durable mirror covers it
+    }
+    await flushIdb();
   })();
 
   const flush = async () => {
+    await flushMirror();
+    await flushIdb();
+  };
+
+  const flushIdb = async () => {
     if (backend !== "indexeddb") return;
     const jobs = [...pending.values()];
     pending.clear();
@@ -265,6 +390,7 @@ export function createDualSaveStore(knownKeys: string[]): DualSaveStore {
     get backend() {
       return backend;
     },
+    mirrorName: mirror ? mirror.name ?? "device" : null,
     ready,
     get lastError() {
       return lastError;
@@ -277,6 +403,10 @@ export function createDualSaveStore(knownKeys: string[]): DualSaveStore {
       }
       const env = wrapPayload(key, payload);
       memory.set(key, env);
+      if (mirror) {
+        mirrorPending.set(key, payload);
+        void flushMirror();
+      }
 
       let lsError: string | undefined;
       if (lsOk) {
@@ -289,12 +419,14 @@ export function createDualSaveStore(knownKeys: string[]): DualSaveStore {
 
       if (backend === "indexeddb") {
         pending.set(key, env);
-        void flush();
+        void flushIdb();
         // Succeed if IDB path active even when localStorage quota fails
         return { ok: true, error: lsError };
       }
 
       if (lsOk && !lsError) return { ok: true };
+      // Browser storage failed or is missing, but the durable mirror has it
+      if (mirror) return { ok: true };
       if (backend === "memory") {
         lastError =
           lastError ??
@@ -309,6 +441,10 @@ export function createDualSaveStore(knownKeys: string[]): DualSaveStore {
     remove: (key: string) => {
       memory.delete(key);
       pending.delete(key);
+      if (mirror) {
+        mirrorPending.set(key, null);
+        void flushMirror();
+      }
       if (lsOk) localRemove(key);
       if (backend === "indexeddb") {
         void idbDelete(key).catch((e) => {

@@ -1,7 +1,7 @@
 # Contributing
 
 This repo is a **point-and-click adventure engine** plus game **packs**.
-Licensed under **[GPL-3.0-only](./LICENSE)** — contributions are under the same terms.
+Licensed under **[GPL-3.0-only](./LICENSE)** with the **[Game Exception](./LICENSE-EXCEPTION.md)** (games made with the engine may use any licence) — contributions are under the same terms.
 
 **New here?** Plain-language paths: [`docs/HOW-TO.md`](./docs/HOW-TO.md).
 
@@ -43,7 +43,7 @@ Starter pack: [`src/games/_template/`](./src/games/_template/).
 
 ## PR checklist
 
-- [ ] `npm run typecheck` and `npm test` pass
+- [ ] `npm run typecheck` and `npm test` pass; `npm run test:e2e` if you touched the play screen
 - [ ] `npm run check-assets` passes (warnings OK for legacy art; no new hard-limit violations)
 - [ ] Engine API changes documented (`PACKS.md` / `ENGINE.md` / `ASSETS.md` as needed)
 - [ ] `CHANGELOG.md` — a line under `## Unreleased`; behaviour changes go under **Upgrade notes**
@@ -63,4 +63,4 @@ Documented in [`src/engine/ASSETS.md`](./src/engine/ASSETS.md). Enforced by `npm
 
 **Copyright (C) 2025–2026 Aaron Davidson** — see [`COPYRIGHT`](./COPYRIGHT) and [`LICENSE`](./LICENSE) (`GPL-3.0-only`).
 
-By contributing, you agree your changes are licensed under the GNU GPL v3.0 only (`GPL-3.0-only`), same as this repository. Please do not remove copyright or attribution notices.
+By contributing, you agree your changes are licensed under the GNU GPL v3.0 only (`GPL-3.0-only`) **with the [Pick-Script Game Exception](./LICENSE-EXCEPTION.md)**, same as this repository — so games built on the engine, including on your contribution, may use any licence. Please do not remove copyright or attribution notices.

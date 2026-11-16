@@ -302,3 +302,93 @@ describe("dual store hydration", () => {
     );
   });
 });
+
+describe("durable save mirror (native storage)", () => {
+  function memoryMirror(seed: Record<string, string> = {}) {
+    const rows = new Map(Object.entries(seed));
+    return {
+      rows,
+      mirror: {
+        name: "device",
+        get: async (k: string) => rows.get(k) ?? null,
+        set: async (k: string, v: string) => {
+          rows.set(k, v);
+        },
+        remove: async (k: string) => {
+          rows.delete(k);
+        },
+      },
+    };
+  }
+  const slotJson = (timestamp: number, room: string) =>
+    JSON.stringify({ gameId: "g", timestamp, data: { currentLocation: room } });
+
+  afterEach(async () => {
+    const { setSaveMirror } = await import("./saveStorage");
+    setSaveMirror(null);
+  });
+
+  it("restores saves from the mirror after web storage was wiped", async () => {
+    const { setSaveMirror } = await import("./saveStorage");
+    const { mirror } = memoryMirror({ k: slotJson(500, "kept-room") });
+    setSaveMirror(mirror);
+    const store = createDualSaveStore(["k"]); // localStorage is empty
+    expect(store.getSync("k")).toBeNull();
+    await store.ready;
+    expect(store.getSync("k")).toContain("kept-room");
+    expect(ls.get("k")).toContain("kept-room");
+    expect(store.mirrorName).toBe("device");
+  });
+
+  it("writes saves and deletes through, and repairs a stale mirror", async () => {
+    const { setSaveMirror } = await import("./saveStorage");
+    const { mirror, rows } = memoryMirror({ k: slotJson(100, "old-room") });
+    ls.set("k", slotJson(900, "newer-room"));
+    setSaveMirror(mirror);
+    const store = createDualSaveStore(["k", "k2"]);
+    await store.ready;
+    expect(store.getSync("k")).toContain("newer-room");
+    expect(rows.get("k")).toContain("newer-room");
+
+    store.set("k2", slotJson(950, "second"));
+    await store.flush();
+    expect(rows.get("k2")).toContain("second");
+
+    store.remove("k2");
+    await store.flush();
+    expect(rows.has("k2")).toBe(false);
+  });
+
+  it("still saves when the mirror throws", async () => {
+    const { setSaveMirror } = await import("./saveStorage");
+    setSaveMirror({
+      get: async () => {
+        throw new Error("plugin missing");
+      },
+      set: async () => {
+        throw new Error("plugin missing");
+      },
+      remove: async () => {},
+    });
+    const store = createDualSaveStore(["k"]);
+    await store.ready;
+    expect(store.set("k", slotJson(1, "a")).ok).toBe(true);
+    await store.flush();
+    expect(store.getSync("k")).toContain('"a"');
+    expect(store.lastError).toContain("plugin missing");
+  });
+
+  it("adapts a Capacitor-Preferences-shaped plugin", async () => {
+    const { createKeyValueSaveMirror } = await import("./saveStorage");
+    const bag = new Map<string, string>();
+    const m = createKeyValueSaveMirror({
+      get: async ({ key }) => ({ value: bag.get(key) ?? null }),
+      set: async ({ key, value }) => void bag.set(key, value),
+      remove: async ({ key }) => void bag.delete(key),
+    });
+    await m.set("a", "1");
+    expect(await m.get("a")).toBe("1");
+    await m.remove("a");
+    expect(await m.get("a")).toBeNull();
+  });
+});

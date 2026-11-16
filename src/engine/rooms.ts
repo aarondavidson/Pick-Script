@@ -1,4 +1,10 @@
-import type { GameState, Room, RoomExit, StatePatch } from "./types";
+import type {
+  GameState,
+  Hotspot,
+  Room,
+  RoomExit,
+  StatePatch,
+} from "./types";
 import { applyStatePatch } from "./state";
 import { putActor } from "./actors";
 import { followCamera, getRoomSize } from "./camera";
@@ -10,7 +16,7 @@ export function getRoom(
   return rooms[roomId] ?? null;
 }
 
-export function getVisibleHotspots(room: Room, state: GameState) {
+export function getVisibleHotspots(room: Room, state: GameState): Hotspot[] {
   return room.hotspots.filter((h) => !h.visible || h.visible(state));
 }
 
