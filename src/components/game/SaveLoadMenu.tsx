@@ -40,8 +40,10 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
     return mode === "load" ? runtime.save.loadAutosave() : null;
   }, [runtime, mode, open, tick]);
 
-  const storageHint =
-    backend === "indexeddb"
+  const mirrorName = runtime.save.getMirrorName();
+  const storageHint = mirrorName
+    ? `Saves are kept in ${mirrorName} storage on this device.`
+    : backend === "indexeddb"
       ? "Saves use IndexedDB (mirrored to localStorage)."
       : backend === "localStorage"
         ? "Saves use localStorage only — export a backup for extra safety."

@@ -112,6 +112,9 @@ to put in `minEngineVersion`.
    npm run build
    ```
    ```bash
+   npm run test:e2e
+   ```
+   ```bash
    npm audit --omit=dev
    ```
 6. **Manual smoke** (`npm run dev`):
@@ -130,7 +133,12 @@ to put in `minEngineVersion`.
    - publishes a **GitHub Release** whose notes are this version's
      `CHANGELOG.md` section, marked as *Latest*
    - attaches `pick-script-web-X.Y.Z.zip` (the built player + Studio, ready
-     for any static host) and `SHA256SUMS.txt`
+     for any static host), `portable-adventure-engine-X.Y.Z.tgz` (the
+     installable package) and `SHA256SUMS.txt`
+   - publishes the package to npm as well **if** the repository has an
+     `NPM_TOKEN` secret (Settings → Secrets and variables → Actions) with
+     publish rights to the `@portable-adventure` scope; otherwise it skips
+     that step and the `.tgz` on the release is the way to install
 
    Prefer tagging by hand? Pushing an annotated tag starts the same workflow:
    ```bash
@@ -148,6 +156,7 @@ to put in `minEngineVersion`.
 |---|---|
 | To see what changed | The [Releases page](https://github.com/aarondavidson/Pick-Script/releases) — or **Watch → Custom → Releases** to be notified |
 | The source at a tested point | The tag (`git checkout v0.3.0`) or the *Source code* archive on the release |
+| The engine in their own app | `npm install` the `portable-adventure-engine-X.Y.Z.tgz` URL from the release — [`ENGINE-PACKAGE.md`](./ENGINE-PACKAGE.md) |
 | A ready-to-host build | `pick-script-web-X.Y.Z.zip` on the release — unzip onto any static host |
 | To update a game built on the engine | [`UPGRADING.md`](./UPGRADING.md) |
 
@@ -172,8 +181,9 @@ If a fix is needed for people who cannot take the newest minor yet, branch from
 the old tag (`git switch -c release/0.2 v0.2.0`), cherry-pick the fix, and
 release `0.2.1` from that branch with the same checklist.
 
-## Not yet published to npm
+## The package
 
-`@portable-adventure/engine` is still a scaffold
-([`ENGINE-PACKAGE.md`](./ENGINE-PACKAGE.md)). Its version is kept in step so the
-first published version matches the engine it contains.
+`@portable-adventure/engine` is built by `npm run pack:engine` and attached to
+each release ([`ENGINE-PACKAGE.md`](./ENGINE-PACKAGE.md)). Its version always
+equals the engine version (`npm run check:release`). Its public API is whatever
+`packages/engine/src/index.ts` exports — the compatibility rules above apply.

@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   analyzeGameDefinition,
   filterSuggestions,
@@ -85,12 +84,12 @@ export function DesignCoachLive({ definition }: DesignCoachLiveProps) {
             </div>
             <p className="text-yellow-100/70 leading-snug">{s.body}</p>
             {s.recipeId && (
-              <Link
-                to={recipeHref(s.recipeId)}
+              <a
+                href={recipeHref(s.recipeId)}
                 className="text-cyan-300 underline"
               >
                 Recipe
-              </Link>
+              </a>
             )}
           </div>
         ))}

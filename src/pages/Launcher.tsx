@@ -280,7 +280,7 @@ const Launcher = () => {
                 · {PICK.short}/{SCRIPT.short}
               </>
             )}{" "}
-            · <span className="text-accent/90">GPL-3.0-only</span>
+            · <span className="text-accent/90">GPL-3.0-only + game exception</span>
           </p>
           <p className="mt-1">
             Keep copyright notices when you fork or ship — see{" "}

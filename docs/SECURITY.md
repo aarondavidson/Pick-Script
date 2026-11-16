@@ -29,6 +29,13 @@ VITE_STUDIO_SECRET=<optional passphrase>
 
 There is no server-side API: the app is a static SPA with no paid services or keys. Authors bring their own art.
 
+## Hosted pack assets
+
+`resolvePackAssetUrls` only rewrites strings that are exactly an `assets/…` path
+with a known image / audio extension and no `..`; everything else is left for
+the normal media allowlist. Resolved URLs stay on the origin and folder the
+pack was fetched from.
+
 ## Save seals
 
 `VITE_SAVE_INTEGRITY_KEY` seals slots with a keyed tag that ships in the bundle —

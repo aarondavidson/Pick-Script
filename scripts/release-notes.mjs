@@ -41,5 +41,13 @@ console.log(`${body}
 
 ---
 
+## Get this release
+
+- **Use the engine in your own React app** — install the package attached below:
+  \`npm install ${repo}/releases/download/v${version}/portable-adventure-engine-${version}.tgz\`
+  then follow [ENGINE-PACKAGE.md](${repo}/blob/v${version}/docs/ENGINE-PACKAGE.md).
+- **Host the player + Studio yourself** — unzip \`pick-script-web-${version}.zip\` onto any static web host.
+- **Work from source** — \`git checkout v${version}\`, or the *Source code* archive below.
+
 **Upgrading a game?** Read [UPGRADING.md](${repo}/blob/v${version}/docs/UPGRADING.md) first.
-**Licence:** GPL-3.0-only — see [COPYRIGHT](${repo}/blob/v${version}/COPYRIGHT).`);
+**Licence:** GPL-3.0-only with the [Pick-Script Game Exception](${repo}/blob/v${version}/LICENSE-EXCEPTION.md) — games you make can use any licence.`);

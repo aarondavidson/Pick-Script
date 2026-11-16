@@ -25,6 +25,7 @@ export interface PackMetaBarProps {
   onRedo: () => void;
   onCopyTs: () => void;
   onExportGameFolder: () => void;
+  onExportHosting: () => void;
   onCopyShipCli: () => void;
   onImport: (file: File | null) => void;
   onReset: () => void;
@@ -54,6 +55,7 @@ export function PackMetaBar({
   onRedo,
   onCopyTs,
   onExportGameFolder,
+  onExportHosting,
   onCopyShipCli,
   onImport,
   onReset,
@@ -119,6 +121,14 @@ export function PackMetaBar({
                 className="pixel-font text-xs min-h-[40px] px-3 border border-accent text-accent"
               >
                 Copy TS pack
+              </button>
+              <button
+                type="button"
+                onClick={() => void onExportHosting()}
+                className="pixel-font text-xs min-h-[40px] px-3 border-2 border-accent text-accent"
+                title="pack.json plus an assets folder — the format for putting a game online. No size limit; art is cached by the browser."
+              >
+                Download for web hosting (.zip)
               </button>
               <button
                 type="button"

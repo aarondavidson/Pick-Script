@@ -333,7 +333,7 @@ const Studio = () => {
           <code className="text-accent">docs/STUDIO.md</code> ·{" "}
           <code className="text-accent">docs/PICK-SCRIPT.md</code>.
           <br />
-          © 2025–2026 Aaron Davidson · GPL-3.0-only · see{" "}
+          © 2025–2026 Aaron Davidson · GPL-3.0-only + game exception (your game, your licence) · see{" "}
           <code className="text-accent">COPYRIGHT</code>
         </footer>
       </div>

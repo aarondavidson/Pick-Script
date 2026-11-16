@@ -45,9 +45,33 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         run: node scripts/check-release.mjs --tag "${{ github.ref_name }}"
 
-      - name: Engine package dry-run
+      - name: Build the installable engine package
         run: npm run pack:engine
 
       - name: Lint
         run: npm run lint
         continue-on-error: true
+
+  e2e:
+    name: Browser tests (phone + desktop)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Play screen in a real browser
+        run: npm run test:e2e

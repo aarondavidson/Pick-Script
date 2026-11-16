@@ -150,6 +150,7 @@ export {
   getSaveIntegrityKey,
   sealTag,
   verifySealTag,
+  configureDeployLock,
 } from "./deployLock";
 export {
   sanitizePlayState,
@@ -183,10 +184,14 @@ export type { SaveSlot, SaveAdapter, SaveBackupV1 } from "./save";
 export {
   checksumString,
   createDualSaveStore,
+  createKeyValueSaveMirror,
+  getSaveMirror,
+  setSaveMirror,
+  payloadTimestamp,
   verifyEnvelope,
   wrapPayload,
 } from "./saveStorage";
-export type { SaveBackend, SaveEnvelope } from "./saveStorage";
+export type { SaveBackend, SaveEnvelope, SaveMirror } from "./saveStorage";
 export { runScripts, emitAndPatch } from "./scripts";
 export { resolveInteraction } from "./interact";
 export {
@@ -448,6 +453,16 @@ export {
 } from "./i18n";
 export type { LocaleId, MessageCatalog, I18nConfig } from "./i18n";
 export { compareSemver, isMajorMismatch, parseSemver } from "./semver";
+export {
+  externalizePackAssets,
+  resolvePackAssetUrls,
+  listRelativePackAssets,
+  isRelativePackAsset,
+  fetchJsonPack,
+  collectRoomMediaUrls,
+  neighbourRoomIds,
+} from "./packAssets";
+export type { ExternalizedPack } from "./packAssets";
 export { ENGINE_VERSION, checkEngineCompatibility } from "./version";
 export type { EngineCompatibility } from "./version";
 export { reconcileStateWithDefinition } from "./stateIntegrity";

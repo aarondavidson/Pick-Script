@@ -85,6 +85,7 @@ import type {
   RoomExit,
   ScriptEvent,
   StatePatch,
+  VerbDef,
   VerbId,
 } from "./types";
 
@@ -193,7 +194,7 @@ export interface AdventureRuntime {
   t: (key: string, fallback?: string) => string;
 }
 
-function getVerbs(def: GameDefinition) {
+function getVerbs(def: GameDefinition): VerbDef[] {
   return resolveVerbs(def);
 }
 

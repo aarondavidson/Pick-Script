@@ -127,7 +127,7 @@ const Recipes = () => {
           . Scaffold:{" "}
           <code className="text-accent">npm run new-pack -- my-game</code>.
           <br />
-          © 2025–2026 Aaron Davidson · GPL-3.0-only · see{" "}
+          © 2025–2026 Aaron Davidson · GPL-3.0-only + game exception (your game, your licence) · see{" "}
           <code className="text-accent">COPYRIGHT</code>
         </footer>
       </div>

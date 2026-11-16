@@ -1093,3 +1093,12 @@ All colors MUST be HSL.
   width: min(100cqw, calc(100cqh * 16 / 9));
   flex: none;
 }
+
+/* Room art still downloading — fade in late so fast loads never flash */
+.play-stage-loading {
+  animation: play-stage-loading-in 0.2s ease-out 0.25s both;
+}
+@keyframes play-stage-loading-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

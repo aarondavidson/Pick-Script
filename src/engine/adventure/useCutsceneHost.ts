@@ -10,6 +10,7 @@ import {
 import type { GameDefinition } from "../definition";
 import type { AdventureRuntime } from "../createGame";
 import type { GameState, StatePatch } from "../types";
+import type { CutsceneLine } from "../cutscene";
 import {
   advanceCutscene,
   currentCutsceneLine,
@@ -127,7 +128,7 @@ export function useCutsceneHost({
     });
   }, [endCutsceneInternal]);
 
-  const cutsceneLine = currentCutsceneLine(cutscene);
+  const cutsceneLine: CutsceneLine | null = currentCutsceneLine(cutscene);
 
   // Reset wait trackers when the active line changes (presentation starts walk/say)
   useEffect(() => {

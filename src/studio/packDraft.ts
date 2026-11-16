@@ -198,6 +198,62 @@ ${formatJsonPackRegistrySnippet(doc)}
   }
 }
 
+/** Plain-text instructions that ship inside the hosting zip. */
+export function formatHostingReadme(doc: JsonPackDocument, files: string[]): string {
+  const id = doc.id;
+  return `${doc.title || id} — web hosting folder
+${"=".repeat(40)}
+
+This folder is your game, ready to put on any web host.
+
+  pack.json      the game (small — no images inside)
+  assets/        ${files.length} image / audio file(s) the game loads
+
+How to publish
+1. Upload this whole folder, keeping the layout, to any HTTPS host
+   (GitHub Pages, Netlify, Vercel, S3, your own site), e.g.
+     https://example.com/games/${id}/pack.json
+     https://example.com/games/${id}/assets/...
+2. Open it in any Pick-Script player:
+     https://<player-site>/play?packUrl=https://example.com/games/${id}/pack.json
+   If the folder is on the same site as the player you can use a path:
+     /play?packUrl=/games/${id}/pack.json
+3. The host must allow the player's site to fetch pack.json (CORS). Static
+   hosts such as GitHub Pages and Netlify allow this by default.
+
+To keep editing, import the original .pack.json (Studio draft) — or this
+pack.json — back into the Studio. Keep the assets/ folder next to it.
+`;
+}
+
+/**
+ * Download the pack as a hosting folder: small pack.json + assets/ files.
+ * This is the format for real games — no size cap, cacheable art.
+ */
+export async function downloadHostingZip(
+  doc: JsonPackDocument
+): Promise<{ files: number; bytes: number }> {
+  const { externalizePackAssets } = await import("@/engine/packAssets");
+  const { zipSync, strToU8 } = await import("fflate");
+  const out = externalizePackAssets(doc);
+  const names = Object.keys(out.files);
+  const folder = doc.id || "game";
+  const zipped: Record<string, Uint8Array> = {
+    [`${folder}/pack.json`]: strToU8(JSON.stringify(out.doc, null, 2)),
+    [`${folder}/README.txt`]: strToU8(formatHostingReadme(doc, names)),
+  };
+  for (const [path, bytes] of Object.entries(out.files)) {
+    zipped[`${folder}/${path}`] = bytes;
+  }
+  // Media is already compressed — store, don't re-deflate
+  const zip = zipSync(zipped, { level: 0 });
+  triggerDownload(
+    new Blob([zip], { type: "application/zip" }),
+    `${folder}-web.zip`
+  );
+  return { files: names.length, bytes: out.bytes };
+}
+
 /** Image → data URL with automatic downscale (keeps pack catalogs small). */
 export async function fileToDataUrl(file: File): Promise<string> {
   assertImageFile(file);

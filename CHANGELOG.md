@@ -8,10 +8,35 @@ anything, you need to change.
 
 ## Unreleased
 
+_Nothing yet._
+
+## 0.4.0 — 2026-11-16
+
+The engine becomes something you can install: a real package with the play UI, games that can use any licence, packs that keep their art in files, and saves that survive on phones.
+
+### Upgrade notes
+
+No pack changes are required. Details: [`docs/UPGRADING.md`](./docs/UPGRADING.md#030--040).
+
+- **Licence:** now GPL-3.0-only **with the [Pick-Script Game Exception](./LICENSE-EXCEPTION.md)**. Games made with the engine (packs, art, audio, writing, your own code) may use any licence. Changes to the engine itself stay GPL
+- **Custom shells:** `AdventurePlaySurface` no longer reads the app router. Pass `onHome` (and optionally `homeLabel`) to show a home control; without it there is none. `PlayMobileMenu` takes the same `onHome`
+- **`npm run pack:engine`** now builds the real package tarball (it was a dry-run of a stub)
+- Capacitor apps: add `@capacitor/preferences` and run `npx cap sync` — saves are mirrored to native storage
+
 ### Added
 
-- **GitHub Releases** — `Release` workflow publishes a GitHub Release (notes from this changelog, built web zip + checksums) from `main` via **Actions → Release → Run workflow** or a pushed `v*` tag; `scripts/release-notes.mjs`; release rules in [`docs/RELEASING.md`](./docs/RELEASING.md)
+- **Installable package** — `@portable-adventure/engine` is built from the same sources the app runs: engine + play UI + styles + type declarations. One component plays a game: `<PickScriptGame definition={…} />`. Attached to every GitHub Release as a `.tgz` (`npm run build:package` / `pack:engine`); see [`docs/ENGINE-PACKAGE.md`](./docs/ENGINE-PACKAGE.md)
+- **Assets outside the JSON** — packs can reference `assets/…` files next to `pack.json` instead of embedding every image. Studio: **Download for web hosting (.zip)**; CLI: `npm run pack-assets -- game.pack.json out/dir`; engine: `externalizePackAssets`, `resolvePackAssetUrls`, `fetchJsonPack`. Hosted packs have no size cap and their art is cached by the browser
+- **Room preloading** — a room's art is loaded before it is shown (with a "Loading…" state instead of a blank scene) and the rooms one exit away are fetched in the background. `collectRoomMediaUrls` / `neighbourRoomIds` for custom shells
+- **Native save storage** — `setSaveMirror` / `createKeyValueSaveMirror` mirror saves to durable host storage; the app registers `@capacitor/preferences` on iOS / Android so saves survive the OS clearing web-view storage. The newest copy wins on boot
+- **`configureDeployLock({ strictPlay, saveIntegrityKey })`** — runtime alternative to the `VITE_*` build variables, for package consumers
+- **Browser tests** — `npm run test:e2e` (Playwright) covers the three play layouts, character scaling, touch play + autosave, hosted packs and the loading state; runs in CI and before every release
+- **GitHub Releases** — `Release` workflow publishes a GitHub Release (notes from this changelog; web build zip, engine package `.tgz`, checksums) from `main` via **Actions → Release → Run workflow** or a pushed `v*` tag; publishes to npm too when an `NPM_TOKEN` secret exists. Release rules in [`docs/RELEASING.md`](./docs/RELEASING.md)
 
+### Fixed
+
+- The play UI crashed outside a router (home link) — it could not be embedded in another app
+- Type declarations: `getVisibleHotspots`, `useCutsceneHost` and verb helpers now have explicit return types
 ## 0.3.0 — 2026-11-16
 
 Play screen rework for phones, character sizing and automatic character cut-outs.

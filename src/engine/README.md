@@ -70,8 +70,9 @@ The app host wraps this in `GameProvider` (`src/contexts/GameContext.tsx`) to wi
 | `jsonPackTypes.ts` / `jsonPackCompile.ts` / `jsonPackDialogue.ts` / `jsonPackCutscenes.ts` / `jsonPackValidate.ts` | JSON pack pipeline |
 | `validate.ts` | Structural pack checks (boot + CI) |
 | `version.ts` | `ENGINE_VERSION` + `checkEngineCompatibility` (`minEngineVersion`) |
+| `packAssets.ts` | Assets outside the JSON (`assets/…`), hosted pack fetch, preload lists |
 | `save.ts` | Per-game slots + autosave + versioning / `migrateSave` |
-| `saveStorage.ts` | IndexedDB + localStorage dual store (newest copy wins) |
+| `saveStorage.ts` | IndexedDB + localStorage store (newest copy wins) + durable host mirror (`setSaveMirror`) |
 | `stateIntegrity.ts` | Clamp loaded state to the pack; reconcile with new content |
 | `security.ts` | Media + packUrl allowlists, safe JSON |
 | `packActions.ts` | Declarative ActionList-lite chains |

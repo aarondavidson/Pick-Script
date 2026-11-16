@@ -10,6 +10,7 @@ import {
 } from "@/authoring/packTemplates";
 import {
   downloadGameFolderZip,
+  downloadHostingZip,
   downloadPackJson,
   preparePlayDraft,
 } from "@/studio/packDraft";
@@ -246,6 +247,23 @@ export function PackTool() {
     );
   };
 
+  const onExportHosting = async () => {
+    const result = validateJsonPack(doc);
+    if (!result.ok) {
+      failValidation(result.errors);
+      return;
+    }
+    try {
+      const { files, bytes } = await downloadHostingZip(doc);
+      toastOk(
+        "Downloaded web hosting folder (.zip)",
+        `pack.json + ${files} asset file(s), ${(bytes / 1_048_576).toFixed(1)} MB. Upload the folder and open /play?packUrl=… — see README.txt inside.`
+      );
+    } catch (e) {
+      toastError("Could not build the hosting folder", e);
+    }
+  };
+
   const onExportGameFolder = async () => {
     const result = validateJsonPack(doc);
     if (!result.ok) {
@@ -462,6 +480,7 @@ export function PackTool() {
           );
         }}
         onExportGameFolder={() => void onExportGameFolder()}
+        onExportHosting={() => void onExportHosting()}
         onCopyShipCli={() => void copyShipCli()}
         onImport={(file) => void onImport(file)}
         onReset={() => {

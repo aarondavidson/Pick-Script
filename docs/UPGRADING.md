@@ -10,7 +10,7 @@ Maintainers cutting a release: see [`RELEASING.md`](./RELEASING.md).
 
 ```ts
 import { ENGINE_VERSION } from "@/engine";
-console.log(ENGINE_VERSION); // "0.3.0"
+console.log(ENGINE_VERSION); // "0.4.0"
 ```
 
 Engine copies from before 0.2.0 have no `ENGINE_VERSION` export — treat them as
@@ -29,8 +29,12 @@ Three version numbers exist. They move independently:
 1. **Read the notes.** Open [`CHANGELOG.md`](../CHANGELOG.md) and read every
    **Upgrade notes** block between your version and the target. The per-version
    summaries below repeat the parts that need action.
-2. **Take a tagged release, not `main`.** Tags (`v0.2.0`) are the tested points.
+2. **Take a release, not `main`.** The
+   [Releases page](https://github.com/aarondavidson/Pick-Script/releases) lists
+   the tested points, with notes and downloads.
 3. **Replace the engine as a whole.**
+   - *Installed as a package (recommended, 0.4.0+):* install the new `.tgz`
+     from the release — see [`ENGINE-PACKAGE.md`](./ENGINE-PACKAGE.md).
    - *Game inside this repo:* merge or rebase onto the tag.
    - *Vendored copy:* delete your `src/engine/` and copy the tagged one in.
      The runtime is self-contained (it imports nothing outside the folder
@@ -163,6 +167,24 @@ Rules of thumb:
   old saves cannot sensibly continue.
 
 ## Version notes
+
+### 0.3.0 → 0.4.0
+
+No pack data changes are required.
+
+| Change | Do you need to act? |
+|---|---|
+| Licence is GPL-3.0-only **with the Game Exception** — your game can use any licence | No. If you vendored the engine, take the new `COPYRIGHT` and `LICENSE-EXCEPTION.md` with it |
+| The engine is an installable package with the play UI | Optional, recommended: replace a vendored `src/engine` with the package — [`ENGINE-PACKAGE.md`](./ENGINE-PACKAGE.md) |
+| `AdventurePlaySurface` / `PlayMobileMenu` no longer use the router | Only custom shells: pass `onHome={() => …}` to keep the home link |
+| Room art is preloaded, with a loading state | No. Custom shells can use `collectRoomMediaUrls` |
+| Packs may keep media in an `assets/` folder | Optional, recommended for anything bigger than a few rooms: Studio → **Download for web hosting (.zip)** |
+| Saves are mirrored to native storage in Capacitor apps | Capacitor apps: `npm install @capacitor/preferences`, `npx cap sync`. Custom native shells: call `setSaveMirror(…)` at startup |
+| `npm run pack:engine` builds the real package | Only if you scripted the old dry-run |
+
+Use `configureDeployLock` instead of `VITE_STRICT_PLAY` / `VITE_SAVE_INTEGRITY_KEY`
+when you consume the package (those variables are fixed when the package is built;
+the packaged default is strict play on, no save sealing).
 
 ### 0.2.0 → 0.3.0
 

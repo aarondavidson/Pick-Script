@@ -121,9 +121,18 @@ Always double-check the license on the download page before you publish publicly
 2. Send them that file.
 3. They open the launcher home page → **Import .pack.json** → play.
 
-**Or** host the file somewhere with HTTPS and open a play link like:
+**Or put it online (best for bigger games):**
 
-`/play?packUrl=https://…/my-game.pack.json`
+1. In Pack, click **Download for web hosting (.zip)**. You get a folder with a
+   small `pack.json` and an `assets` folder holding your pictures as normal files.
+2. Upload that folder to any web host with HTTPS (GitHub Pages, Netlify, your own site).
+3. Share a play link like:
+
+`/play?packUrl=https://…/my-game/pack.json`
+
+This way there is no size limit, and pictures load faster the second time. The
+single `.pack.json` file is fine for small games, but it must stay under about
+12 MB to be installed in a browser.
 
 **Publish to launcher** only installs the game in *your* browser. It does not upload it for the world.
 

@@ -66,6 +66,13 @@ After content/engine changes: `npm run cap:sync` again so `dist/` is copied into
 - `viewport-fit=cover` + CSS `--sat/--sab/--sal/--sar` (`env(safe-area-inset-*)`)
 - `AdventurePlaySurface` and `PlayMobileMenu` pad with those insets (desktop stays `0`)
 - Save quota failure → Save/Load toast offers **Export backup** one-tap download
+- **Saves use native storage.** iOS and Android may clear a web view's storage
+  (low disk space, app not opened for weeks). On a native build the app mirrors
+  every save to `@capacitor/preferences` (`src/utils/nativeSaves.ts`), and on
+  launch the newest copy wins, so saves come back even after the web view was
+  wiped. Run `npx cap sync` after installing so the plugin is in the native
+  project. The save menu says "Saves are kept in device storage" when it is active.
+  There is still no cloud sync — Export backup is the way to move saves between devices
 
 ---
 

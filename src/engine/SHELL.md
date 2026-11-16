@@ -7,6 +7,18 @@ The **host shell** is the reusable UI around the portable engine: verb bar, sent
 
 ---
 
+## Loading room art
+
+Rooms should never appear blank. The host preloads with
+`collectRoomMediaUrls(definition, roomId)` (background first, then layers,
+overlays and character sprites) and `neighbourRoomIds(definition, roomId)`:
+
+- show a loading state until the current room's background has loaded — or
+  failed, or ~8 s passed; a missing image must not block play
+- then fetch the rooms one exit away in the background
+
+The built-in shell does this in `src/hooks/useRoomPreload.ts`.
+
 ## Play layouts
 
 The host picks one arrangement per screen (`usePlayLayout`, `src/hooks/usePlayLayout.ts`)

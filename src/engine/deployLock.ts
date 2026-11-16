@@ -11,6 +11,26 @@
 
 let testOverride: boolean | null = null;
 let testIntegrityKey: string | null = null;
+let configuredStrict: boolean | null = null;
+let configuredIntegrityKey: string | null = null;
+
+/**
+ * Set deploy-lock behaviour at runtime instead of through `VITE_*` build
+ * variables — for apps that install the engine as a package (where those
+ * variables were fixed when the package was built) or do not use Vite.
+ * Call before creating a game. Pass `null` to return to the default.
+ */
+export function configureDeployLock(options: {
+  /** Refuse authoring overrides and enforce save / travel guards */
+  strictPlay?: boolean | null;
+  /** Seal saves against casual edits (not a server secret) */
+  saveIntegrityKey?: string | null;
+}): void {
+  if ("strictPlay" in options) configuredStrict = options.strictPlay ?? null;
+  if ("saveIntegrityKey" in options) {
+    configuredIntegrityKey = options.saveIntegrityKey ?? null;
+  }
+}
 
 /** @internal */
 export function __setStrictPlayTestOverride(value: boolean | null): void {
@@ -34,6 +54,7 @@ function isStudioBuildEnabledLocal(): boolean {
  */
 export function isStrictPlayEnabled(): boolean {
   if (testOverride !== null) return testOverride;
+  if (configuredStrict !== null) return configuredStrict;
 
   const flag = import.meta.env.VITE_STRICT_PLAY;
   if (flag === "true") return true;
@@ -53,6 +74,7 @@ export function isStrictPlayEnabled(): boolean {
  */
 export function getSaveIntegrityKey(): string {
   if (testIntegrityKey !== null) return testIntegrityKey;
+  if (configuredIntegrityKey !== null) return configuredIntegrityKey.trim();
   const s = import.meta.env.VITE_SAVE_INTEGRITY_KEY;
   return typeof s === "string" ? s.trim() : "";
 }

@@ -12,6 +12,7 @@ import { useHotspotOverrides } from "@/hooks/useHotspotOverrides";
 import { useDebug } from "@/contexts/DebugContext";
 import { isPhoneLayout, usePlayLayout } from "@/hooks/usePlayLayout";
 import { SentenceLine } from "./SentenceLine";
+import { useRoomPreload } from "@/hooks/useRoomPreload";
 import {
   StageScaleProvider,
   useMeasuredStageScale,
@@ -67,6 +68,10 @@ export const LocationView = () => {
   const phone = isPhoneLayout(layout);
   const [stageEl, setStageEl] = useState<HTMLDivElement | null>(null);
   const stageScale = useMeasuredStageScale(stageEl);
+  const { ready: artReady } = useRoomPreload(
+    definition,
+    gameState.currentLocation
+  );
 
   useEffect(() => {
     return () => {
@@ -332,6 +337,16 @@ export const LocationView = () => {
           />
         </div>
 
+        {!artReady && (
+          <div
+            className="absolute inset-0 z-20 flex items-center justify-center bg-background/90 play-stage-loading"
+            role="status"
+            aria-live="polite"
+            data-testid="room-loading"
+          >
+            <p className="pixel-font text-accent text-sm">Loading…</p>
+          </div>
+        )}
         {/* Desktop / preview: caption over the scene. Phones keep the scene
           clear — portrait shows the caption underneath, landscape a name chip. */}
         {!phone && (
