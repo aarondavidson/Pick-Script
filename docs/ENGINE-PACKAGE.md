@@ -49,7 +49,9 @@ import { createGameFromJson, translate } from "@/engine";
 
 ### Games in their own repos (until publish)
 
-Games built on the engine in separate repositories **vendor** a copy of `src/engine`. Cross-cutting fixes land here first, then get copied or cherry-picked into those repos.
+Games built on the engine in separate repositories **vendor** a copy of `src/engine`. Cross-cutting fixes land here first; those repos then replace their copy with the one from a tagged release — steps in [`UPGRADING.md`](./UPGRADING.md). `ENGINE_VERSION` (exported from the engine) tells a vendored copy which release it is.
+
+The scaffold's `version` is kept equal to the engine version (`npm run check:release`), so the first published package matches the engine it contains.
 
 ### Post-publish (target)
 

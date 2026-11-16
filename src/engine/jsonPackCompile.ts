@@ -7,6 +7,7 @@ import { sanitizeCredits } from "./credits";
 import { sanitizeWinFlag } from "./winFlag";
 import type { RoomTransition, RoomTransitionKind } from "./types";
 import {
+  JSON_PACK_MIN_SCHEMA_VERSION,
   JSON_PACK_SCHEMA_VERSION,
   type JsonPackAchievement,
   type JsonPackDocument,
@@ -72,6 +73,56 @@ export function createEmptyJsonPack(
   };
 }
 
+/**
+ * Schema upgrades, keyed by the schemaVersion they upgrade FROM.
+ * `JSON_PACK_MIGRATIONS[1]` turns a v1 document into v2, and so on.
+ *
+ * Rule for engine maintainers: when `JSON_PACK_SCHEMA_VERSION` is bumped, add
+ * the migration here in the same change so every older `.pack.json` in the
+ * wild keeps loading. Only raise `JSON_PACK_MIN_SCHEMA_VERSION` in a major
+ * engine release. See docs/RELEASING.md.
+ */
+export const JSON_PACK_MIGRATIONS: Record<
+  number,
+  (doc: Record<string, unknown>) => Record<string, unknown>
+> = {};
+
+/**
+ * Upgrade a raw pack document to the current schemaVersion.
+ * Throws a readable error for packs that are too new, too old, or unversioned.
+ */
+export function migrateJsonPackDocument(
+  doc: Record<string, unknown>
+): Record<string, unknown> {
+  const found = doc.schemaVersion;
+  if (typeof found !== "number" || !Number.isInteger(found)) {
+    throw new Error(
+      `Unsupported schemaVersion ${String(found)} (expected ${JSON_PACK_SCHEMA_VERSION})`
+    );
+  }
+  if (found > JSON_PACK_SCHEMA_VERSION) {
+    throw new Error(
+      `Unsupported schemaVersion ${found} — this pack was made with a newer engine (this engine reads up to ${JSON_PACK_SCHEMA_VERSION}). Update the engine to open it.`
+    );
+  }
+  if (found < JSON_PACK_MIN_SCHEMA_VERSION) {
+    throw new Error(
+      `Unsupported schemaVersion ${found} — too old for this engine (oldest supported is ${JSON_PACK_MIN_SCHEMA_VERSION}). Open and re-save it with an older engine release first.`
+    );
+  }
+  let current = doc;
+  for (let v = found; v < JSON_PACK_SCHEMA_VERSION; v++) {
+    const step = JSON_PACK_MIGRATIONS[v];
+    if (!step) {
+      throw new Error(
+        `Unsupported schemaVersion ${found} (no upgrade path from ${v} to ${v + 1})`
+      );
+    }
+    current = { ...step(current), schemaVersion: v + 1 };
+  }
+  return current;
+}
+
 export function parseJsonPack(raw: unknown): JsonPackDocument {
   // Re-parse through reviver to strip __proto__ / constructor keys
   let cleaned: unknown = raw;
@@ -83,12 +134,9 @@ export function parseJsonPack(raw: unknown): JsonPackDocument {
   if (!cleaned || typeof cleaned !== "object") {
     throw new Error("Pack must be a JSON object");
   }
-  const doc = cleaned as Partial<JsonPackDocument>;
-  if (doc.schemaVersion !== JSON_PACK_SCHEMA_VERSION) {
-    throw new Error(
-      `Unsupported schemaVersion ${String(doc.schemaVersion)} (expected ${JSON_PACK_SCHEMA_VERSION})`
-    );
-  }
+  const doc = migrateJsonPackDocument(
+    cleaned as Record<string, unknown>
+  ) as Partial<JsonPackDocument>;
   if (!doc.id?.trim()) throw new Error("Pack missing id");
   if (!doc.title?.trim()) throw new Error("Pack missing title");
   if (!doc.version?.trim()) throw new Error("Pack missing version");
@@ -104,6 +152,9 @@ export function parseJsonPack(raw: unknown): JsonPackDocument {
     credits: sanitizeCredits(doc.credits),
     winFlag: sanitizeWinFlag(doc.winFlag),
     version: doc.version.trim(),
+    ...(typeof doc.minEngineVersion === "string" && doc.minEngineVersion.trim()
+      ? { minEngineVersion: doc.minEngineVersion.trim().slice(0, 32) }
+      : {}),
     startRoom: doc.startRoom.trim(),
     verbMode:
       doc.verbMode === "classic"

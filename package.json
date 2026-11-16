@@ -1,7 +1,7 @@
 {
   "name": "pick-script",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "engines": {
     "node": ">=22.12.0"
@@ -24,7 +24,8 @@
     "check:capacitor": "node scripts/check-capacitor-ship.mjs",
     "check:cli": "npm run pack-doctor -- scripts/fixtures/smoke.pack.json",
     "pack:engine": "node scripts/pack-engine-dry-run.mjs",
-    "verify": "npm run typecheck && npm test && npm run check-assets",
+    "check:release": "node scripts/check-release.mjs",
+    "verify": "npm run typecheck && npm test && npm run check-assets && npm run check:release",
     "cap:sync": "npm run build && npx cap sync",
     "cap:ios": "npm run cap:sync && npx cap open ios",
     "cap:android": "npm run cap:sync && npx cap open android"

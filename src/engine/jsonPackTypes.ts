@@ -22,6 +22,12 @@ import type { CreditEntry } from "./credits";
 
 export const JSON_PACK_SCHEMA_VERSION = 1 as const;
 
+/**
+ * Oldest `.pack.json` schemaVersion this engine still loads. Older documents
+ * are upgraded step by step through `JSON_PACK_MIGRATIONS` (jsonPackCompile.ts).
+ */
+export const JSON_PACK_MIN_SCHEMA_VERSION = 1;
+
 export type JsonPackHotspotKind =
   | "interact"
   | "pickup"
@@ -455,6 +461,8 @@ export interface JsonPackDocument {
   /** The game ends (win screen) when this flag turns on */
   winFlag?: string;
   version: string;
+  /** Oldest engine release (semver) this pack runs on — see `checkEngineCompatibility` */
+  minEngineVersion?: string;
   startRoom: string;
   verbMode?: "simple" | "classic" | "coin";
   audio?: PackAudio;

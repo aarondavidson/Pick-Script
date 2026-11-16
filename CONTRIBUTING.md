@@ -11,7 +11,7 @@ Node.js 22.12+ (see `.nvmrc`).
 
 ```sh
 npm install
-npm run verify       # typecheck + test + check-assets
+npm run verify       # typecheck + test + check-assets + check:release
 npm run dev          # http://localhost:8080
 ```
 
@@ -46,6 +46,9 @@ Starter pack: [`src/games/_template/`](./src/games/_template/).
 - [ ] `npm run typecheck` and `npm test` pass
 - [ ] `npm run check-assets` passes (warnings OK for legacy art; no new hard-limit violations)
 - [ ] Engine API changes documented (`PACKS.md` / `ENGINE.md` / `ASSETS.md` as needed)
+- [ ] `CHANGELOG.md` — a line under `## Unreleased`; behaviour changes go under **Upgrade notes**
+- [ ] Compatibility kept — old saves and `.pack.json` files still load; new pack fields are optional; nothing exported from `@/engine` removed without a deprecation ([rules](./docs/RELEASING.md#compatibility-rules))
+- [ ] No version bump in feature PRs — versions change only in a release ([`docs/RELEASING.md`](./docs/RELEASING.md))
 - [ ] Pack changes: stable `definition.id`, save-safe; use `runtime.travel` / exits, not raw `currentLocation` writes in UI
 - [ ] No secrets or large binary dumps unrelated to the game
 

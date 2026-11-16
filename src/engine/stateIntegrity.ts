@@ -7,6 +7,7 @@
 
 import type { GameDefinition } from "./definition";
 import type { GameItem, GameState } from "./types";
+import { createInitialActors } from "./actors";
 import {
   isSafeIdentifierKey,
   isSafePlayMediaUrl,
@@ -171,6 +172,72 @@ export function sanitizePlayState(
     quests,
     journalEntries,
     gameComplete: !!state.gameComplete,
+  };
+}
+
+/**
+ * Bring a loaded save up to date with the current pack content.
+ *
+ * Saves store a snapshot of achievements / quests / actors. When a pack
+ * update adds new ones, an old save would never be able to unlock or show
+ * them. This fills the gaps without touching recorded progress:
+ *
+ * - achievements / quests: pack order and text win; `unlocked`, `timestamp`,
+ *   `completed`, `completedObjectives` are kept from the save
+ * - actors: instances are added for actors the save has never seen
+ * - flags / objectStates: `initialFlags` / `initialObjectStates` keys that
+ *   are absent from the save get their initial value (present keys are kept)
+ * - ego: falls back to the pack ego when the saved one no longer exists
+ *
+ * Runs on save load only (not per state patch).
+ */
+export function reconcileStateWithDefinition(
+  state: GameState,
+  def: GameDefinition
+): GameState {
+  const savedAch = new Map((state.achievements ?? []).map((a) => [a.id, a]));
+  const achievements = def.achievements.map((a) => {
+    const saved = savedAch.get(a.id);
+    return {
+      ...a,
+      unlocked: !!saved?.unlocked,
+      ...(typeof saved?.timestamp === "number"
+        ? { timestamp: saved.timestamp }
+        : {}),
+    };
+  });
+
+  const savedQuests = new Map((state.quests ?? []).map((q) => [q.id, q]));
+  const quests = def.quests.map((q) => {
+    const saved = savedQuests.get(q.id);
+    const done = Array.isArray(saved?.completedObjectives)
+      ? saved.completedObjectives.filter(
+          (i) => Number.isInteger(i) && i >= 0 && i < q.objectives.length
+        )
+      : [];
+    return { ...q, completed: !!saved?.completed, completedObjectives: done };
+  });
+
+  const actors = { ...(state.actors ?? {}) };
+  for (const [id, inst] of Object.entries(createInitialActors(def))) {
+    if (!Object.prototype.hasOwnProperty.call(actors, id)) actors[id] = inst;
+  }
+
+  let egoId = state.egoId ?? null;
+  if (egoId && def.actors && !def.actors[egoId]) egoId = def.egoId ?? null;
+  if (!egoId && def.egoId) egoId = def.egoId;
+
+  return {
+    ...state,
+    achievements,
+    quests,
+    actors,
+    egoId,
+    flags: { ...(def.initialFlags ?? {}), ...(state.flags ?? {}) },
+    objectStates: {
+      ...(def.initialObjectStates ?? {}),
+      ...(state.objectStates ?? {}),
+    },
   };
 }
 

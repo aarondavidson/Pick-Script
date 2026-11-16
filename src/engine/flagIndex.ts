@@ -2,7 +2,7 @@
  * Index which pack elements set / read flags — for Flag inspector + unlock chains.
  */
 
-import type { JsonPackDocument } from "@/engine/jsonPack";
+import type { JsonPackDocument } from "./jsonPack";
 
 export type FlagRefKind =
   | "dialogue_set"

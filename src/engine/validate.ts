@@ -1,4 +1,5 @@
 import type { GameDefinition } from "./definition";
+import { checkEngineCompatibility } from "./version";
 
 export interface ValidationResult {
   ok: boolean;
@@ -20,6 +21,9 @@ export function validateGameDefinition(
   if (!def.title?.trim()) errors.push("missing title");
   if (!def.version?.trim()) errors.push("missing version");
   if (!def.startRoom?.trim()) errors.push("missing startRoom");
+
+  const engineCompat = checkEngineCompatibility(def.minEngineVersion);
+  if (!engineCompat.ok) errors.push(`pack ${engineCompat.reason}`);
   if (!def.rooms || Object.keys(def.rooms).length === 0) {
     errors.push("rooms is empty");
   }

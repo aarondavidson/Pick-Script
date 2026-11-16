@@ -266,6 +266,9 @@ export {
   validateJsonPack,
   compileJsonDialogue,
   JSON_PACK_SCHEMA_VERSION,
+  JSON_PACK_MIN_SCHEMA_VERSION,
+  JSON_PACK_MIGRATIONS,
+  migrateJsonPackDocument,
   JSON_PACK_PLACEHOLDER_IMAGE,
 } from "./jsonPack";
 export {
@@ -441,6 +444,9 @@ export {
 } from "./i18n";
 export type { LocaleId, MessageCatalog, I18nConfig } from "./i18n";
 export { compareSemver, isMajorMismatch, parseSemver } from "./semver";
+export { ENGINE_VERSION, checkEngineCompatibility } from "./version";
+export type { EngineCompatibility } from "./version";
+export { reconcileStateWithDefinition } from "./stateIntegrity";
 export type { LocString } from "./types";
 export {
   pointInWalkbox,

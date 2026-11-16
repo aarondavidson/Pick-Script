@@ -76,7 +76,8 @@ Shared UI lives in `src/components/game/`. Engine code lives in `src/engine/` an
 |---|---|---|
 | `id` | yes | Stable slug; used for save keys (`adventure_<id>_save_<n>`) |
 | `title` / `subtitle` | title yes | Shown in launcher + in-game header |
-| `version` | yes | Content semver (independent of engine) |
+| `version` | yes | Content semver (independent of engine) — stamped into every save; see [Save versioning](#save-versioning) |
+| `minEngineVersion` | no | Oldest engine release the pack runs on, e.g. `"0.2.0"`. An older engine refuses the pack at boot with an "update the engine" message. Since 0.2.0 |
 | `winFlag` | no | Flag name — when it turns on, the game ends and shows the win screen (TS packs can also patch `gameComplete: true`) |
 | `credits` | no | `{ work, author, license?, url? }[]` — asset credits shown in the in-game Settings menu and on the default win screen (`url` must be https) |
 | `startRoom` | yes | Must exist in `rooms` |
@@ -430,13 +431,29 @@ Every save/autosave stores `definition.version`.
 | Minor/patch drift, no migrator | Load with console warning |
 | Major mismatch, no migrator | Slot marked `incompatible` — UI refuses load |
 | `migrateSave(state, from, to)` provided | Return migrated state, or `null` to reject |
+| `migrateSave` returns `null` or throws | Slot marked `incompatible` — kept, never deleted |
 
 ```ts
 migrateSave: (state, from, to) => {
-  // bump flags / reshape inventory for breaking content changes
-  return state;
+  // rename ids / reshape inventory for breaking content changes
+  const rename = (id: string) => (id === "cellar" ? "basement" : id);
+  return { ...state, currentLocation: rename(state.currentLocation) };
 },
 ```
+
+Load order (since 0.2.0): parse → `migrateSave` (sees the save as written, old
+ids intact) → clamp to the pack (unknown room → `startRoom`, …) → reconcile.
+
+**Reconcile** means you do not need a migrator just because you *added*
+content: achievements, quests and actors introduced by an update are added to
+old saves (progress kept, text refreshed from the pack), and `initialFlags` /
+`initialObjectStates` the save has never seen get their initial value.
+You still need `migrateSave` when you **rename or remove** room, item or flag ids.
+
+Each save also records the `engineVersion` that wrote it (informational).
+
+Full guide — bumping your version, testing old saves, engine updates:
+[`docs/UPGRADING.md`](../../docs/UPGRADING.md).
 
 ---
 

@@ -47,6 +47,26 @@ export function verifyEnvelope(env: SaveEnvelope): boolean {
   return env.checksum === checksumString(env.payload);
 }
 
+/**
+ * Best-effort "when was this written" for a stored slot payload.
+ * Reads `timestamp` from a SaveSlot JSON (or from inside a sealed envelope).
+ * Returns 0 when unknown so a copy with a readable timestamp wins.
+ */
+export function payloadTimestamp(payload: string): number {
+  try {
+    let parsed = safeJsonParse<{ timestamp?: unknown; payload?: unknown }>(
+      payload
+    );
+    if (parsed && typeof parsed.payload === "string") {
+      parsed = safeJsonParse<{ timestamp?: unknown }>(parsed.payload);
+    }
+    const t = parsed?.timestamp;
+    return typeof t === "number" && Number.isFinite(t) && t > 0 ? t : 0;
+  } catch {
+    return 0;
+  }
+}
+
 function canUseLocalStorage(): boolean {
   try {
     if (typeof localStorage === "undefined") return false;
@@ -195,11 +215,20 @@ export function createDualSaveStore(knownKeys: string[]): DualSaveStore {
         try {
           const fromIdb = await idbGet(key);
           const fromMem = memory.get(key);
-          if (fromIdb && (!fromMem || fromIdb.savedAt >= fromMem.savedAt)) {
-            memory.set(key, fromIdb);
-            // Mirror newer IDB → localStorage for browsers that lose IDB
-            if (lsOk) localSet(key, fromIdb.payload);
-          } else if (fromMem && !fromIdb) {
+          // Compare the save's own timestamp, not when the envelope was
+          // wrapped: the localStorage copy is re-wrapped on every boot, so
+          // its `savedAt` is always "now" and would beat a newer IDB save
+          // (e.g. after a localStorage quota failure). Ties prefer IDB.
+          const idbTime = fromIdb ? payloadTimestamp(fromIdb.payload) : 0;
+          const memTime = fromMem ? payloadTimestamp(fromMem.payload) : 0;
+          if (fromIdb && (!fromMem || idbTime >= memTime)) {
+            if (fromMem?.payload !== fromIdb.payload) {
+              memory.set(key, fromIdb);
+              // Mirror newer IDB → localStorage for browsers that lose IDB
+              if (lsOk) localSet(key, fromIdb.payload);
+            }
+          } else if (fromMem) {
+            // Missing or stale in IDB (tab closed before a flush finished)
             await idbSet(fromMem);
           }
         } catch (e) {

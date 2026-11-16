@@ -18,7 +18,7 @@ The packed entry (`src/index.js`) is a **stub** that throws until extract + publ
 Until the extract lands:
 
 1. Develop engine APIs under `src/engine/` as today.
-2. Refresh games in other repos by copying or cherry-picking `src/engine` changes.
+2. Refresh games in other repos by replacing their `src/engine` with the copy from a tagged release — see [`docs/UPGRADING.md`](../../docs/UPGRADING.md).
 3. Treat `packages/engine` as docs + manifest + packable stub — root `package.json` does **not** declare npm workspaces, so Vite/CI stay unchanged.
 4. Validate the package shape with `npm run pack:engine` (dry-run).
 

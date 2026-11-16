@@ -4,7 +4,11 @@ Cheat sheet for Studio / Harbor Fog–style packs. Canonical TypeScript types li
 [`src/engine/jsonPackTypes.ts`](../src/engine/jsonPackTypes.ts). Authoring guide:
 [`PACKS.md`](../src/engine/PACKS.md).
 
-`schemaVersion` is currently **`1`** (`JSON_PACK_SCHEMA_VERSION`).
+`schemaVersion` is currently **`1`** (`JSON_PACK_SCHEMA_VERSION`). Adding
+optional fields does not change it. When it does change, older files are
+upgraded on load (`migrateJsonPackDocument`), and a file from a *newer* engine
+is refused with an "update the engine" message — see
+[`RELEASING.md`](./RELEASING.md#packjson-schema).
 
 Untrusted packs are sanitized at compile (`parseJsonPack` / `createGameFromJson`) —
 nesting caps, allowlisted specials, safe identifier keys, media URL checks.
@@ -18,7 +22,8 @@ nesting caps, allowlisted specials, safe identifier keys, media URL checks.
 | `schemaVersion` | `1` | Required |
 | `id` | string | Stable slug → save keys |
 | `title` / `subtitle` | string | Launcher + header |
-| `version` | string | Content semver |
+| `version` | string | Content semver — stamped into saves ([`UPGRADING.md`](./UPGRADING.md#updating-your-own-game-without-breaking-saves)) |
+| `minEngineVersion` | string | Optional. Oldest engine release (semver) the pack runs on; older engines refuse it. Since 0.2.0 |
 | `winFlag` | string | Optional. When this flag turns on, the game ends and shows the win screen. Set it from any action, dialogue, cutscene, pickup (`got_<itemId>`) or minigame `winFlag` |
 | `credits` | `{ work, author, license?, url? }[]` | Optional asset credits, shown in Settings → Credits and on the win screen. Non-https `url`s are dropped; max 100 rows |
 | `startRoom` | string | Must exist in `rooms` |

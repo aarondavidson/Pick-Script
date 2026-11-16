@@ -12,6 +12,13 @@ import type {
 } from "./jsonPack";
 import { parseJsonPack } from "./jsonPack";
 import { mergeCredits } from "./credits";
+import { compareSemver } from "./semver";
+
+function higherMinEngine(a?: string, b?: string): string | undefined {
+  if (!a) return b;
+  if (!b) return a;
+  return compareSemver(a, b) >= 0 ? a : b;
+}
 
 export const BLEND_LAYERS = [
   "rooms",
@@ -392,6 +399,15 @@ export function blendPacks(
     ...basePack,
     // Donor art comes along, so its credits must too
     credits: mergeCredits(basePack.credits, donorPack.credits),
+    // Donor features come along, so the stricter engine requirement must too
+    ...(higherMinEngine(basePack.minEngineVersion, donorPack.minEngineVersion)
+      ? {
+          minEngineVersion: higherMinEngine(
+            basePack.minEngineVersion,
+            donorPack.minEngineVersion
+          ),
+        }
+      : {}),
     rooms,
     items,
     actors: Object.keys(actors).length ? actors : basePack.actors,

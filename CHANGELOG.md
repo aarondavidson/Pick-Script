@@ -1,6 +1,48 @@
 # Changelog
 
+All notable changes to Pick-Script. Versions follow
+[semantic versioning](https://semver.org); the policy and release checklist are
+in [`docs/RELEASING.md`](./docs/RELEASING.md). **Upgrading a game?** Read
+[`docs/UPGRADING.md`](./docs/UPGRADING.md) — each release lists what, if
+anything, you need to change.
+
 ## Unreleased
+
+_Nothing yet._
+
+## 0.2.0 — 2026-11-16
+
+First release with a stated update policy: the engine now reports its version,
+packs can require a minimum engine, and saves survive pack updates.
+
+### Upgrade notes
+
+No pack changes are required. Details and examples: [`docs/UPGRADING.md`](./docs/UPGRADING.md#010--020).
+
+- `migrateSave` now receives the save **as written** (before it is clamped to the pack); its result is clamped afterwards. Migrators that rename room / item ids now work. Migrators that assumed pre-sanitized input should be re-checked
+- Loaded saves are reconciled with the pack: new achievements, quests, actors and initial flags appear in old saves. Remove hand-written workarounds in `migrateSave`
+- Re-export any TS pack produced by Studio's **Copy TS pack** / **Download game folder** under 0.1.0 — it was missing most pack content (see Fixed)
+- Requires **Node.js 22.12+** for the dev toolchain (`engines`, `.nvmrc`)
+
+### Added
+
+- **Engine version** — `ENGINE_VERSION` and `checkEngineCompatibility()` exported from `@/engine`; saves record the `engineVersion` that wrote them
+- **`minEngineVersion`** on packs (TS + JSON) — an older engine refuses the pack with a clear "update the engine" error; blending packs keeps the stricter requirement
+- **Pack schema upgrade path** — `migrateJsonPackDocument` / `JSON_PACK_MIGRATIONS` / `JSON_PACK_MIN_SCHEMA_VERSION`; packs made with a newer engine now say so instead of a bare "unsupported schemaVersion"
+- **`reconcileStateWithDefinition`** — brings a loaded save up to date with pack content
+- **Release tooling** — `npm run check:release` (versions in sync + changelog section; part of `npm run verify` and CI), CI on `v*` tags checks the tag matches the version, CI runs the engine package dry-run
+- **Docs** — [`docs/UPGRADING.md`](./docs/UPGRADING.md) (authors) and [`docs/RELEASING.md`](./docs/RELEASING.md) (maintainers: semver policy, compatibility rules, release checklist)
+
+### Fixed
+
+- **Stale save restored after reload** — when IndexedDB and localStorage held different copies of a slot (e.g. after a localStorage quota failure), the localStorage copy always won, even if older. The copy with the newer in-save timestamp now wins and the other store is repaired
+- **Saves "vanishing" after a pack update** — a `migrateSave` that threw made the slot look empty (and open to being overwritten). It is now shown as incompatible
+- **New achievements / quests never unlockable on old saves** — see Upgrade notes
+- **TS export dropped pack content** — "Copy TS pack" and "Download game folder" omitted items, actors, hints, cutscenes, quests, achievements, comics, i18n, `winFlag` and `credits`, so the exported game could differ from the Studio draft and could not be won
+- Saves whose `gameId` is malformed (not just different) are rejected; non-object save data is rejected
+- `flagIndex.ts` used an `@/engine` alias import inside the engine folder, breaking copies of `src/engine` in repos without that alias
+
+### Also in 0.2.0 (since 0.1.0)
 
 - **Win flag** — packs (JSON + TS) can set `winFlag`; the game ends and shows the win screen when it turns on. Studio: Quests & achievements → Game ends when flag; `pack-doctor` reports packs with no ending and win flags nothing sets. Previously Studio-made packs could never reach the win screen
 - **Fix: template sticky note** — using (not looking at) the note on a fresh game said “You already took the key” while handing over the key. Responses can now be state functions that return a translation key, so gated copy stays translatable

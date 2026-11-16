@@ -390,6 +390,7 @@ export function createGameFromJson(doc: JsonPackDocument): GameDefinition {
     credits: pack.credits,
     winFlag: pack.winFlag,
     version: pack.version,
+    minEngineVersion: pack.minEngineVersion,
     startRoom: pack.startRoom,
     verbMode: pack.verbMode,
     autosave: true,

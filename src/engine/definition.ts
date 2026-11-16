@@ -60,6 +60,13 @@ export interface GameDefinition {
   winFlag?: string;
   /** Semver for content (independent of engine) */
   version: string;
+  /**
+   * Oldest engine release this pack runs on (semver, e.g. `"0.2.0"`).
+   * An older engine refuses the pack with a clear "update the engine" error
+   * instead of misbehaving on features it does not have. Omit when the pack
+   * only uses long-standing features.
+   */
+  minEngineVersion?: string;
   /** Starting room id */
   startRoom: string;
   /** Controllable actor id (SCUMM VAR_EGO). Omit to disable walker/ego. */
