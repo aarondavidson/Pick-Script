@@ -15,6 +15,7 @@ import type { TransitionRuntime } from "../transitions";
 import type { WalkMotion } from "../walk";
 import type { SpeechLine } from "../speech";
 import type { PendingArrive } from "./pendingInteract";
+import { uiText } from "../uiStrings";
 
 export interface UseTravelArgs {
   runtime: AdventureRuntime;
@@ -155,7 +156,7 @@ export function useTravel({
       const exit: RoomExit = {
         direction: "fast",
         to: roomId,
-        label: "Fast travel",
+        label: uiText("ui.map.fast_travel"),
       };
       return travelThroughExit(exit);
     },

@@ -10,7 +10,7 @@ Maintainers cutting a release: see [`RELEASING.md`](./RELEASING.md).
 
 ```ts
 import { ENGINE_VERSION } from "@/engine";
-console.log(ENGINE_VERSION); // "0.4.0"
+console.log(ENGINE_VERSION); // "0.5.0"
 ```
 
 Engine copies from before 0.2.0 have no `ENGINE_VERSION` export — treat them as
@@ -167,6 +167,21 @@ Rules of thumb:
   old saves cannot sensibly continue.
 
 ## Version notes
+
+### 0.4.0 → 0.5.0
+
+No pack data changes are required.
+
+| Change | Do you need to act? |
+|---|---|
+| Hotspots are keyboard-focusable; Enter acts without arming a verb | No. Custom shells: give your hotspot element `role="button"`, `tabIndex`, a name, and call `executeSentence(hotspot, options, { verb })` on Enter |
+| Interface text is translatable (`ui.*` keys) | Optional. To translate: add the keys from `uiStringsCsv()` to your pack's locale catalog. Custom shells should render text with `uiText(key)` |
+| Voice clips stop on skip; per-language clips with `key@locale` | No. Add recordings in Studio → Pack → **Voice acting** |
+| Dialogs are capped to the screen with a pinned close button | Only if you built custom dialogs on `components/ui/dialog` — check them once on a phone |
+| Viewport no longer blocks zoom | If you copied `index.html`, drop `maximum-scale=1.0, user-scalable=no` |
+| Runtime quests (`addQuest`) survive save / load | No |
+| `npm run lint` fails on warnings and is part of `verify` | Only if you contribute to this repo |
+| `InventoryDialog` component removed (it was unused) | Only if you imported it — use `EnhancedInventory` |
 
 ### 0.3.0 → 0.4.0
 

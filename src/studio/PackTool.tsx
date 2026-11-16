@@ -45,6 +45,7 @@ import { RoomLayersPanel } from "@/studio/RoomLayersPanel";
 import { PackHintsPanel } from "@/studio/PackHintsPanel";
 import { PackProgressPanel } from "@/studio/PackProgressPanel";
 import { PackActorsPanel } from "@/studio/PackActorsPanel";
+import { PackVoicePanel } from "@/studio/PackVoicePanel";
 import { PackCutscenesPanel } from "@/studio/PackCutscenesPanel";
 import { PackRoomsPanel } from "@/studio/PackRoomsPanel";
 import { ArtHandoffPanel } from "@/studio/ArtHandoffPanel";
@@ -668,6 +669,7 @@ export function PackTool() {
             <PackHintsPanel doc={doc} onChange={(next) => persist(next)} />
             <PackProgressPanel doc={doc} onChange={(next) => persist(next)} />
             <PackActorsPanel doc={doc} onChange={(next) => persist(next)} />
+            <PackVoicePanel doc={doc} onChange={(next) => persist(next)} />
             <PackCutscenesPanel
               doc={doc}
               roomId={roomId}

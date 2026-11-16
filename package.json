@@ -1,7 +1,7 @@
 {
   "name": "pick-script",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.5.0",
   "type": "module",
   "engines": {
     "node": ">=22.12.0"
@@ -12,7 +12,7 @@
     "build": "vite build --mode engine",
     "build:engine": "vite build --mode engine",
     "build:dev": "vite build --mode development",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -28,7 +28,7 @@
     "build:package": "node scripts/build-engine-package.mjs",
     "pack:engine": "node scripts/build-engine-package.mjs --pack",
     "check:release": "node scripts/check-release.mjs",
-    "verify": "npm run typecheck && npm test && npm run check-assets && npm run check:release",
+    "verify": "npm run typecheck && npm run lint && npm test && npm run check-assets && npm run check:release",
     "cap:sync": "npm run build && npx cap sync",
     "cap:ios": "npm run cap:sync && npx cap open ios",
     "cap:android": "npm run cap:sync && npx cap open android"

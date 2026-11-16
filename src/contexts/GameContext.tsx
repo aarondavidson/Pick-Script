@@ -1,11 +1,12 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import {
   AdventureProvider,
   useAdventure,
   type AdventureContextValue,
   type GameDefinition,
 } from "@/engine";
-import { resolveRoomMusicKey } from "@/engine/audio";
+import { resolveRoomMusicKey, resolveVoiceUrl } from "@/engine/audio";
+import { getActiveUiLocale } from "@/engine/uiStrings";
 import { soundFX } from "@/utils/soundEffects";
 import { packAudioPlayer } from "@/utils/packAudioPlayer";
 import { haptics } from "@/utils/haptics";
@@ -22,6 +23,13 @@ const SpeechMusicDuck: React.FC = () => {
     if (currentSpeech) duckMusic(0.28);
     else restoreMusic();
   }, [currentSpeech, duckMusic, restoreMusic]);
+  // A line that is skipped or replaced must not keep talking over the next one
+  const speechId = currentSpeech?.id ?? null;
+  useEffect(() => {
+    return () => {
+      if (speechId) packAudioPlayer.stop({ channel: "voice" });
+    };
+  }, [speechId]);
   return null;
 };
 
@@ -94,21 +102,40 @@ export const GameProvider: React.FC<{
     [definition.audio]
   );
 
+  const voiceRestoreTimer = useRef<number | undefined>(undefined);
+  useEffect(
+    () => () => {
+      window.clearTimeout(voiceRestoreTimer.current);
+      packAudioPlayer.stop({ channel: "voice" });
+    },
+    []
+  );
+
   const onVoice = useCallback(
     async (key: string): Promise<number | undefined> => {
-      music.duckMusic(0.22);
-      const url = definition.audio?.voice?.[key];
+      // One voice at a time
+      packAudioPlayer.stop({ channel: "voice" });
+      window.clearTimeout(voiceRestoreTimer.current);
+      const url = resolveVoiceUrl(definition.audio, key, getActiveUiLocale());
       if (url) {
+        music.duckMusic(0.22);
         const durationMs = await packAudioPlayer.durationMs(url);
         const id = await packAudioPlayer.play(url, {
           key,
           channel: "voice",
         });
         if (id != null) {
+          // Dialogue-box lines have no speech bar to end the duck for them
+          voiceRestoreTimer.current = window.setTimeout(
+            () => music.restoreMusic(),
+            (durationMs ?? 2500) + 150
+          );
           return durationMs ?? undefined;
         }
+        music.restoreMusic();
       }
-      soundFX.playKey(key.startsWith("tony") ? "verb" : "click");
+      // No recording for this line: a soft blip so speech still has a beat
+      soundFX.playKey("click");
       return undefined;
     },
     [definition.audio, music]

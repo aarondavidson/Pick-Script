@@ -10,6 +10,35 @@ anything, you need to change.
 
 _Nothing yet._
 
+## 0.5.0 — 2026-11-16
+
+Playable without a mouse or a screen, translatable interface, voice acting you can actually author.
+
+### Upgrade notes
+
+No pack changes are required. Details: [`docs/UPGRADING.md`](./docs/UPGRADING.md#040--050).
+
+- **Pinch-zoom is allowed again** — the page no longer sets `user-scalable=no`. If you copied `index.html`, remove `maximum-scale` / `user-scalable` from your viewport tag too
+- **Dialogs changed shape** — every dialog is now capped to the screen with its body scrolling inside and the close button pinned (44px). Custom dialog content that relied on the dialog itself scrolling still works; content that positioned things against the dialog edge should be checked
+- **Enter on a focused hotspot acts without arming a verb** (Look, or the first verb the hotspot takes). Pointer behaviour is unchanged
+- **Lint must be clean** — `npm run lint` fails on any warning and is part of `npm run verify` and CI
+
+### Added
+
+- **Keyboard and screen-reader play** — hotspots are focusable buttons with names; Tab moves between them, Enter / Space interacts; the verb coin opens from the keyboard (arrows move, Esc closes and returns focus); a "Skip to the scene" link; the scene is a labelled region that announces the room and how many things are in it; messages are announced; conversations are proper dialogs (Esc closes, focus lands on the first reply); the start screen is a real button; `<html lang>` follows the game language
+- **Translatable interface** — every menu, button, save dialog, system message and screen-reader label goes through `src/engine/uiStrings.ts` (~210 `ui.*` keys). A pack translates the interface by adding those keys to its locale catalog; hosts can `registerUiStrings(locale, table)`; `uiStringsCsv()` exports the list for translators. Sentence wording and word order (`Look at {target}`) are keys too
+- **Voice acting** — Studio → Pack → **Voice acting**: attach a recording to any spoken line, preview it, see how many lines are voiced. Per-language recordings via `"<voiceKey>@<locale>"` (`resolveVoiceUrl`). Inline `data:audio/…` clips are accepted in packs (`isSafeAudioUrl`) and become files with **Download for web hosting**
+- **Browser tests** for keyboard-only play, the verb coin, phone dialogs and a translated interface (13 in total)
+
+### Fixed
+
+- **Dialogs could not be closed on a phone** — the hints dialog (and any tall dialog) ran off the screen with the close button out of reach
+- **Skipped speech kept talking** — skipping a line or moving on in a conversation now stops its voice clip; music returns to full volume after a voiced conversation line
+- **Quests added at runtime were lost on load** — `addQuest` quests now survive a save and load (malformed ones are still dropped)
+- Selected buttons (yellow fill) had unreadable shadowed text
+- The cutscene preview in Studio ignored a duration edit while playing
+- Removed a game-specific check from the shared voice fallback, the unused `InventoryDialog`, and the stale `bun.lockb`
+
 ## 0.4.0 — 2026-11-16
 
 The engine becomes something you can install: a real package with the play UI, games that can use any licence, packs that keep their art in files, and saves that survive on phones.

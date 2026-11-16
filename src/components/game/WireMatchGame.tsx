@@ -11,6 +11,7 @@ import {
   wirePairMap,
   type WirePair,
 } from "./wireMatchLogic";
+import { uiText } from "@/engine/uiStrings";
 
 const DEFAULT_PAIRS: WirePair[] = [
   { left: "a", right: "1" },
@@ -145,42 +146,43 @@ export function WireMatchGame({
         <div className="space-y-4 text-center">
           {phase === "ready" && (
             <div className="space-y-3 py-4">
-              <h2 className="pixel-font text-lg text-accent">WIRE MATCH</h2>
+              <h2 className="pixel-font text-lg text-accent">{uiText("ui.minigame.wire.title")}</h2>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Connect each left terminal to its matching right end. Wrong
-                pairs reset the selection.
+                {uiText("ui.minigame.wire.help")}
               </p>
               {alreadyWon && (
                 <p className="text-xs text-green-400 pixel-font">
-                  Already matched
+                  {uiText("ui.minigame.wire.already")}
                 </p>
               )}
               <Button
                 onClick={start}
                 className="pixel-font bg-accent hover:bg-accent/80 text-accent-foreground"
               >
-                {alreadyWon ? "TRY AGAIN" : "START"}
+                {alreadyWon ? uiText("ui.minigame.retry") : uiText("ui.minigame.start")}
               </Button>
             </div>
           )}
 
           {phase === "playing" && (
             <div className="space-y-3">
-              <h2 className="pixel-font text-sm text-accent">MATCH WIRES</h2>
+              <h2 className="pixel-font text-sm text-accent">{uiText("ui.minigame.wire.prompt")}</h2>
               <p
                 className="pixel-font text-xs text-muted-foreground"
                 aria-live="polite"
               >
                 {feedback ??
                   (selectedLeft
-                    ? `Left: ${selectedLeft.toUpperCase()} — pick right`
-                    : "Pick a left terminal")}
+                    ? uiText("ui.minigame.wire.pick_right", {
+                        left: selectedLeft.toUpperCase(),
+                      })
+                    : uiText("ui.minigame.wire.pick_left"))}
               </p>
               <div className="grid grid-cols-2 gap-4 text-left">
                 <div
                   className="space-y-2"
                   role="group"
-                  aria-label="Left terminals"
+                  aria-label={uiText("ui.minigame.wire.left")}
                 >
                   {leftIds.map((id) => {
                     const done = matched.has(id);
@@ -208,7 +210,7 @@ export function WireMatchGame({
                 <div
                   className="space-y-2"
                   role="group"
-                  aria-label="Right terminals"
+                  aria-label={uiText("ui.minigame.wire.right")}
                 >
                   {rightOrder.map((id) => {
                     const done = matchedRights.has(id);
@@ -237,19 +239,19 @@ export function WireMatchGame({
                 onClick={handleClose}
                 className="pixel-font text-xs"
               >
-                ABORT
+                {uiText("ui.minigame.abort")}
               </Button>
             </div>
           )}
 
           {phase === "won" && (
             <div className="space-y-3 py-4">
-              <h2 className="pixel-font text-lg text-green-400">MATCHED</h2>
+              <h2 className="pixel-font text-lg text-green-400">{uiText("ui.minigame.wire.done")}</h2>
               <p className="text-xs text-muted-foreground">
-                All wires connected correctly.
+                {uiText("ui.minigame.wire.win")}
               </p>
               <Button onClick={handleClose} className="pixel-font">
-                DONE
+                {uiText("ui.minigame.done")}
               </Button>
             </div>
           )}

@@ -16,6 +16,7 @@ import { soundFX } from "@/utils/soundEffects";
 import { haptics } from "@/utils/haptics";
 import { useMemo } from "react";
 import { isPhoneLayout, usePlayLayout } from "@/hooks/usePlayLayout";
+import { uiText } from "@/engine/uiStrings";
 
 export const NavigationPanel = () => {
   const { gameState, runtime, inputLocked, travelThroughExit, showMessage } =
@@ -38,7 +39,7 @@ export const NavigationPanel = () => {
   const handleNavigation = (exit: (typeof location.exits)[number]) => {
     if (inputLocked) return;
     if (exit.blocked?.(gameState)) {
-      showMessage(exit.blockedMessage ?? "You can't go that way right now.");
+      showMessage(exit.blockedMessage ?? uiText("ui.exits.blocked"));
       haptics.warning();
       soundFX.error();
       return;
@@ -84,10 +85,10 @@ export const NavigationPanel = () => {
     return (
       <div className="bg-game-ui border-2 border-game-border p-2 md:p-4">
         <h3 className="pixel-font text-accent mb-1 text-sm md:text-base">
-          Exits
+          {uiText("ui.exits.title")}
         </h3>
         <p className="text-xs text-muted-foreground">
-          No doors from here — explore hotspots in the room.
+          {uiText("ui.exits.none")}
         </p>
       </div>
     );
@@ -106,7 +107,7 @@ export const NavigationPanel = () => {
             : "pixel-font text-accent mb-2 md:mb-3 text-sm md:text-base"
         }
       >
-        Exits
+        {uiText("ui.exits.title")}
       </h3>
       <div
         className={`grid gap-1 md:gap-2 ${
@@ -128,6 +129,11 @@ export const NavigationPanel = () => {
               variant="outline"
               size="sm"
               disabled={inputLocked}
+              aria-label={
+                blocked
+                  ? uiText("ui.a11y.exit_sealed", { label })
+                  : uiText("ui.a11y.exit", { label })
+              }
               className={`pixel-font bg-secondary/50 hover:bg-primary/20 active:bg-primary/30 flex items-center gap-1 md:gap-2 touch-manipulation tap-feedback ${
                 phone
                   ? "text-[11px] min-h-[44px] justify-start px-2"
@@ -136,8 +142,7 @@ export const NavigationPanel = () => {
             >
               {getDirectionIcon(exit.direction)}
               <span className="truncate text-left">
-                {label}
-                {blocked ? " · sealed" : ""}
+                {blocked ? uiText("ui.exits.sealed", { label }) : label}
               </span>
             </Button>
           );

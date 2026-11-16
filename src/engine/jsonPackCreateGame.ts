@@ -21,7 +21,12 @@ import { compilePackSpecials } from "./jsonPackSpecials";
 import { sanitizeJuiceCue } from "./juice";
 import { sanitizePackActions } from "./packActions";
 import { sanitizeRoomTimers } from "./roomTimers";
-import { isSafeIdentifierKey, isSafeMediaUrl, isSafePlayMediaUrl } from "./security";
+import {
+  isSafeAudioUrl,
+  isSafeIdentifierKey,
+  isSafeMediaUrl,
+  isSafePlayMediaUrl,
+} from "./security";
 import { clampWalkFloor, sanitizeWalkboxList } from "./walkboxes";
 import type {
   Actor,
@@ -119,13 +124,17 @@ function sanitizePackAudio(audio: PackAudio | undefined): PackAudio | undefined 
       if (preset) music[key] = { preset, mood: mapped.mood };
     }
   }
-  const filterKeyMap = (raw?: Record<string, string>) => {
+  const filterKeyMap = (raw?: Record<string, string>, inlineAudio = false) => {
     const out: Record<string, string> = {};
     for (const [k, v] of Object.entries(raw ?? {})) {
       if (!k.trim() || typeof v !== "string") continue;
       const t = v.trim();
       // Ambient/preset tokens or safe media URLs
-      if (/^[a-z][a-z0-9_-]{0,63}$/i.test(t) || isSafeMediaUrl(t)) {
+      if (
+        /^[a-z][a-z0-9_-]{0,63}$/i.test(t) ||
+        isSafeMediaUrl(t) ||
+        (inlineAudio && isSafeAudioUrl(t))
+      ) {
         out[k] = t;
       }
     }
@@ -137,8 +146,8 @@ function sanitizePackAudio(audio: PackAudio | undefined): PackAudio | undefined 
       : {}),
     ...(Object.keys(music).length ? { music } : {}),
     ambient: filterKeyMap(audio.ambient),
-    voice: filterKeyMap(audio.voice),
-    sfx: filterKeyMap(audio.sfx),
+    voice: filterKeyMap(audio.voice, true),
+    sfx: filterKeyMap(audio.sfx, true),
   };
 }
 

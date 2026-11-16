@@ -464,12 +464,14 @@ export function useSentenceInteract({
         onDialogueOpen?: () => void;
         onSpecial?: () => void;
       },
-      opts?: { skipConsumeConfirm?: boolean }
+      opts?: { skipConsumeConfirm?: boolean; verb?: VerbId }
     ) => {
       if (cutscene?.active) return;
 
+      // `opts.verb` lets a host act without arming a verb first (keyboard
+      // activation, context menus). An armed verb / item still wins.
       const verb: VerbId | null =
-        selectedVerb ?? (selectedCombineItem ? "use" : null);
+        selectedVerb ?? (selectedCombineItem ? "use" : opts?.verb ?? null);
       if (!verb) return;
 
       const withItem =

@@ -1,6 +1,8 @@
+import { useEffect, useRef } from "react";
 import { useGame } from "@/contexts/GameContext";
 import type { Hotspot, VerbId } from "@/engine";
 import { soundFX } from "@/utils/soundEffects";
+import { uiText, uiTextOr } from "@/engine/uiStrings";
 
 interface VerbCoinProps {
   hotspot: Hotspot;
@@ -28,6 +30,51 @@ export function VerbCoin({
 }: VerbCoinProps) {
   const { setSelectedVerb, executeSentence, inputLocked } = useGame();
 
+  const coinRef = useRef<HTMLDivElement>(null);
+
+  // Keyboard: focus the first usable face; Escape closes; arrows cycle
+  useEffect(() => {
+    const first = coinRef.current?.querySelector<HTMLButtonElement>(
+      'button[role="menuitem"]:not(:disabled)'
+    );
+    first?.focus();
+  }, []);
+
+  const closeAndReturnFocus = () => {
+    onClose();
+    // Put focus back on the thing the coin was opened for
+    requestAnimationFrame(() => {
+      document
+        .querySelector<HTMLElement>(`[data-hotspot="${CSS.escape(hotspot.id)}"]`)
+        ?.focus();
+    });
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      e.stopPropagation();
+      closeAndReturnFocus();
+      return;
+    }
+    const dir =
+      e.key === "ArrowRight" || e.key === "ArrowDown"
+        ? 1
+        : e.key === "ArrowLeft" || e.key === "ArrowUp"
+          ? -1
+          : 0;
+    if (!dir) return;
+    e.preventDefault();
+    const faces = [
+      ...(coinRef.current?.querySelectorAll<HTMLButtonElement>(
+        'button[role="menuitem"]:not(:disabled)'
+      ) ?? []),
+    ];
+    if (!faces.length) return;
+    const at = faces.indexOf(document.activeElement as HTMLButtonElement);
+    faces[(at + dir + faces.length) % faces.length]?.focus();
+  };
+
   if (inputLocked) return null;
 
   const pick = (verb: VerbId) => {
@@ -42,15 +89,17 @@ export function VerbCoin({
       className="absolute z-40 pointer-events-auto"
       style={{ left: `${x}%`, top: `${y}%`, transform: "translate(-50%, -50%)" }}
       role="menu"
-      aria-label="Verb coin"
+      ref={coinRef}
+      onKeyDown={onKeyDown}
+      aria-label={uiText("ui.a11y.verb_choices", { name: hotspot.name })}
     >
       <div className="relative w-28 h-28">
         <div className="absolute inset-0 rounded-full border-2 border-game-border bg-game-ui/95 shadow-lg" />
         <button
           type="button"
           className="absolute inset-[34%] rounded-full border border-border bg-background/80 text-[10px] pixel-font text-muted-foreground"
-          onClick={onClose}
-          aria-label="Cancel"
+          onClick={closeAndReturnFocus}
+          aria-label={uiText("ui.common.cancel")}
         >
           ✕
         </button>
@@ -75,7 +124,7 @@ export function VerbCoin({
               style={{ left: `${cx}%`, top: `${cy}%` }}
               onClick={() => allowed && pick(face.verb)}
             >
-              {face.label}
+              {uiTextOr(`ui.verb.short.${face.verb}`, face.label)}
             </button>
           );
         })}

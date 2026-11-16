@@ -6,7 +6,7 @@
  */
 
 import type { GameDefinition } from "./definition";
-import type { GameItem, GameState } from "./types";
+import type { GameItem, GameState, Quest } from "./types";
 import { createInitialActors } from "./actors";
 import {
   isSafeIdentifierKey,
@@ -17,6 +17,23 @@ import {
 const MAX_INVENTORY = 64;
 const MAX_JOURNAL = 200;
 const MAX_VISITED = 256;
+const MAX_RUNTIME_QUESTS = 50;
+
+/** Shape check for a quest that is not declared in the pack. */
+function isWellFormedRuntimeQuest(q: unknown): q is Quest {
+  if (!q || typeof q !== "object") return false;
+  const row = q as Quest;
+  return (
+    isSafeIdentifierKey(row.id) &&
+    typeof row.title === "string" &&
+    row.title.length <= 200 &&
+    typeof row.description === "string" &&
+    row.description.length <= 2_000 &&
+    Array.isArray(row.objectives) &&
+    row.objectives.length <= 32 &&
+    row.objectives.every((o) => typeof o === "string" && o.length <= 400)
+  );
+}
 
 /** Item ids declared on the pack (icons, combinations, hotspot pickups). */
 export function collectKnownItemIds(def: GameDefinition): Set<string> {
@@ -128,8 +145,12 @@ export function sanitizePlayState(
       unlocked: !!a.unlocked,
     }));
 
+  // Pack quests, plus quests a script added at runtime (`addQuest`) — those
+  // are not in the definition, so they are kept when well-formed.
   const questIds = new Set(def.quests.map((q) => q.id));
-  const quests = (state.quests ?? []).filter((q) => q && questIds.has(q.id));
+  const quests = (state.quests ?? [])
+    .filter((q) => q && (questIds.has(q.id) || isWellFormedRuntimeQuest(q)))
+    .slice(0, def.quests.length + MAX_RUNTIME_QUESTS);
 
   const journalEntries = (state.journalEntries ?? [])
     .filter(
@@ -217,6 +238,21 @@ export function reconcileStateWithDefinition(
       : [];
     return { ...q, completed: !!saved?.completed, completedObjectives: done };
   });
+  // Quests added at runtime are not in the pack — carry them over after it
+  const packQuestIds = new Set(def.quests.map((q) => q.id));
+  for (const saved of state.quests ?? []) {
+    if (!saved || packQuestIds.has(saved.id)) continue;
+    quests.push({
+      ...saved,
+      completed: !!saved.completed,
+      completedObjectives: Array.isArray(saved.completedObjectives)
+        ? saved.completedObjectives.filter(
+            (i) =>
+              Number.isInteger(i) && i >= 0 && i < saved.objectives.length
+          )
+        : [],
+    });
+  }
 
   const actors = { ...(state.actors ?? {}) };
   for (const [id, inst] of Object.entries(createInitialActors(def))) {

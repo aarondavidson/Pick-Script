@@ -16,6 +16,7 @@ import {
   resolveMapTravelPolicy,
 } from "@/engine/mapFog";
 import type { PlayDialogChromeProps } from "@/components/game/playDialogChrome";
+import { uiText } from "@/engine/uiStrings";
 
 /**
  * World map — fast travel ALWAYS goes through travelToRoom → runtime.travel
@@ -91,28 +92,27 @@ export const MapDialog = ({
             className="pixel-font bg-secondary/50 hover:bg-accent/20 min-h-[44px]"
           >
             <Map className="w-4 h-4 mr-2" />
-            Map
+            {uiText("ui.menu.map")}
           </Button>
         </DialogTrigger>
       )}
       <DialogContent className="max-w-3xl bg-card border-2 border-game-border max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="pixel-font text-accent text-xl">
-            World Map
+            {uiText("ui.map.title")}
           </DialogTitle>
           <p className="text-sm text-muted-foreground">
             {fogOn
-              ? "Fog lifts as you explore and the story advances"
+              ? uiText("ui.map.help_fog")
               : policy.requireVisited
-                ? "Tap a visited location to fast travel"
-                : "Tap a location to travel"}
+                ? uiText("ui.map.help_visited") : uiText("ui.map.help_any")}
           </p>
         </DialogHeader>
 
         {currentExits.length > 0 && (
           <div className="mb-4 p-3 border border-game-border/60 bg-secondary/20 rounded">
             <p className="pixel-font text-xs text-primary mb-2">
-              From here
+              {uiText("ui.map.from_here")}
             </p>
             <div className="flex flex-wrap gap-2">
               {currentExits.map((exit) => {
@@ -130,7 +130,7 @@ export const MapDialog = ({
                       if (blocked) {
                         showMessage(
                           exit.blockedMessage ??
-                            "You can't go that way right now."
+                            uiText("ui.exits.blocked")
                         );
                         soundFX.error();
                         return;
@@ -233,7 +233,7 @@ export const MapDialog = ({
                           </div>
                           {fogged ? (
                             <div className="text-xs text-muted-foreground mt-1">
-                              Shrouded in fog
+                              {uiText("ui.map.fog")}
                             </div>
                           ) : (
                             <div className="text-xs text-muted-foreground mt-1 line-clamp-2">

@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { uiText } from "@/engine/uiStrings";
 
 /**
  * Warn before irreversible inventory consumes (use-with consumeItem / takeItem).
@@ -25,21 +26,15 @@ export function ConsumeConfirmDialog() {
       <DialogContent className="bg-game-ui border-2 border-game-border max-w-md">
         <DialogHeader>
           <DialogTitle className="pixel-font text-accent">
-            Use this item?
+            {uiText("ui.consume.title")}
           </DialogTitle>
         </DialogHeader>
         {pendingConsumeConfirm && (
           <p className="text-sm text-foreground">
-            Using{" "}
-            <span className="text-accent pixel-font">
-              {pendingConsumeConfirm.item.name}
-            </span>{" "}
-            with{" "}
-            <span className="text-accent pixel-font">
-              {pendingConsumeConfirm.hotspot.name}
-            </span>{" "}
-            will remove it from your inventory. This can’t be undone without
-            loading a save.
+            {uiText("ui.consume.body", {
+              item: pendingConsumeConfirm.item.name,
+              target: pendingConsumeConfirm.hotspot.name,
+            })}
           </p>
         )}
         <DialogFooter className="gap-2 sm:gap-2">
@@ -48,13 +43,13 @@ export function ConsumeConfirmDialog() {
             className="pixel-font text-xs min-h-[44px]"
             onClick={() => cancelConsume()}
           >
-            Cancel
+            {uiText("ui.common.cancel")}
           </Button>
           <Button
             className="pixel-font text-xs min-h-[44px]"
             onClick={() => confirmConsume()}
           >
-            Use it
+            {uiText("ui.consume.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

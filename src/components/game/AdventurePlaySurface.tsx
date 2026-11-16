@@ -33,6 +33,7 @@ import {
   useViewportPlayLayout,
   type PlayLayout,
 } from "@/hooks/usePlayLayout";
+import { uiText } from "@/engine/uiStrings";
 
 export type AdventurePlayVariant = "full" | "preview";
 
@@ -58,7 +59,7 @@ export function AdventurePlaySurface({
   variant = "full",
   onRestart,
   onHome,
-  homeLabel = "Games",
+  homeLabel = uiText("ui.chrome.home"),
 }: AdventurePlaySurfaceProps) {
   const { gameState, definition } = useGame();
   const { isUnlocked, unlockAudio } = useMusic();
@@ -85,14 +86,14 @@ export function AdventurePlaySurface({
       return (
         <div className="flex flex-col items-center justify-center gap-3 p-6 min-h-[280px] bg-background border border-game-border">
           <p className="pixel-font text-sm text-accent text-center">
-            Tap to unlock audio & start preview
+            {uiText("ui.start.preview_prompt")}
           </p>
           <button
             type="button"
             onClick={() => void unlockAudio()}
             className="pixel-font text-xs min-h-[44px] px-4 border-2 border-accent text-accent hover:bg-accent/10"
           >
-            Start preview
+            {uiText("ui.start.preview_button")}
           </button>
         </div>
       );
@@ -110,6 +111,23 @@ export function AdventurePlaySurface({
   }
 
   const ShellCanvasFx = getShellCanvasFx(definition);
+
+  /** First thing a keyboard user reaches: jump past the menus to the room */
+  const skipLink = (
+    <a
+      href="#play-stage"
+      className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-accent focus:text-accent-foreground focus:px-3 focus:py-2 pixel-font text-sm"
+      onClick={(e) => {
+        e.preventDefault();
+        const stage = document.getElementById("play-stage");
+        (
+          stage?.querySelector<HTMLElement>("[data-hotspot]") ?? stage
+        )?.focus();
+      }}
+    >
+      {uiText("ui.a11y.skip_to_scene")}
+    </a>
+  );
 
   const overlays = (
     <>
@@ -171,13 +189,14 @@ export function AdventurePlaySurface({
           }}
           data-play-layout={layout}
         >
+          {skipLink}
           {canvasFx}
           <div className="play-stage-area flex-1 min-w-0 h-full flex items-center justify-center bg-black relative z-10">
             <LocationView />
           </div>
           <aside
             className="w-[clamp(8.5rem,18vw,13rem)] shrink-0 h-full overflow-y-auto overscroll-contain border-l border-game-border bg-game-ui p-1.5 space-y-1.5 relative z-10"
-            aria-label="Game controls"
+            aria-label={uiText("ui.a11y.controls")}
           >
             <div className="flex items-center gap-1">
               <h1 className="pixel-font text-accent text-[11px] truncate flex-1 min-w-0 leading-none">
@@ -210,6 +229,7 @@ export function AdventurePlaySurface({
           }}
           data-play-layout={layout}
         >
+          {skipLink}
           {canvasFx}
           <div className="relative z-10">
             <header className="flex items-center gap-1.5 min-h-[44px] px-2">
@@ -233,7 +253,7 @@ export function AdventurePlaySurface({
               <VerbPanelEnhanced />
               <NavigationPanel />
               <p className="text-[11px] text-muted-foreground/80 text-center pt-2">
-                Tip: turn your phone sideways for a bigger scene.
+                {uiText("ui.tip.rotate")}
               </p>
             </div>
           </div>
@@ -269,6 +289,7 @@ export function AdventurePlaySurface({
               }
         }
       >
+        {!preview && skipLink}
         {/* Pack-opted canvas FX — other packs use Room.particles / AtmosphereLayers */}
         {!preview && ShellCanvasFx && (
           <Suspense fallback={null}>
@@ -302,7 +323,7 @@ export function AdventurePlaySurface({
                   {definition.title}
                   {preview && (
                     <span className="text-muted-foreground font-sans text-[10px] ml-2">
-                      preview
+                      {uiText("ui.chrome.preview")}
                     </span>
                   )}
                 </h1>
@@ -360,8 +381,7 @@ export function AdventurePlaySurface({
           {!preview && (
             <footer className="bg-game-ui border-2 border-game-border p-2 md:p-3 text-center hidden md:block">
               <p className="text-xs text-muted-foreground pixel-font">
-                Inventory: click an item, then a hotspot to use it • Number keys
-                for verbs • H for hints • ESC to deselect • Map for fast travel
+                {uiText("ui.chrome.footer_help")}
               </p>
             </footer>
           )}

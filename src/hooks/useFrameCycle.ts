@@ -9,20 +9,23 @@ export function useFrameCycle(
   fps = 4
 ): string | undefined {
   const list = frames?.filter(Boolean) ?? [];
+  /** Content key — restart the cycle when the frame set changes */
+  const framesKey = list.join("|");
+  const frameCount = list.length;
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
     setIndex(0);
-  }, [list.join("|")]);
+  }, [framesKey]);
 
   useEffect(() => {
-    if (list.length <= 1) return;
+    if (frameCount <= 1) return;
     const ms = Math.max(40, Math.round(1000 / Math.max(1, fps)));
     const id = window.setInterval(() => {
-      setIndex((i) => (i + 1) % list.length);
+      setIndex((i) => (i + 1) % frameCount);
     }, ms);
     return () => window.clearInterval(id);
-  }, [list.length, fps, list.join("|")]);
+  }, [frameCount, fps, framesKey]);
 
   if (!list.length) return undefined;
   return list[Math.min(index, list.length - 1)];

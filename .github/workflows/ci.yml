@@ -48,9 +48,8 @@ jobs:
       - name: Build the installable engine package
         run: npm run pack:engine
 
-      - name: Lint
+      - name: Lint (no warnings allowed)
         run: npm run lint
-        continue-on-error: true
 
   e2e:
     name: Browser tests (phone + desktop)

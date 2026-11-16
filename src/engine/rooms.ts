@@ -8,6 +8,7 @@ import type {
 import { applyStatePatch } from "./state";
 import { putActor } from "./actors";
 import { followCamera, getRoomSize } from "./camera";
+import { uiText } from "./uiStrings";
 
 export function getRoom(
   rooms: Record<string, Room>,
@@ -39,13 +40,13 @@ export function travelTo(
   if (exit.blocked?.(state)) {
     return {
       ok: false,
-      message: exit.blockedMessage ?? "You can't go that way right now.",
+      message: exit.blockedMessage ?? uiText("ui.exits.blocked"),
     };
   }
 
   const destination = rooms[exit.to];
   if (!destination) {
-    return { ok: false, message: "That path leads nowhere." };
+    return { ok: false, message: uiText("ui.exits.nowhere") };
   }
 
   const source = rooms[state.currentLocation];

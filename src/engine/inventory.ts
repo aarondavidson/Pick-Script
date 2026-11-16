@@ -1,5 +1,6 @@
 import type { GameItem, GameState, ItemCombination, StatePatch } from "./types";
 import type { GameDefinition } from "./definition";
+import { uiText } from "./uiStrings";
 
 export function addItem(state: GameState, item: GameItem): StatePatch {
   if (state.inventory.some((i) => i.id === item.id)) {
@@ -57,13 +58,13 @@ export function tryCombineItems(
 
   const recipe = findCombination(def.combinations, item1.id, item2.id);
   if (!recipe) {
-    return { ok: false, message: "These items don't combine." };
+    return { ok: false, message: uiText("ui.default.no_combine") };
   }
 
   if (recipe.condition && !recipe.condition(state)) {
     return {
       ok: false,
-      message: recipe.failMessage ?? "That won't work right now.",
+      message: recipe.failMessage ?? uiText("ui.default.not_now"),
     };
   }
 

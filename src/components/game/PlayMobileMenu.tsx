@@ -15,6 +15,7 @@ import { AchievementsDialog } from "@/components/game/AchievementsDialog";
 import { HintDialog } from "@/components/game/HintDialog";
 import { SettingsMenu } from "@/components/game/SettingsMenu";
 import type { PlayChromeFlags } from "@/engine/playChrome";
+import { uiText } from "@/engine/uiStrings";
 
 type ExtraPanel =
   | "journal"
@@ -59,10 +60,10 @@ export function PlayMobileMenu({
             variant="outline"
             size="sm"
             className="pixel-font bg-secondary/50 hover:bg-accent/20 min-h-[36px] h-9 px-2.5 shrink-0"
-            aria-label="Game menu"
+            aria-label={uiText("ui.menu.open")}
           >
             <Menu className="w-4 h-4" />
-            <span className="sr-only">Menu</span>
+            <span className="sr-only">{uiText("ui.menu.title")}</span>
           </Button>
         </SheetTrigger>
         <SheetContent
@@ -80,12 +81,12 @@ export function PlayMobileMenu({
         >
           <SheetHeader className="mb-3 text-left">
             <SheetTitle className="pixel-font text-accent text-lg">
-              Menu
+              {uiText("ui.menu.title")}
             </SheetTitle>
           </SheetHeader>
           <nav
             className="flex flex-col gap-2 [@media(max-height:540px)]:grid [@media(max-height:540px)]:grid-cols-2"
-            aria-label="Game extras"
+            aria-label={uiText("ui.menu.extras")}
           >
             {chrome.home && onHome && (
               <button
@@ -100,23 +101,25 @@ export function PlayMobileMenu({
               </button>
             )}
             {chrome.journal && (
-              <MenuRow onClick={() => openPanel("journal")}>Journal</MenuRow>
+              <MenuRow onClick={() => openPanel("journal")}>{uiText("ui.menu.journal")}</MenuRow>
             )}
             {chrome.quests && (
-              <MenuRow onClick={() => openPanel("quests")}>Quests</MenuRow>
+              <MenuRow onClick={() => openPanel("quests")}>{uiText("ui.menu.quests")}</MenuRow>
             )}
             {chrome.map && (
-              <MenuRow onClick={() => openPanel("map")}>Map</MenuRow>
+              <MenuRow onClick={() => openPanel("map")}>
+                {uiText("ui.menu.map")}
+              </MenuRow>
             )}
             {chrome.achievements && (
               <MenuRow onClick={() => openPanel("achievements")}>
-                Achievements
+                {uiText("ui.menu.achievements")}
               </MenuRow>
             )}
             {chrome.hints && (
-              <MenuRow onClick={() => openPanel("hints")}>Hints</MenuRow>
+              <MenuRow onClick={() => openPanel("hints")}>{uiText("ui.menu.hints")}</MenuRow>
             )}
-            <MenuRow onClick={() => openPanel("settings")}>Settings</MenuRow>
+            <MenuRow onClick={() => openPanel("settings")}>{uiText("ui.menu.settings")}</MenuRow>
           </nav>
         </SheetContent>
       </Sheet>

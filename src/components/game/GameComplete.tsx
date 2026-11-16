@@ -4,6 +4,7 @@ import { GameState } from "@/engine";
 import { useGame } from "@/contexts/GameContext";
 import { getShellComplete } from "./shellUi";
 import { CreditsList } from "./CreditsList";
+import { uiText } from "@/engine/uiStrings";
 
 interface GameCompleteProps {
   onRestart: () => void;
@@ -26,21 +27,20 @@ export const GameComplete = ({ onRestart, gameState }: GameCompleteProps) => {
     <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 flex items-center justify-center">
       <div className="bg-card border-4 border-accent p-8 max-w-2xl mx-4 text-center space-y-6 animate-in fade-in zoom-in-95">
         <h1 className="pixel-font text-4xl text-accent animate-pulse">
-          You win!
+          {uiText("ui.complete.title")}
         </h1>
 
         <div className="space-y-3 text-foreground">
           <p className="text-lg">
-            You finished{" "}
-            <span className="text-accent font-bold">{definition.title}</span>.
+            {uiText("ui.complete.finished", { title: definition.title })}
           </p>
-          <p className="text-sm text-muted-foreground">Thanks for playing!</p>
+          <p className="text-sm text-muted-foreground">{uiText("ui.complete.thanks")}</p>
         </div>
 
         {definition.credits && definition.credits.length > 0 && (
           <section className="text-left text-xs text-muted-foreground space-y-1 max-h-40 overflow-y-auto border-t border-border pt-3">
             <h2 className="pixel-font text-[10px] text-accent uppercase tracking-widest">
-              Credits
+              {uiText("ui.common.credits")}
             </h2>
             <CreditsList credits={definition.credits} />
           </section>
@@ -51,7 +51,7 @@ export const GameComplete = ({ onRestart, gameState }: GameCompleteProps) => {
           size="lg"
           className="pixel-font bg-accent hover:bg-accent/80"
         >
-          Restart
+          {uiText("ui.complete.restart")}
         </Button>
       </div>
     </div>

@@ -34,7 +34,11 @@ export interface PackAudio {
   defaultMusic?: string;
   /** Ambient SFX cue per music key (rain | crowd | drip | wind | hum | static | none) */
   ambient?: Record<string, string>;
-  /** Optional voice key → asset URL (host may ignore until VO ships) */
+  /**
+   * Voice-over clips: voice key → audio URL. Lines name a clip with
+   * `voiceKey`; dialogue lines default to `voice.<room>.<hotspot>.<lineId>`.
+   * Add `"<key>@<locale>"` entries for translated recordings.
+   */
   voice?: Record<string, string>;
   /** Optional SFX key → asset URL */
   sfx?: Record<string, string>;
@@ -140,4 +144,31 @@ export function resolveAmbientKey(
   audio?: PackAudio
 ): string | undefined {
   return audio?.ambient?.[musicKey];
+}
+
+/**
+ * URL of a voice clip for a line, or undefined when the pack has none.
+ * A translated recording wins: `"<voiceKey>@<locale>"` (e.g.
+ * `"voice.docks.trader.hello@es"`), then the base language of a regional
+ * locale (`@pt` for `pt-BR`), then the plain key.
+ */
+export function resolveVoiceUrl(
+  audio: PackAudio | undefined,
+  voiceKey: string | undefined | null,
+  locale?: string
+): string | undefined {
+  const key = voiceKey?.trim();
+  const map = audio?.voice;
+  if (!key || !map) return undefined;
+  const candidates = [key];
+  if (locale) {
+    const base = locale.split("-")[0];
+    if (base !== locale) candidates.unshift(`${key}@${base}`);
+    candidates.unshift(`${key}@${locale}`);
+  }
+  for (const k of candidates) {
+    const url = Object.prototype.hasOwnProperty.call(map, k) ? map[k] : undefined;
+    if (typeof url === "string" && url.trim()) return url.trim();
+  }
+  return undefined;
 }

@@ -392,3 +392,41 @@ describe("durable save mirror (native storage)", () => {
     expect(await m.get("a")).toBeNull();
   });
 });
+
+describe("quests added at runtime", () => {
+  it("survive a save and load, alongside pack quests", () => {
+    const def = pack("1.0.0", {
+      quests: [{ id: "main", title: "Main", description: "d", objectives: ["a"] }],
+    } as Partial<GameDefinition>);
+    const runtime = createGame(def);
+    const state = runtime.createInitialState();
+    state.quests = [
+      ...state.quests,
+      {
+        id: "favour",
+        title: "A favour",
+        description: "Added by a script",
+        objectives: ["Find the cat", "Return it"],
+        completed: false,
+        completedObjectives: [0, 7],
+      },
+    ];
+    runtime.save.saveGame(1, state, "Start");
+    const loaded = runtime.save.loadGame(1)!.data.quests;
+    expect(loaded.map((q) => q.id)).toEqual(["main", "favour"]);
+    expect(loaded[1].completedObjectives).toEqual([0]);
+  });
+
+  it("drops malformed runtime quests from a forged save", () => {
+    const def = pack("1.0.0");
+    const runtime = createGame(def);
+    const state = runtime.createInitialState();
+    state.quests = [
+      { id: "__proto__", title: "x", description: "", objectives: [], completed: false, completedObjectives: [] },
+      { id: "no_objectives", title: "x", description: "" } as never,
+      { id: "ok", title: "Fine", description: "", objectives: ["one"], completed: true, completedObjectives: [] },
+    ];
+    runtime.save.saveGame(1, state, "Start");
+    expect(runtime.save.loadGame(1)!.data.quests.map((q) => q.id)).toEqual(["ok"]);
+  });
+});

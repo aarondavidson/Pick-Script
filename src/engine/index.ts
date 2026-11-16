@@ -128,6 +128,7 @@ export {
 export type { PackAction, PackActionRunResult } from "./packActions";
 export {
   isSafeMediaUrl,
+  isSafeAudioUrl,
   isSafePlayMediaUrl,
   safeMediaUrl,
   safePlayMediaUrl,
@@ -433,6 +434,7 @@ export {
   resolveMusicCue,
   isMusicFileBed,
   isMusicUrlString,
+  resolveVoiceUrl,
 } from "./audio";
 export type {
   PackAudio,
@@ -463,6 +465,17 @@ export {
   neighbourRoomIds,
 } from "./packAssets";
 export type { ExternalizedPack } from "./packAssets";
+export {
+  UI_STRINGS_EN,
+  registerUiStrings,
+  setActiveUiLocale,
+  getActiveUiLocale,
+  translateUi,
+  uiText,
+  uiTextOr,
+  uiStringsCsv,
+} from "./uiStrings";
+export type { UiStringKey, UiStringTable } from "./uiStrings";
 export { ENGINE_VERSION, checkEngineCompatibility } from "./version";
 export type { EngineCompatibility } from "./version";
 export { reconcileStateWithDefinition } from "./stateIntegrity";

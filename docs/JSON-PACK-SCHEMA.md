@@ -51,7 +51,8 @@ hosting (.zip)** or `npm run pack-assets -- game.pack.json out/dir`.
 | `hints` | `JsonPackHint[]` | Progressive + optional `hotspotId` pulse |
 | `quests` / `achievements` | arrays | Journal |
 | `actors` | optional | Ego / NPC art (incl. facing sheets). Each actor may set `scale` (0.25–4, default 1) to resize it on stage |
-| `audio` | `PackAudio` | Music / ambient / voice / SFX maps |
+| `audio` | `PackAudio` | Music / ambient / voice / SFX maps. `voice`: voice key → clip (URL, `assets/…`, or a small inline `data:audio/…`); `"<key>@<locale>"` for translated recordings |
+| `i18n` | `{ defaultLocale, messages }` | Locale catalogs for game text **and** interface text (`ui.*` keys) |
 | `comics` | `Record<id, JsonPackComic>` | Allowlisted pages |
 | `flagCutscenes` | `{ [flag]: cutsceneId }` | Auto-start |
 | `mapGroups` / `mapFog` / `mapFastTravel` | optional | World map |

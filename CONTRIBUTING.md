@@ -43,6 +43,8 @@ Starter pack: [`src/games/_template/`](./src/games/_template/).
 
 ## PR checklist
 
+- [ ] `npm run lint` is clean (warnings fail)
+- [ ] Play-screen text uses `uiText("ui.…")`, new controls work from the keyboard and have a name
 - [ ] `npm run typecheck` and `npm test` pass; `npm run test:e2e` if you touched the play screen
 - [ ] `npm run check-assets` passes (warnings OK for legacy art; no new hard-limit violations)
 - [ ] Engine API changes documented (`PACKS.md` / `ENGINE.md` / `ASSETS.md` as needed)

@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Lightbulb } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { PlayDialogChromeProps } from "@/components/game/playDialogChrome";
+import { uiText } from "@/engine/uiStrings";
 
 /**
  * Progressive in-game hints. Shows revealed tiers plus “Reveal next”.
@@ -49,7 +50,7 @@ export const HintDialog = ({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [hasHints]);
+  }, [hasHints, setOpen]);
 
   if (!hasHints) return null;
 
@@ -70,10 +71,10 @@ export const HintDialog = ({
             variant="outline"
             size="sm"
             className="pixel-font bg-secondary/50 hover:bg-accent/20 relative"
-            title="Hints (H)"
+            title={uiText("ui.hints.open")}
           >
             <Lightbulb className="w-4 h-4 mr-1" />
-            Hints
+            {uiText("ui.menu.hints")}
             {availableCount > 0 && (
               <span className="ml-1 text-[10px] text-accent">
                 {availableCount}
@@ -85,19 +86,17 @@ export const HintDialog = ({
       <DialogContent className="bg-game-ui border-2 border-game-border max-w-lg">
         <DialogHeader>
           <DialogTitle className="pixel-font text-xl text-accent">
-            Hints
+            {uiText("ui.menu.hints")}
           </DialogTitle>
         </DialogHeader>
         <p className="text-xs text-muted-foreground">
-          Progressive clues — each reveal is clearer. Press{" "}
-          <kbd className="text-foreground">H</kbd> anytime.
-          {hintsUsed > 0 ? ` (${hintsUsed} used)` : ""}
+          {uiText("ui.hints.intro")}
+          {hintsUsed > 0 ? ` ${uiText("ui.hints.used", { count: hintsUsed })}` : ""}
         </p>
         <ScrollArea className="max-h-[50vh] pr-2">
           {activeHints.length === 0 ? (
             <p className="text-sm text-muted-foreground py-6 text-center">
-              No hints available right now. Keep exploring — or you already
-              solved this thread.
+              {uiText("ui.hints.none")}
             </p>
           ) : (
             <div className="space-y-3">
@@ -136,10 +135,9 @@ export const HintDialog = ({
                       }}
                     >
                       {hint.exhausted
-                        ? "No more clues"
+                        ? uiText("ui.hints.no_more")
                         : hint.revealed === 0
-                          ? "Reveal first hint"
-                          : "Reveal next hint"}
+                          ? uiText("ui.hints.reveal_first") : uiText("ui.hints.reveal_next")}
                     </Button>
                   </div>
                 );
@@ -149,7 +147,7 @@ export const HintDialog = ({
         </ScrollArea>
         {lastReveal && (
           <div className="border border-accent/40 bg-accent/10 p-3 mt-2">
-            <p className="text-[10px] pixel-font text-primary mb-1">Latest</p>
+            <p className="text-[10px] pixel-font text-primary mb-1">{uiText("ui.hints.latest")}</p>
             <p className="text-sm text-foreground">{lastReveal}</p>
           </div>
         )}

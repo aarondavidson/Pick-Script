@@ -96,7 +96,8 @@ export function PackCutscenesPanel({
   const selected = selectedId ? cutscenes[selectedId] : null;
   const flagCutscenes = doc.flagCutscenes ?? {};
   const previewSteps = selected?.steps ?? [];
-  const previewMax = Math.max(0, previewSteps.length - 1);
+  const previewStepCount = previewSteps.length;
+  const previewMax = Math.max(0, previewStepCount - 1);
   const previewStep = previewSteps[previewIndex];
   const previewSummary = previewStep
     ? summarizeCutscenePreviewStep(previewStep)
@@ -113,22 +114,24 @@ export function PackCutscenesPanel({
 
   // Lightweight auto-advance: linger per step duration, no game runtime.
   useEffect(() => {
-    if (!previewPlaying || previewSteps.length === 0) return;
-    const step = previewSteps[previewIndex];
+    if (!previewPlaying || previewStepCount === 0) return;
+    // `previewStep` (not the array) is the dependency: editing the step that
+    // is on screen restarts its timer with the new duration.
+    const step = previewStep;
     if (!step) {
       setPreviewPlaying(false);
       return;
     }
     const ms = Math.max(200, previewStepDurationMs(step));
     const timer = setTimeout(() => {
-      if (previewIndex >= previewSteps.length - 1) {
+      if (previewIndex >= previewStepCount - 1) {
         setPreviewPlaying(false);
         return;
       }
       setPreviewIndex((i) => i + 1);
     }, ms);
     return () => clearTimeout(timer);
-  }, [previewPlaying, previewIndex, previewSteps.length, selectedId]);
+  }, [previewPlaying, previewIndex, previewStepCount, previewStep, selectedId]);
 
   const setCutscenes = (next: Record<string, JsonPackCutscene>) => {
     onChange({ ...doc, cutscenes: next });

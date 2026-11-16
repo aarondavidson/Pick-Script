@@ -60,6 +60,8 @@ import { useSentenceInteract } from "./adventure/useSentenceInteract";
 import { useSpeechHost } from "./adventure/useSpeechHost";
 import { useTravel } from "./adventure/useTravel";
 import { useWalkTick } from "./adventure/useWalkTick";
+import { setActiveUiLocale, uiText } from "./uiStrings";
+import { getCatalog } from "./i18n";
 
 /** @deprecated use SpeechLine */
 export type SayLineBubble = SpeechLine;
@@ -101,7 +103,9 @@ export interface AdventureContextValue {
     options?: {
       onDialogueOpen?: () => void;
       onSpecial?: () => void;
-    }
+    },
+    /** `verb`: act with this verb when none is armed (keyboard activation) */
+    opts?: { skipConsumeConfirm?: boolean; verb?: VerbId }
   ) => void;
   /** Click-to-walk ego to a room % point (clamped to walkboxes). */
   walkEgoTo: (x: number, y: number) => boolean;
@@ -269,6 +273,14 @@ export const AdventureProvider: React.FC<AdventureProviderProps> = ({
     [definition]
   );
   const [locale, setLocaleState] = useState(() => runtime.getLocale());
+  // Interface strings follow the game's language. Set during render so every
+  // child in this pass already reads the right table.
+  setActiveUiLocale(locale, getCatalog(definition.i18n, locale));
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = locale;
+    }
+  }, [locale]);
   const setLocale = useCallback(
     (next: string) => {
       runtime.setLocale(next);
@@ -277,7 +289,12 @@ export const AdventureProvider: React.FC<AdventureProviderProps> = ({
     [runtime]
   );
   const t = useCallback(
-    (key: string, fallback?: string) => runtime.t(key, fallback),
+    (key: string, fallback?: string) => {
+      // `runtime.t` reads the runtime's current locale; depending on `locale`
+      // gives `t` a new identity on a language switch so consumers re-render.
+      void locale;
+      return runtime.t(key, fallback);
+    },
     [runtime, locale]
   );
   const [currentMessage, setCurrentMessage] = useState<string | null>(null);
@@ -615,7 +632,7 @@ export const AdventureProvider: React.FC<AdventureProviderProps> = ({
         runtime.getActorDef(actorId)?.name ??
         gameStateRef.current.actors?.[actorId]?.id ??
         actorId;
-      showMessage(`Now controlling ${name}.`);
+      showMessage(uiText("ui.msg.now_controlling", { name }));
       return true;
     },
     [inputLocked, runtime, showMessage, setEgoWalkBoth, updateGameState]
@@ -675,15 +692,15 @@ export const AdventureProvider: React.FC<AdventureProviderProps> = ({
   const loadAutosave = useCallback(() => {
     const slot = runtime.save.loadAutosave();
     if (!slot) {
-      showMessage("No autosave found.");
+      showMessage(uiText("ui.save.no_autosave"));
       return false;
     }
     if (slot.incompatible) {
-      showMessage(slot.incompatibleReason ?? "Autosave is incompatible.");
+      showMessage(slot.incompatibleReason ?? uiText("ui.save.autosave_incompatible"));
       return false;
     }
     replaceGameState(slot.data);
-    showMessage("Autosave restored.");
+    showMessage(uiText("ui.save.autosave_restored"));
     return true;
   }, [runtime, replaceGameState, showMessage]);
 

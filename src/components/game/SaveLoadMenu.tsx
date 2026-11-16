@@ -9,6 +9,7 @@ import { useGame } from "@/contexts/GameContext";
 import { Download, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { uiText } from "@/engine/uiStrings";
 
 interface SaveLoadMenuProps {
   open: boolean;
@@ -31,23 +32,25 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
   }, [open, runtime]);
 
   const saves = useMemo(() => {
+    // Re-read from storage whenever the menu opens or a save changes
     void tick;
+    void open;
     return runtime.save.getAllSaves();
   }, [runtime, open, tick]);
 
   const autosave = useMemo(() => {
+    // Re-read from storage whenever the menu opens or a save changes
     void tick;
+    void open;
     return mode === "load" ? runtime.save.loadAutosave() : null;
   }, [runtime, mode, open, tick]);
 
   const mirrorName = runtime.save.getMirrorName();
   const storageHint = mirrorName
-    ? `Saves are kept in ${mirrorName} storage on this device.`
+    ? uiText("ui.save.storage_device", { name: mirrorName })
     : backend === "indexeddb"
-      ? "Saves use IndexedDB (mirrored to localStorage)."
-      : backend === "localStorage"
-        ? "Saves use localStorage only — export a backup for extra safety."
-        : "Storage is temporary — export a backup before closing this tab.";
+      ? uiText("ui.save.storage_idb") : backend === "localStorage"
+        ? uiText("ui.save.storage_ls") : uiText("ui.save.storage_memory");
 
   const handleExport = () => {
     const json = runtime.save.exportBackup();
@@ -58,7 +61,7 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
     a.download = `${runtime.definition.id}-saves.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success("Save backup downloaded");
+    toast.success(uiText("ui.save.exported"));
   };
 
   const handleSave = (slot: number) => {
@@ -75,7 +78,7 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
       toast.error(err, {
         duration: 10_000,
         action: {
-          label: "Export backup",
+          label: uiText("ui.save.export"),
           onClick: () => handleExport(),
         },
       });
@@ -83,9 +86,9 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
     }
     const warn = runtime.save.getLastError();
     if (warn) {
-      toast.success(`Saved to slot ${slot}`, { description: warn });
+      toast.success(uiText("ui.save.saved_slot", { slot }), { description: warn });
     } else {
-      toast.success(`Game saved to slot ${slot}!`);
+      toast.success(uiText("ui.save.saved_slot_ok", { slot }));
     }
     void runtime.save.flush();
     setTick((t) => t + 1);
@@ -96,14 +99,17 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
     const saveData = runtime.save.loadGame(slot);
     if (!saveData) return;
     if (saveData.incompatible) {
-      toast.error(saveData.incompatibleReason ?? "Incompatible save.");
+      toast.error(saveData.incompatibleReason ?? uiText("ui.save.incompatible"));
       return;
     }
     replaceGameState(saveData.data);
     toast.success(
-      `Game loaded from slot ${slot}${
-        saveData.version ? ` (v${saveData.version})` : ""
-      }!`
+      saveData.version
+        ? uiText("ui.save.loaded_slot_version", {
+            slot,
+            version: saveData.version,
+          })
+        : uiText("ui.save.loaded_slot", { slot })
     );
     onClose();
   };
@@ -112,25 +118,25 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
     const saveData = runtime.save.loadAutosave();
     if (!saveData) return;
     if (saveData.incompatible) {
-      toast.error(saveData.incompatibleReason ?? "Incompatible autosave.");
+      toast.error(saveData.incompatibleReason ?? uiText("ui.save.autosave_incompatible"));
       return;
     }
     replaceGameState(saveData.data);
-    toast.success("Autosave loaded!");
+    toast.success(uiText("ui.save.autosave_loaded"));
     onClose();
   };
 
   const handleDelete = (slot: number, e: React.MouseEvent) => {
     e.stopPropagation();
     runtime.save.deleteSave(slot);
-    toast.success(`Save slot ${slot} deleted!`);
+    toast.success(uiText("ui.save.deleted_slot", { slot }));
     setTick((t) => t + 1);
   };
 
   const handleDeleteAutosave = (e: React.MouseEvent) => {
     e.stopPropagation();
     runtime.save.deleteAutosave();
-    toast.success("Autosave deleted!");
+    toast.success(uiText("ui.save.autosave_deleted"));
     setTick((t) => t + 1);
   };
 
@@ -140,14 +146,14 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
       const text = await file.text();
       const result = runtime.save.importBackup(text);
       if (!result.ok) {
-        toast.error(result.error ?? "Import failed");
+        toast.error(result.error ?? uiText("ui.save.import_failed"));
         return;
       }
       await runtime.save.flush();
       setTick((t) => t + 1);
-      toast.success(`Imported ${result.imported} save(s)`);
+      toast.success(uiText("ui.save.imported", { count: result.imported }));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Import failed");
+      toast.error(e instanceof Error ? e.message : uiText("ui.save.import_failed"));
     }
   };
 
@@ -160,13 +166,12 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
       <DialogContent className="bg-game-ui border-2 border-game-border max-w-2xl">
         <DialogHeader>
           <DialogTitle className="pixel-font text-2xl text-accent">
-            {mode === "save" ? "Save Game" : "Load Game"}
+            {mode === "save" ? uiText("ui.save.save_game") : uiText("ui.save.load_game")}
           </DialogTitle>
         </DialogHeader>
 
         <p className="text-xs text-muted-foreground leading-relaxed">
-          {storageHint} Backups work across browsers and survive cleared site
-          data.
+          {storageHint} {uiText("ui.save.backup_help")}
         </p>
 
         <div className="flex flex-wrap gap-2">
@@ -178,7 +183,7 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
             onClick={handleExport}
           >
             <Download className="w-4 h-4 mr-1" />
-            Export backup
+            {uiText("ui.save.export")}
           </Button>
           <Button
             type="button"
@@ -188,7 +193,7 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
             onClick={() => importRef.current?.click()}
           >
             <Upload className="w-4 h-4 mr-1" />
-            Import backup
+            {uiText("ui.save.import")}
           </Button>
           <input
             ref={importRef}
@@ -210,7 +215,7 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="pixel-font text-foreground text-lg">
-                    Autosave
+                    {uiText("ui.save.autosave")}
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1">
                     {autosave.locationName}
@@ -249,7 +254,7 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="pixel-font text-foreground text-lg">
-                      Slot {slotNumber}
+                      {uiText("ui.save.slot", { slot: slotNumber })}
                     </h3>
                     {save ? (
                       <>
@@ -262,18 +267,20 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
                         </p>
                         {save.incompatible ? (
                           <p className="text-xs text-destructive mt-1">
-                            {save.incompatibleReason ?? "Incompatible version"}
+                            {save.incompatibleReason ?? uiText("ui.save.incompatible_version")}
                           </p>
                         ) : (
                           <p className="text-xs text-accent mt-1">
-                            {save.data.inventory.length} items •{" "}
-                            {Object.keys(save.data.flags).length} flags
+                            {uiText("ui.save.slot_summary", {
+                              items: save.data.inventory.length,
+                              flags: Object.keys(save.data.flags).length,
+                            })}
                           </p>
                         )}
                       </>
                     ) : (
                       <p className="text-sm text-muted-foreground mt-1">
-                        {mode === "save" ? "Click to save" : "Empty slot"}
+                        {mode === "save" ? uiText("ui.save.click_to_save") : uiText("ui.save.empty_slot")}
                       </p>
                     )}
                   </div>
@@ -299,7 +306,7 @@ export const SaveLoadMenu = ({ open, onClose, mode }: SaveLoadMenuProps) => {
           className="pixel-font w-full"
           onClick={onClose}
         >
-          Cancel
+          {uiText("ui.common.cancel")}
         </Button>
       </DialogContent>
     </Dialog>

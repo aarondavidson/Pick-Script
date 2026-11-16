@@ -34,12 +34,15 @@ const Launcher = () => {
   const [importError, setImportError] = useState<string | null>(null);
   const [importOk, setImportOk] = useState<string | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
-  const catalog = useMemo(() => listPlayableGames(), [installTick]);
-  const installedOnly = useMemo(
-    () =>
-      product.isTitleProduct ? [] : listInstalledCatalogEntries(),
-    [installTick, product.isTitleProduct]
-  );
+  // `installTick` bumps after an install / removal so the lists re-read storage
+  const catalog = useMemo(() => {
+    void installTick;
+    return listPlayableGames();
+  }, [installTick]);
+  const installedOnly = useMemo(() => {
+    void installTick;
+    return product.isTitleProduct ? [] : listInstalledCatalogEntries();
+  }, [installTick, product.isTitleProduct]);
 
   const featuredId = product.featuredGameId ?? product.defaultGameId;
   const featured =

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Volume2 } from "lucide-react";
 import { soundFX } from "@/utils/soundEffects";
 import { useGame } from "@/contexts/GameContext";
+import { uiText } from "@/engine/uiStrings";
 
 interface AudioUnlockOverlayProps {
   onUnlock: () => void;
@@ -41,6 +42,9 @@ export const AudioUnlockOverlay = ({ onUnlock }: AudioUnlockOverlayProps) => {
       }}
       onClick={handleInteraction}
       onTouchEnd={handleInteraction}
+      role="button"
+      tabIndex={0}
+      aria-label={uiText("ui.a11y.start", { title: definition.title })}
     >
       <div className="text-center space-y-6 p-8 max-w-sm">
         <div className="mx-auto w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center animate-pulse">
@@ -48,10 +52,10 @@ export const AudioUnlockOverlay = ({ onUnlock }: AudioUnlockOverlayProps) => {
         </div>
         <h2 className="pixel-font text-2xl text-accent">{definition.title}</h2>
         <p className="text-muted-foreground text-sm">
-          Tap anywhere to enable audio and begin
+          {uiText("ui.start.prompt")}
         </p>
         <p className="text-xs text-muted-foreground/70 pixel-font">
-          Web · iOS · point-and-click
+          {uiText("ui.start.platforms")}
         </p>
       </div>
     </div>
