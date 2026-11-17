@@ -8,7 +8,9 @@ anything, you need to change.
 
 ## Unreleased
 
-_Nothing yet._
+### Security
+
+- Dev toolchain: `typescript-eslint` 8.72 → 8.73, which moves its `minimatch` dependency from 10.2.6 to 11.x and clears the glob-pattern denial-of-service advisory (GHSA-g3hv-75wg-m249). Lint tooling only — nothing shipped to players or package users was affected
 
 ## 0.5.0 — 2026-11-16
 
