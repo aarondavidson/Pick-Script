@@ -5,6 +5,7 @@ import { haptics } from "@/utils/haptics";
 import { soundFX } from "@/utils/soundEffects";
 import type { ModalityPlayerProps } from "./modalityRegistry";
 import { advanceSequenceLock } from "./sequenceLockLogic";
+import { uiText } from "@/engine/uiStrings";
 
 const DEFAULT_SEQUENCE = ["a", "b", "c", "d"];
 
@@ -75,7 +76,7 @@ export function SequenceLockGame({
       setProgress(result.progress);
       if (result.won) {
         setPhase("won");
-        setFeedback("UNLOCKED");
+        setFeedback(uiText("ui.minigame.unlocked"));
         haptics.success();
         soundFX.success();
         if (!alreadyWon) onWin();
@@ -107,35 +108,34 @@ export function SequenceLockGame({
         <div className="space-y-4 text-center">
           {phase === "ready" && (
             <div className="space-y-3 py-4">
-              <h2 className="pixel-font text-lg text-accent">SEQUENCE LOCK</h2>
+              <h2 className="pixel-font text-lg text-accent">{uiText("ui.minigame.sequence.title")}</h2>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Press the pads in the correct order. A wrong press resets the
-                sequence.
+                {uiText("ui.minigame.sequence.help")}
               </p>
               {alreadyWon && (
                 <p className="text-xs text-green-400 pixel-font">
-                  Already unlocked
+                  {uiText("ui.minigame.already_unlocked")}
                 </p>
               )}
               <Button
                 onClick={start}
                 className="pixel-font bg-accent hover:bg-accent/80 text-accent-foreground"
               >
-                {alreadyWon ? "TRY AGAIN" : "START"}
+                {alreadyWon ? uiText("ui.minigame.retry") : uiText("ui.minigame.start")}
               </Button>
             </div>
           )}
 
           {phase === "playing" && (
             <div className="space-y-3">
-              <h2 className="pixel-font text-sm text-accent">ENTER SEQUENCE</h2>
+              <h2 className="pixel-font text-sm text-accent">{uiText("ui.minigame.sequence.prompt")}</h2>
               <p className="pixel-font text-xs text-muted-foreground" aria-live="polite">
                 {feedback ?? `0 / ${sequence.length}`}
               </p>
               <div
                 className="flex flex-wrap justify-center gap-2"
                 role="group"
-                aria-label="Lock pads"
+                aria-label={uiText("ui.minigame.sequence.pads")}
               >
                 {pads.map((id) => (
                   <button
@@ -155,19 +155,19 @@ export function SequenceLockGame({
                 onClick={handleClose}
                 className="pixel-font text-xs"
               >
-                ABORT
+                {uiText("ui.minigame.abort")}
               </Button>
             </div>
           )}
 
           {phase === "won" && (
             <div className="space-y-3 py-4">
-              <h2 className="pixel-font text-lg text-green-400">UNLOCKED</h2>
+              <h2 className="pixel-font text-lg text-green-400">{uiText("ui.minigame.unlocked")}</h2>
               <p className="text-xs text-muted-foreground">
-                The sequence matched. Lock disengaged.
+                {uiText("ui.minigame.sequence.win")}
               </p>
               <Button onClick={handleClose} className="pixel-font">
-                DONE
+                {uiText("ui.minigame.done")}
               </Button>
             </div>
           )}

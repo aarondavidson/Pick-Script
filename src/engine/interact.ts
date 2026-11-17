@@ -7,6 +7,7 @@ import type {
 } from "./types";
 import { getCatalog, resolveLocString } from "./i18n";
 import { getDefaultVerbResponse } from "./defaultResponses";
+import { uiText } from "./uiStrings";
 
 /**
  * Resolve a verb+hotspot interaction (SCUMM object verb script).
@@ -42,7 +43,7 @@ export function resolveInteraction(
   ) {
     return {
       blocked: true,
-      message: "You need something else to do that.",
+      message: uiText("ui.default.need_item"),
     };
   }
 

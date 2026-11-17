@@ -32,6 +32,7 @@ import {
 } from "@/utils/playPrefs";
 import { PICK } from "@/product/branding";
 import type { PlayDialogChromeProps } from "@/components/game/playDialogChrome";
+import { uiText } from "@/engine/uiStrings";
 
 interface SettingsMenuProps extends PlayDialogChromeProps {
   onSaveClick: () => void;
@@ -72,9 +73,9 @@ export const SettingsMenu = ({
   const setOpen = onOpenChange ?? setUncontrolledOpen;
 
   const modes: { id: VerbMode; label: string }[] = [
-    { id: "classic", label: "Classic (7 verbs)" },
-    { id: "simple", label: "Simple (Look / Use)" },
-    { id: "coin", label: "Verb coin (Look / Talk / Use)" },
+    { id: "classic", label: uiText("ui.settings.verbs_classic") },
+    { id: "simple", label: uiText("ui.settings.verbs_simple") },
+    { id: "coin", label: uiText("ui.settings.verbs_coin") },
   ];
 
   const closeThen = (fn: () => void) => {
@@ -85,12 +86,12 @@ export const SettingsMenu = ({
   const body = (
     <div className="space-y-4">
       <div>
-        <h3 className="pixel-font text-accent mb-2 text-sm">Audio</h3>
+        <h3 className="pixel-font text-accent mb-2 text-sm">{uiText("ui.settings.audio")}</h3>
         <MusicControls />
       </div>
 
       <div className="border-t border-game-border pt-3">
-        <h3 className="pixel-font text-accent mb-2 text-sm">Verb mode</h3>
+        <h3 className="pixel-font text-accent mb-2 text-sm">{uiText("ui.settings.verb_mode")}</h3>
         <div className="flex flex-col gap-1">
           {modes.map((m) => (
             <Button
@@ -111,7 +112,7 @@ export const SettingsMenu = ({
       </div>
 
       <div className="border-t border-game-border pt-3">
-        <h3 className="pixel-font text-accent mb-2 text-sm">Captions</h3>
+        <h3 className="pixel-font text-accent mb-2 text-sm">{uiText("ui.settings.captions")}</h3>
         <Button
           variant={captions ? "default" : "outline"}
           size="sm"
@@ -126,12 +127,12 @@ export const SettingsMenu = ({
             setCaptions(next);
           }}
         >
-          {captions ? "Captions on" : "Captions off"}
+          {captions ? uiText("ui.settings.captions_on") : uiText("ui.settings.captions_off")}
         </Button>
         <p className="text-[10px] text-muted-foreground mt-1.5 mb-2">
-          Speech bar and dialogue text. VO still plays when off.
+          {uiText("ui.settings.captions_help")}
         </p>
-        <h3 className="pixel-font text-accent mb-2 text-sm">Text size</h3>
+        <h3 className="pixel-font text-accent mb-2 text-sm">{uiText("ui.settings.text_size")}</h3>
         <div className="flex gap-1">
           {(["sm", "md", "lg"] as TextScale[]).map((s) => (
             <Button
@@ -155,7 +156,7 @@ export const SettingsMenu = ({
       </div>
 
       <div className="border-t border-game-border pt-3">
-        <h3 className="pixel-font text-accent mb-2 text-sm">Motion</h3>
+        <h3 className="pixel-font text-accent mb-2 text-sm">{uiText("ui.settings.motion")}</h3>
         <Button
           variant={reduceMotionActive ? "default" : "outline"}
           size="sm"
@@ -170,17 +171,16 @@ export const SettingsMenu = ({
             setReduceMotion(next);
           }}
         >
-          {reduceMotionActive ? "Reduced motion on" : "Reduce motion"}
+          {reduceMotionActive ? uiText("ui.settings.motion_reduced") : uiText("ui.settings.motion_reduce")}
         </Button>
         <p className="text-[10px] text-muted-foreground mt-1.5 leading-relaxed">
-          Softens screen shake and particle bursts. Follows system preference
-          until you toggle.
+          {uiText("ui.settings.motion_help")}
         </p>
       </div>
 
       {locales.length > 1 && (
         <div className="border-t border-game-border pt-3">
-          <h3 className="pixel-font text-accent mb-2 text-sm">Language</h3>
+          <h3 className="pixel-font text-accent mb-2 text-sm">{uiText("ui.settings.language")}</h3>
           <div className="flex flex-col gap-1">
             {locales.map((id) => (
               <Button
@@ -228,7 +228,7 @@ export const SettingsMenu = ({
       )}
 
       <div className="border-t border-game-border pt-3">
-        <h3 className="pixel-font text-accent mb-2 text-sm">Game</h3>
+        <h3 className="pixel-font text-accent mb-2 text-sm">{uiText("ui.settings.game")}</h3>
         <div className="flex flex-col gap-2">
           <Button
             variant="outline"
@@ -237,7 +237,7 @@ export const SettingsMenu = ({
             onClick={() => closeThen(onSaveClick)}
           >
             <Save className="w-4 h-4 mr-2" />
-            Save Game
+            {uiText("ui.save.save_game")}
           </Button>
           <Button
             variant="outline"
@@ -246,7 +246,7 @@ export const SettingsMenu = ({
             onClick={() => closeThen(onLoadClick)}
           >
             <FolderOpen className="w-4 h-4 mr-2" />
-            Load Game
+            {uiText("ui.save.load_game")}
           </Button>
           {hasAutosave && (
             <Button
@@ -259,7 +259,7 @@ export const SettingsMenu = ({
               }}
             >
               <RotateCcw className="w-4 h-4 mr-2" />
-              Restore Autosave
+              {uiText("ui.save.restore_autosave")}
             </Button>
           )}
         </div>
@@ -267,7 +267,7 @@ export const SettingsMenu = ({
 
       {definition.credits && definition.credits.length > 0 && (
         <div className="border-t border-game-border pt-3">
-          <h3 className="pixel-font text-accent mb-2 text-sm">Credits</h3>
+          <h3 className="pixel-font text-accent mb-2 text-sm">{uiText("ui.common.credits")}</h3>
           <div className="text-xs text-muted-foreground max-h-32 overflow-y-auto">
             <CreditsList credits={definition.credits} />
           </div>
@@ -283,7 +283,7 @@ export const SettingsMenu = ({
         <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto bg-game-ui border-2 border-game-border">
           <DialogHeader>
             <DialogTitle className="pixel-font text-accent text-lg">
-              Settings
+              {uiText("ui.menu.settings")}
             </DialogTitle>
           </DialogHeader>
           {body}
@@ -299,10 +299,10 @@ export const SettingsMenu = ({
           variant="outline"
           size="sm"
           className="pixel-font bg-secondary/50 hover:bg-accent/20 min-h-[40px]"
-          aria-label="Settings"
+          aria-label={uiText("ui.menu.settings")}
         >
           <Settings className="w-4 h-4 md:mr-1" />
-          <span className="hidden md:inline">Settings</span>
+          <span className="hidden md:inline">{uiText("ui.menu.settings")}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-72 bg-game-ui border-2 border-game-border p-4">

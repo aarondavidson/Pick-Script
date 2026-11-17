@@ -1,6 +1,7 @@
 import { useGame } from "@/contexts/GameContext";
 import { Button } from "@/components/ui/button";
 import { Lightbulb } from "lucide-react";
+import { uiText } from "@/engine/uiStrings";
 
 /**
  * Soft "Need a hint?" prompt after idle time or a streak of failed interacts.
@@ -25,7 +26,7 @@ export function StuckAssistBanner() {
       <div className="flex items-start gap-2">
         <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
         <div className="min-w-0 flex-1 space-y-2">
-          <p className="pixel-font text-sm text-accent">Need a hint?</p>
+          <p className="pixel-font text-sm text-accent">{uiText("ui.stuck.title")}</p>
           <p className="text-xs text-muted-foreground">
             Next clue for “{next.title}” ({next.revealed}/{next.total}).
           </p>
@@ -35,7 +36,7 @@ export function StuckAssistBanner() {
               className="pixel-font text-xs min-h-[44px]"
               onClick={() => acceptStuckAssist()}
             >
-              Show hint
+              {uiText("ui.stuck.show")}
             </Button>
             <Button
               size="sm"
@@ -43,7 +44,7 @@ export function StuckAssistBanner() {
               className="pixel-font text-xs min-h-[44px]"
               onClick={() => dismissStuckAssist()}
             >
-              Not now
+              {uiText("ui.stuck.dismiss")}
             </Button>
           </div>
         </div>

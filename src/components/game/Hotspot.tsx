@@ -51,6 +51,8 @@ export const Hotspot = ({
   const [animationClass, setAnimationClass] = useState("");
   const [clickFeedback, setClickFeedback] = useState(false);
   const [isTouching, setIsTouching] = useState(false);
+  /** Keyboard focus — shows the same highlight as hover */
+  const [isFocused, setIsFocused] = useState(false);
   // Sideways phones can be wider than the mobile breakpoint — still touch-first
   const narrowViewport = useIsMobile();
   const isMobile = isPhoneLayout(usePlayLayout()) || narrowViewport;
@@ -159,11 +161,57 @@ export const Hotspot = ({
     handleInteraction();
   }, [isTouching, inputLocked, handleInteraction]);
 
+  /** What Enter does when no verb is armed: Look, else the first verb it takes */
+  const defaultVerb: VerbId =
+    !hotspot.verbs?.length || hotspot.verbs.includes("look")
+      ? "look"
+      : hotspot.verbs[0];
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (inputLocked) return;
+      if (onVerbCoinRequest && !selectedVerb && !selectedCombineItem) {
+        onVerbCoinRequest(hotspot, onDialogueOpen);
+        return;
+      }
+      // Keyboard users cannot "arm then click" as easily — act directly
+      executeSentence(
+        hotspot,
+        { onDialogueOpen },
+        selectedVerb || selectedCombineItem ? undefined : { verb: defaultVerb }
+      );
+    },
+    [
+      inputLocked,
+      onVerbCoinRequest,
+      selectedVerb,
+      selectedCombineItem,
+      hotspot,
+      onDialogueOpen,
+      executeSentence,
+      defaultVerb,
+    ]
+  );
+
+  const handleFocus = useCallback(() => {
+    if (inputLocked) return;
+    setIsFocused(true);
+    setHoveredTargetName(hotspot.name);
+  }, [inputLocked, hotspot.name, setHoveredTargetName]);
+
+  const handleBlur = useCallback(() => {
+    setIsFocused(false);
+    setHoveredTargetName(null);
+  }, [setHoveredTargetName]);
+
   const handleTouchMove = useCallback((_e: React.TouchEvent) => {
     setIsHovered(true);
   }, []);
 
-  const isActive = isHovered || isTouching || forceReveal;
+  const isActive = isHovered || isTouching || isFocused || forceReveal;
   const stuckPulse = stuckAssistHotspotId === hotspot.id;
   const characterClasses = isCharacter ? `character-animated ${animationClass}`.trim() : "";
   const displayVerb = selectedVerb ?? (selectedCombineItem ? "use" : null);
@@ -175,7 +223,18 @@ export const Hotspot = ({
           <div
             data-hotspot={hotspot.id}
             data-stuck-pulse={stuckPulse || undefined}
-            className={`absolute cursor-pointer transition-all duration-200 touch-manipulation ${characterClasses} ${
+            role="button"
+            tabIndex={inputLocked ? -1 : 0}
+            aria-disabled={inputLocked || undefined}
+            aria-label={
+              (isFocused || isHovered) && sentenceLine
+                ? sentenceLine
+                : hotspot.name
+            }
+            onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            className={`absolute cursor-pointer transition-all duration-200 touch-manipulation outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent ${characterClasses} ${
               clickFeedback ? "scale-95" : "scale-100"
             } ${isActive ? "hotspot-active" : "hotspot-idle"} ${
               stuckPulse ? "hotspot-stuck-pulse" : ""

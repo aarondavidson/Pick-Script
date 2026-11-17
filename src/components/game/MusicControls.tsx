@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Volume2, VolumeX, Play, Pause } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { uiText } from "@/engine/uiStrings";
 
 export const MusicControls = () => {
   const {
@@ -23,7 +24,7 @@ export const MusicControls = () => {
         size="icon"
         className="pixel-font min-h-[44px] min-w-[44px]"
         onClick={togglePlay}
-        title={isPlaying ? "Pause music" : "Play music"}
+        title={isPlaying ? uiText("ui.audio.pause") : uiText("ui.audio.play")}
       >
         {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
       </Button>
@@ -34,7 +35,7 @@ export const MusicControls = () => {
             variant="outline"
             size="icon"
             className="pixel-font min-h-[44px] min-w-[44px]"
-            title="Audio levels"
+            title={uiText("ui.audio.levels")}
           >
             {isMuted ? (
               <VolumeX className="w-4 h-4" />
@@ -46,18 +47,18 @@ export const MusicControls = () => {
         <PopoverContent className="w-56 bg-game-ui border-2 border-game-border">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-xs pixel-font text-muted-foreground">Mute all</p>
+              <p className="text-xs pixel-font text-muted-foreground">{uiText("ui.audio.mute_all")}</p>
               <Button
                 variant="outline"
                 size="sm"
                 className="pixel-font text-xs h-8"
                 onClick={toggleMute}
               >
-                {isMuted ? "Unmute" : "Mute"}
+                {isMuted ? uiText("ui.audio.unmute") : uiText("ui.audio.mute")}
               </Button>
             </div>
             <div className="space-y-2">
-              <p className="text-xs pixel-font text-muted-foreground">Music</p>
+              <p className="text-xs pixel-font text-muted-foreground">{uiText("ui.audio.music")}</p>
               <Slider
                 value={[volume * 100]}
                 onValueChange={(value) => setVolume(value[0] / 100)}
@@ -68,7 +69,7 @@ export const MusicControls = () => {
               />
             </div>
             <div className="space-y-2">
-              <p className="text-xs pixel-font text-muted-foreground">Sound effects</p>
+              <p className="text-xs pixel-font text-muted-foreground">{uiText("ui.audio.sfx")}</p>
               <Slider
                 value={[sfxVolume * 100]}
                 onValueChange={(value) => setSfxVolume(value[0] / 100)}

@@ -9,6 +9,7 @@ import {
   clampDialValue,
   dialLockMatches,
 } from "./dialLockLogic";
+import { uiText } from "@/engine/uiStrings";
 
 const DEFAULT_TARGET = [3, 7, 1];
 const DEFAULT_POSITIONS = 10;
@@ -100,32 +101,34 @@ export function DialLockGame({
         <div className="space-y-4 text-center">
           {phase === "ready" && (
             <div className="space-y-3 py-4">
-              <h2 className="pixel-font text-lg text-accent">DIAL LOCK</h2>
+              <h2 className="pixel-font text-lg text-accent">{uiText("ui.minigame.dial.title")}</h2>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Turn each dial until the combination matches. {target.length}{" "}
-                dials · {positions} positions.
+                {uiText("ui.minigame.dial.help", {
+                  dials: target.length,
+                  positions,
+                })}
               </p>
               {alreadyWon && (
                 <p className="text-xs text-green-400 pixel-font">
-                  Already unlocked
+                  {uiText("ui.minigame.already_unlocked")}
                 </p>
               )}
               <Button
                 onClick={start}
                 className="pixel-font bg-accent hover:bg-accent/80 text-accent-foreground"
               >
-                {alreadyWon ? "TRY AGAIN" : "START"}
+                {alreadyWon ? uiText("ui.minigame.retry") : uiText("ui.minigame.start")}
               </Button>
             </div>
           )}
 
           {phase === "playing" && (
             <div className="space-y-3">
-              <h2 className="pixel-font text-sm text-accent">ENTER COMBO</h2>
+              <h2 className="pixel-font text-sm text-accent">{uiText("ui.minigame.dial.prompt")}</h2>
               <div
                 className="flex flex-wrap justify-center gap-2"
                 role="group"
-                aria-label="Combination dials"
+                aria-label={uiText("ui.minigame.dial.dials")}
               >
                 {values.map((v, i) => (
                   <button
@@ -145,19 +148,19 @@ export function DialLockGame({
                 onClick={handleClose}
                 className="pixel-font text-xs"
               >
-                ABORT
+                {uiText("ui.minigame.abort")}
               </Button>
             </div>
           )}
 
           {phase === "won" && (
             <div className="space-y-3 py-4">
-              <h2 className="pixel-font text-lg text-green-400">UNLOCKED</h2>
+              <h2 className="pixel-font text-lg text-green-400">{uiText("ui.minigame.unlocked")}</h2>
               <p className="text-xs text-muted-foreground">
-                Combination matched. Lock disengaged.
+                {uiText("ui.minigame.dial.win")}
               </p>
               <Button onClick={handleClose} className="pixel-font">
-                DONE
+                {uiText("ui.minigame.done")}
               </Button>
             </div>
           )}

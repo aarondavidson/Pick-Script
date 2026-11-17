@@ -9,6 +9,7 @@ import type {
 import { resolveInteraction } from "./interact";
 import { getCatalog, resolveLocString } from "./i18n";
 import { DEFAULT_VERB_RESPONSES } from "./defaultResponses";
+import { uiText, uiTextOr } from "./uiStrings";
 
 export interface Sentence {
   verb: VerbId | null;
@@ -26,7 +27,9 @@ export function formatSentence(sentence: Sentence): string {
     return "";
   }
 
-  const verbLabel =
+  // Verb wording and word order come from the interface string table, so a
+  // translation can say "{target} ansehen" as easily as "Look at {target}".
+  const fallback =
     verb === "look"
       ? "Look at"
       : verb === "talk"
@@ -34,18 +37,26 @@ export function formatSentence(sentence: Sentence): string {
         : verb === "pickup"
           ? "Pick up"
           : verb.charAt(0).toUpperCase() + verb.slice(1);
+  const verbLabel = uiTextOr(`ui.verb.${verb}`, fallback);
 
   if (verb === "use" && item) {
-    if (targetName) return `Use ${item.name} with ${targetName}`;
-    return `Use ${item.name} with`;
+    return targetName
+      ? uiText("ui.sentence.use_with", { item: item.name, target: targetName })
+      : uiText("ui.sentence.use_with_open", { item: item.name });
   }
 
   if (verb === "give" && item) {
-    if (targetName) return `Give ${item.name} to ${targetName}`;
-    return `Give ${item.name} to`;
+    return targetName
+      ? uiText("ui.sentence.give_to", { item: item.name, target: targetName })
+      : uiText("ui.sentence.give_to_open", { item: item.name });
   }
 
-  if (targetName) return `${verbLabel} ${targetName}`;
+  if (targetName) {
+    return uiText("ui.sentence.verb_target", {
+      verb: verbLabel,
+      target: targetName,
+    });
+  }
   return verbLabel;
 }
 
@@ -101,7 +112,10 @@ function resolveUseWith(
     const message =
       response !== undefined
         ? resolveLocString(response, state, catalog)
-        : `You use the ${item.name} with the ${hotspot.name}.`;
+        : uiText("ui.default.use_with", {
+            item: item.name,
+            target: hotspot.name,
+          });
     return { message, patch };
   }
 
@@ -120,7 +134,10 @@ function resolveUseWith(
   };
   const fail =
     defaults.useWith ??
-    `The ${item.name} doesn't work with the ${hotspot.name}.`;
+    uiText("ui.default.use_with_fail", {
+      item: item.name,
+      target: hotspot.name,
+    });
   return {
     blocked: true,
     message: typeof fail === "function" ? fail(state) : fail,

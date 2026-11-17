@@ -84,6 +84,21 @@ export default function globalSetup() {
     links: [
       { from: "hall", to: "vault", direction: "east", fromLabel: "Vault", toLabel: "Hall" },
     ],
+    // A pack translates the interface with ui.* keys in its own catalog
+    i18n: {
+      defaultLocale: "en",
+      messages: {
+        en: {},
+        es: {
+          "ui.exits.title": "Salidas",
+          "ui.verbs.title": "Acciones",
+          "ui.verb.look": "Mirar",
+          "ui.inventory.title": "Inventario",
+          "ui.menu.settings": "Ajustes",
+          "ui.a11y.scene": "Escena: {name}",
+        },
+      },
+    },
   };
   writeFileSync(join(dir, "pack.json"), JSON.stringify(pack));
 }

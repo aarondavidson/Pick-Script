@@ -1102,3 +1102,9 @@ All colors MUST be HSL.
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* Selected (accent-filled) controls: drop the pixel text shadow so labels stay readable */
+.bg-accent.pixel-font,
+.bg-accent .pixel-font {
+  text-shadow: none;
+}

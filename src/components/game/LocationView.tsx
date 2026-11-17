@@ -22,6 +22,7 @@ import { lookupComic } from "@/engine/specials";
 import { pixelBackgroundStyle } from "@/engine/script";
 import { getModalityPlayer } from "./modalityRegistry";
 import { resolveMinigameWinFlag } from "@/engine/jsonPackSpecials";
+import { uiText } from "@/engine/uiStrings";
 
 export const LocationView = () => {
   const {
@@ -102,7 +103,7 @@ export const LocationView = () => {
         setActiveMinigameConfig(pendingModality.config);
       } else {
         showMessage(
-          `Unknown minigame “${pendingModality.minigameId}” — no player registered.`,
+          uiText("ui.msg.unknown_minigame", { id: pendingModality.minigameId }),
         );
       }
     }
@@ -110,7 +111,7 @@ export const LocationView = () => {
   }, [pendingModality, clearModality, showMessage]);
 
   if (!location) {
-    return <div>Location not found</div>;
+    return <div>{uiText("ui.room.not_found")}</div>;
   }
 
   const baseHotspots = runtime.getVisibleHotspots(
@@ -241,7 +242,12 @@ export const LocationView = () => {
   return (
     <>
       <div
-        className={`relative bg-card border-game-border overflow-hidden touch-none ${stageClass}`}
+        className={`relative bg-card border-game-border overflow-hidden touch-pinch-zoom outline-none ${stageClass}`}
+        id="play-stage"
+        tabIndex={-1}
+        role="region"
+        aria-label={uiText("ui.a11y.scene", { name: location.name })}
+        aria-describedby="play-stage-help"
         ref={setStageEl}
         data-testid="play-stage"
       >
@@ -337,6 +343,17 @@ export const LocationView = () => {
           />
         </div>
 
+        {/* Screen readers: how to play, and what room this is (re-announced on travel) */}
+        <p id="play-stage-help" className="sr-only">
+          {uiText("ui.a11y.scene_help")}
+        </p>
+        <p className="sr-only" aria-live="polite" aria-atomic="true">
+          {uiText("ui.a11y.room_announce", {
+            name: location.name,
+            description: location.description ?? "",
+            count: visibleHotspots.length,
+          })}
+        </p>
         {!artReady && (
           <div
             className="absolute inset-0 z-20 flex items-center justify-center bg-background/90 play-stage-loading"
@@ -344,7 +361,7 @@ export const LocationView = () => {
             aria-live="polite"
             data-testid="room-loading"
           >
-            <p className="pixel-font text-accent text-sm">Loading…</p>
+            <p className="pixel-font text-accent text-sm">{uiText("ui.room.loading")}</p>
           </div>
         )}
         {/* Desktop / preview: caption over the scene. Phones keep the scene

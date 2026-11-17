@@ -1,6 +1,7 @@
 import type { GameState, StatePatch } from "./types";
 import type { GameDefinition } from "./definition";
 import { applyStatePatch } from "./state";
+import { uiText } from "./uiStrings";
 
 export interface HintDef {
   id: string;
@@ -60,14 +61,14 @@ export function revealNextHint(
   hintId: string
 ): { ok: boolean; message?: string; patch?: StatePatch } {
   const def = definition.hints?.find((h) => h.id === hintId);
-  if (!def) return { ok: false, message: "No such hint." };
+  if (!def) return { ok: false, message: uiText("ui.hints.missing") };
   if (!def.condition(state) || def.completed?.(state)) {
-    return { ok: false, message: "That hint isn't available right now." };
+    return { ok: false, message: uiText("ui.hints.unavailable") };
   }
 
   const revealed = state.hintProgress?.[hintId] ?? 0;
   if (revealed >= def.tiers.length) {
-    return { ok: false, message: "No more hints for that." };
+    return { ok: false, message: uiText("ui.hints.exhausted") };
   }
 
   const text = def.tiers[revealed];

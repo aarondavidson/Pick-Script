@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { EnhancedInventory } from "@/components/game/EnhancedInventory";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { isPhoneLayout, usePlayLayout } from "@/hooks/usePlayLayout";
+import { uiText, uiTextOr } from "@/engine/uiStrings";
 
 /** Presentation icons — engine provides labels/shortcuts via GameDefinition.verbs */
 const VERB_ICONS: Partial<Record<VerbId, string>> = {
@@ -39,7 +40,8 @@ export const VerbPanelEnhanced = () => {
     () =>
       verbDefs.map((v, index) => ({
         type: v.id,
-        label: `${VERB_ICONS[v.id] ?? ""} ${v.label}`.trim(),
+        name: uiTextOr(`ui.verb.${v.id}`, v.label),
+        label: `${VERB_ICONS[v.id] ?? ""} ${uiTextOr(`ui.verb.${v.id}`, v.label)}`.trim(),
         shortLabel: VERB_ICONS[v.id] ?? v.shortLabel,
         key: v.shortcut ?? String(index + 1),
       })),
@@ -116,12 +118,11 @@ export const VerbPanelEnhanced = () => {
             : "pixel-font text-accent mb-2 md:mb-3 text-sm md:text-base"
         }
       >
-        {coinMode ? "Verb coin" : "Actions"}
+        {coinMode ? uiText("ui.verbs.coin_title") : uiText("ui.verbs.title")}
       </h3>
       {coinMode && !phone && (
         <p className="text-[11px] text-muted-foreground mb-2 leading-relaxed">
-          Click a hotspot to open the Look / Talk / Use coin. Inventory still
-          arms Use-with.
+          {uiText("ui.verbs.coin_help")}
         </p>
       )}
       <div className={`grid ${cols} gap-1 md:gap-2`}>
@@ -137,6 +138,8 @@ export const VerbPanelEnhanced = () => {
             variant={selectedVerb === verb.type ? "default" : "outline"}
             size="sm"
             disabled={inputLocked}
+            aria-pressed={selectedVerb === verb.type}
+            aria-label={verb.name}
             className={`pixel-font text-xs relative min-h-[44px] touch-manipulation tap-feedback ${
               selectedVerb === verb.type
                 ? "bg-accent text-accent-foreground hover:bg-accent/90"
@@ -162,11 +165,14 @@ export const VerbPanelEnhanced = () => {
           }}
           variant="outline"
           size="sm"
+          aria-label={uiText("ui.inventory.title")}
+          aria-haspopup="dialog"
           className="pixel-font text-xs relative bg-secondary/50 hover:bg-game-verb/20 active:bg-game-verb/30 min-h-[44px] touch-manipulation tap-feedback"
         >
           <span className={iconCls}>🎒</span>
           <span className={labelCls}>
-            🎒 {roomyRow ? "Bag" : "Inventory"}
+            🎒{" "}
+            {roomyRow ? uiText("ui.inventory.bag") : uiText("ui.inventory.title")}
           </span>
           {!isMobile && (
             <span className="absolute top-0 right-1 text-[10px] opacity-50">
@@ -177,7 +183,7 @@ export const VerbPanelEnhanced = () => {
       </div>
       {!isMobile && (
         <p className="text-xs text-muted-foreground mt-3 text-center">
-          Press 1-{inventoryKey} or ESC
+          {uiText("ui.verbs.keys_help", { last: inventoryKey })}
         </p>
       )}
 

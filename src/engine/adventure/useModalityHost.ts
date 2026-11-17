@@ -11,6 +11,7 @@ import { applyStatePatch } from "../state";
 import type { PackModality } from "../specials";
 import { resolveMinigameWinFlag } from "../jsonPackSpecials";
 import { isSafeIdentifierKey } from "../security";
+import { uiText } from "../uiStrings";
 
 export interface UseModalityHostArgs {
   definition: GameDefinition;
@@ -109,7 +110,7 @@ export function useModalityHost({
             );
             queueMicrotask(() => {
               sfx?.success?.();
-              showMessage(`Achievement Unlocked: ${ach.title}!`);
+              showMessage(uiText("ui.msg.achievement", { title: ach.title }));
             });
           }
         }

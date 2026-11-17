@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   type DialogueTree,
   type GameState,
@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { soundFX } from "@/utils/soundEffects";
+import { packAudioPlayer } from "@/utils/packAudioPlayer";
 import { safeCssColor } from "@/engine/security";
 import { useGame } from "@/contexts/GameContext";
 import {
@@ -17,6 +18,7 @@ import {
   getTextScale,
   textScaleClass,
 } from "@/utils/playPrefs";
+import { uiText } from "@/engine/uiStrings";
 
 interface DialogueBoxProps {
   npcName: string;
@@ -44,6 +46,15 @@ export const DialogueBox = ({
 }: DialogueBoxProps) => {
   const { t, playVoice } = useGame();
   const [currentNodeId, setCurrentNodeId] = useState(dialogueTree.startNode);
+  // Keyboard: land on the first reply each time the conversation moves on
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const first = dialogRef.current?.querySelector<HTMLButtonElement>(
+      "[data-dialogue-choice]"
+    );
+    first?.focus();
+  }, [currentNodeId]);
+
   const [captionsOn] = useState(() => getCaptionsEnabled());
   const [textScale] = useState(() => getTextScale());
   const color = safeCssColor(talkColor);
@@ -74,6 +85,7 @@ export const DialogueBox = ({
       playVoice(view.node.voiceKey);
     }
     return () => {
+      packAudioPlayer.stop({ channel: "voice" });
       if (actorId) {
         onChoice(setActorAnimState(gameState, actorId, "idle"));
       }
@@ -136,6 +148,16 @@ export const DialogueBox = ({
   return (
     <div
       className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-2 md:p-4 bg-black/60 animate-in fade-in safe-all"
+      role="dialog"
+      aria-modal="true"
+      aria-label={uiText("ui.a11y.dialogue", { name: npcName })}
+      ref={dialogRef}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") {
+          e.stopPropagation();
+          handleClose();
+        }
+      }}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           handleClose();
@@ -148,6 +170,7 @@ export const DialogueBox = ({
           size="icon"
           className="absolute top-2 right-2 h-10 w-10 md:h-8 md:w-8 hover:bg-destructive/20 touch-manipulation z-10"
           onClick={handleClose}
+          aria-label={uiText("ui.common.close")}
         >
           <X className="h-5 w-5" />
         </Button>
@@ -174,7 +197,7 @@ export const DialogueBox = ({
             )}
             {!captionsOn && (
               <p className="text-[10px] text-muted-foreground pixel-font">
-                Captions off — enable in Settings
+                {uiText("ui.dialogue.captions_off")}
               </p>
             )}
           </div>
@@ -193,6 +216,7 @@ export const DialogueBox = ({
                     variant="outline"
                     className="w-full justify-start pixel-font text-left h-auto py-3 md:py-3 min-h-[48px] hover:bg-primary/20 hover:border-primary active:bg-primary/30 transition-all touch-manipulation"
                     onClick={() => handleChoice(choice, index)}
+                    data-dialogue-choice
                   >
                     <span className="text-primary mr-2">▶</span>
                     <span className={textScaleClass(textScale)}>{label}</span>
@@ -205,8 +229,9 @@ export const DialogueBox = ({
               variant="default"
               className="w-full pixel-font min-h-[48px] touch-manipulation"
               onClick={handleClose}
+              data-dialogue-choice
             >
-              [Close]
+              {uiText("ui.dialogue.close")}
             </Button>
           )}
         </div>

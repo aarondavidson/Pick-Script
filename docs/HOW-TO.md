@@ -183,6 +183,22 @@ This is great for “the desk click box is a bit too small.” Big story changes
 
 ---
 
+## Voices and other languages
+
+**Voices:** in Pack, open **Voice acting**. Every spoken line is listed; press
+**Add recording** next to a line and choose an audio file. It plays when the
+character says that line.
+
+**Other languages:** the game's own text is translated with the Strings export
+(CSV). The buttons and menus around the game can be translated too — see
+"Translating the interface" in [`PACKS.md`](../src/engine/PACKS.md#translating-the-interface).
+
+**Playing without a mouse:** Tab moves between the things in a room, Enter uses
+them, number keys choose an action. This works for players using a keyboard or
+a screen reader with no extra setup from you.
+
+---
+
 ## 9. Check before you share
 
 **Goal:** Catch “I can’t finish the game” problems early.

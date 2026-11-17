@@ -1,5 +1,6 @@
 import { useGame } from "@/contexts/GameContext";
 import { getCurrentObjective } from "@/engine/currentObjective";
+import { uiText } from "@/engine/uiStrings";
 
 /**
  * Always-visible current sub-goal (first incomplete objective on the first
@@ -21,7 +22,7 @@ export function CurrentObjectiveBar({ rail = false }: { rail?: boolean }) {
         data-testid="current-objective"
       >
         <p className="pixel-font text-[8px] uppercase tracking-widest text-primary leading-none mb-0.5">
-          Goal
+          {uiText("ui.objective.goal")}
           {objective.total > 1 && !objective.awaitingComplete
             ? ` ${objective.step}/${objective.total}`
             : ""}
@@ -43,13 +44,13 @@ export function CurrentObjectiveBar({ rail = false }: { rail?: boolean }) {
       data-testid="current-objective"
     >
       <span className="pixel-font text-[9px] md:text-[10px] uppercase tracking-widest text-primary shrink-0">
-        Objective
+        {uiText("ui.objective.label")}
       </span>
       <span className="text-xs md:text-sm text-foreground min-w-0">
         {objective.awaitingComplete ? (
           <>
             <span className="text-muted-foreground">{objective.questTitle}</span>
-            <span className="text-muted-foreground"> — wrap up</span>
+            <span className="text-muted-foreground"> {uiText("ui.objective.wrap_up")}</span>
           </>
         ) : (
           <>

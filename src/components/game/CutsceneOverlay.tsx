@@ -6,6 +6,7 @@ import { soundFX } from "@/utils/soundEffects";
 import { packAudioPlayer } from "@/utils/packAudioPlayer";
 import { createSpeechLine } from "@/engine/speech";
 import { panTo, setCameraFollow, zoomTo } from "@/engine/camera";
+import { uiText } from "@/engine/uiStrings";
 
 /**
  * Engine-driven cutscene presentation: locks input, starts line effects.
@@ -156,7 +157,7 @@ export const CutsceneOverlay = () => {
         className="fixed inset-0 z-[100] bg-black/40"
         role="dialog"
         aria-modal="true"
-        aria-label="Cutscene beat"
+        aria-label={uiText("ui.cutscene.beat")}
         onClick={advanceCutsceneLine}
       />
     );
@@ -168,7 +169,7 @@ export const CutsceneOverlay = () => {
       onClick={advanceCutsceneLine}
       role="dialog"
       aria-modal="true"
-      aria-label="Cutscene"
+      aria-label={uiText("ui.cutscene.label")}
     >
       <div
         className="w-full max-w-2xl bg-game-ui border-2 border-primary p-4 md:p-6 shadow-lg animate-in fade-in zoom-in-95 duration-200"
@@ -189,8 +190,9 @@ export const CutsceneOverlay = () => {
         )}
         <div className="flex items-center justify-between gap-2 mt-4">
           <p className="text-[10px] md:text-xs text-muted-foreground pixel-font">
-            Click / Space / Enter to continue
-            {skippable ? " · Esc to skip" : ""}
+            {skippable
+              ? uiText("ui.cutscene.skip_help")
+              : uiText("ui.cutscene.continue_help")}
           </p>
           <div className="flex gap-2">
             {skippable && (
@@ -200,7 +202,7 @@ export const CutsceneOverlay = () => {
                 className="pixel-font text-xs"
                 onClick={skipActiveCutscene}
               >
-                Skip
+                {uiText("ui.cutscene.skip")}
               </Button>
             )}
             <Button
@@ -208,7 +210,7 @@ export const CutsceneOverlay = () => {
               className="pixel-font text-xs"
               onClick={advanceCutsceneLine}
             >
-              Continue
+              {uiText("ui.cutscene.continue")}
             </Button>
           </div>
         </div>

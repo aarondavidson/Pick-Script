@@ -5,7 +5,7 @@ ready-made play UI for React. Phone, tablet and desktop layouts, touch, saves,
 audio, hints, journal and map are included.
 
 ```bash
-npm install https://github.com/aarondavidson/Pick-Script/releases/download/v0.4.0/portable-adventure-engine-0.4.0.tgz
+npm install https://github.com/aarondavidson/Pick-Script/releases/download/v0.5.0/portable-adventure-engine-0.5.0.tgz
 ```
 
 ```tsx

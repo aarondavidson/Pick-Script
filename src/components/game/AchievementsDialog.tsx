@@ -12,6 +12,7 @@ import { Trophy, Lock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import type { PlayDialogChromeProps } from "@/components/game/playDialogChrome";
+import { uiText } from "@/engine/uiStrings";
 
 export const AchievementsDialog = ({
   open: openProp,
@@ -39,19 +40,22 @@ export const AchievementsDialog = ({
             className="pixel-font bg-secondary/50 hover:bg-accent/20"
           >
             <Trophy className="w-4 h-4 mr-2" />
-            Achievements
+            {uiText("ui.menu.achievements")}
           </Button>
         </DialogTrigger>
       )}
       <DialogContent className="max-w-2xl bg-card border-2 border-game-border">
         <DialogHeader>
           <DialogTitle className="pixel-font text-accent text-xl">
-            Achievements
+            {uiText("ui.menu.achievements")}
           </DialogTitle>
           <div className="mt-2">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm text-muted-foreground">
-                {unlockedCount} / {totalCount} Unlocked
+                {uiText("ui.achievements.progress", {
+                  unlocked: unlockedCount,
+                  total: totalCount,
+                })}
               </span>
               <span className="text-sm text-accent pixel-font">
                 {progressPercent.toFixed(0)}%
@@ -104,9 +108,10 @@ export const AchievementsDialog = ({
                     </p>
                     {achievement.unlocked && achievement.timestamp && (
                       <p className="text-xs text-muted-foreground mt-2">
-                        Unlocked{" "}
-                        {formatDistanceToNow(achievement.timestamp, {
-                          addSuffix: true,
+                        {uiText("ui.achievements.unlocked_when", {
+                          when: formatDistanceToNow(achievement.timestamp, {
+                            addSuffix: true,
+                          }),
                         })}
                       </p>
                     )}

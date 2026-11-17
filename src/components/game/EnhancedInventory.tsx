@@ -7,6 +7,7 @@ import { useState } from "react";
 import { resolveItemIcon } from "@/utils/itemIcon";
 import { soundFX } from "@/utils/soundEffects";
 import type { GameItem } from "@/engine";
+import { uiText } from "@/engine/uiStrings";
 
 interface EnhancedInventoryProps {
   open?: boolean;
@@ -46,12 +47,12 @@ export const EnhancedInventory = ({ open, onClose }: EnhancedInventoryProps = {}
     if (combineMode) {
       if (!selectedCombineItem) {
         setSelectedCombineItem(item);
-        showMessage(`Selected ${item.name}. Click another item to combine.`);
+        showMessage(uiText("ui.inventory.selected", { name: item.name }));
         return;
       }
       if (selectedCombineItem.id === item.id) {
         setSelectedCombineItem(null);
-        showMessage(`Deselected ${item.name}.`);
+        showMessage(uiText("ui.inventory.deselected", { name: item.name }));
         return;
       }
       combineItems(selectedCombineItem, item);
@@ -64,16 +65,16 @@ export const EnhancedInventory = ({ open, onClose }: EnhancedInventoryProps = {}
     if (selectedCombineItem?.id === item.id) {
       setSelectedCombineItem(null);
       setSelectedVerb(null);
-      showMessage(`Deselected ${item.name}.`);
+      showMessage(uiText("ui.inventory.deselected", { name: item.name }));
       return;
     }
 
     setSelectedCombineItem(item);
     if (selectedVerb === "give") {
-      showMessage(`Give ${item.name} to… (click someone in the room)`);
+      showMessage(uiText("ui.inventory.give_with", { name: item.name }));
     } else {
       setSelectedVerb("use");
-      showMessage(`Use ${item.name} with… (click something in the room)`);
+      showMessage(uiText("ui.inventory.use_with", { name: item.name }));
     }
     closeDialog();
   };
@@ -96,7 +97,7 @@ export const EnhancedInventory = ({ open, onClose }: EnhancedInventoryProps = {}
       <DialogContent className="max-w-2xl bg-card border-2 border-game-border">
         <DialogHeader>
           <DialogTitle className="pixel-font text-accent text-xl flex items-center justify-between gap-2">
-            <span>Inventory</span>
+            <span>{uiText("ui.inventory.title")}</span>
             <Button
               variant={combineMode ? "default" : "outline"}
               size="sm"
@@ -106,18 +107,16 @@ export const EnhancedInventory = ({ open, onClose }: EnhancedInventoryProps = {}
                 setSelectedCombineItem(null);
                 showMessage(
                   combineMode
-                    ? "Combine mode off"
-                    : "Combine mode — select two items"
+                    ? uiText("ui.inventory.combine_off") : uiText("ui.inventory.combine_on")
                 );
               }}
             >
-              {combineMode ? "Cancel combine" : "Combine items"}
+              {combineMode ? uiText("ui.inventory.combine_cancel") : uiText("ui.inventory.combine")}
             </Button>
           </DialogTitle>
           <p className="text-sm text-muted-foreground">
             {combineMode
-              ? "Select two items to combine."
-              : "Click an item, then click something in the room to use it with."}
+              ? uiText("ui.inventory.combine_help") : uiText("ui.inventory.use_help")}
           </p>
         </DialogHeader>
 
@@ -125,8 +124,8 @@ export const EnhancedInventory = ({ open, onClose }: EnhancedInventoryProps = {}
           {gameState.inventory.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <Backpack className="w-16 h-16 mx-auto mb-4 opacity-20" />
-              <p>Your inventory is empty.</p>
-              <p className="text-sm mt-2">Explore to find items!</p>
+              <p>{uiText("ui.inventory.empty")}</p>
+              <p className="text-sm mt-2">{uiText("ui.inventory.empty_hint")}</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4">
@@ -179,8 +178,7 @@ export const EnhancedInventory = ({ open, onClose }: EnhancedInventoryProps = {}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               {combineMode
-                ? "Click another item to combine, or click again to deselect"
-                : "Click a hotspot in the room (or reopen inventory to change)"}
+                ? uiText("ui.inventory.combine_next") : uiText("ui.inventory.armed_help")}
             </p>
           </div>
         )}

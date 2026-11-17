@@ -13,7 +13,7 @@ Every [GitHub Release](https://github.com/aarondavidson/Pick-Script/releases)
 has the package attached. Install it by URL:
 
 ```bash
-npm install https://github.com/aarondavidson/Pick-Script/releases/download/v0.4.0/portable-adventure-engine-0.4.0.tgz
+npm install https://github.com/aarondavidson/Pick-Script/releases/download/v0.5.0/portable-adventure-engine-0.5.0.tgz
 ```
 
 Replace both version numbers to move to another release. If the package is also

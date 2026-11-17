@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { BookOpen, CheckCircle2, Circle } from "lucide-react";
 import { useState } from "react";
 import type { PlayDialogChromeProps } from "@/components/game/playDialogChrome";
+import { uiText } from "@/engine/uiStrings";
 
 export const QuestLog = ({
   open: openProp,
@@ -36,28 +37,28 @@ export const QuestLog = ({
             className="pixel-font bg-secondary/50 hover:bg-accent/20"
           >
             <BookOpen className="w-4 h-4 mr-2" />
-            Quests
+            {uiText("ui.menu.quests")}
           </Button>
         </DialogTrigger>
       )}
       <DialogContent className="max-w-2xl bg-card border-2 border-game-border">
         <DialogHeader>
           <DialogTitle className="pixel-font text-accent text-xl">
-            Quest Log
+            {uiText("ui.quests.log")}
           </DialogTitle>
         </DialogHeader>
 
         <ScrollArea className="h-[400px] pr-4">
           {activeQuests.length === 0 && completedQuests.length === 0 && (
             <p className="text-muted-foreground text-center py-8">
-              No quests yet. Explore to find your purpose.
+              {uiText("ui.quests.empty")}
             </p>
           )}
 
           {activeQuests.length > 0 && (
             <div className="mb-6">
               <h3 className="pixel-font text-primary text-lg mb-3">
-                Active Quests
+                {uiText("ui.quests.active")}
               </h3>
               {activeQuests.map((quest) => (
                 <div
@@ -100,7 +101,7 @@ export const QuestLog = ({
           {completedQuests.length > 0 && (
             <div>
               <h3 className="pixel-font text-muted-foreground text-lg mb-3">
-                Completed
+                {uiText("ui.quests.completed")}
               </h3>
               {completedQuests.map((quest) => (
                 <div

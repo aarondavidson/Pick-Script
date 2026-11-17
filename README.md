@@ -10,13 +10,13 @@ Teaching demos: Attic Study + Harbor Fog.
 
 ## Versions & updates
 
-Current release: **0.4.0** — see [`CHANGELOG.md`](./CHANGELOG.md).
+Current release: **0.5.0** — see [`CHANGELOG.md`](./CHANGELOG.md).
 
 - Using the engine in your own app? Install the package from a release — [`docs/ENGINE-PACKAGE.md`](./docs/ENGINE-PACKAGE.md).
 - Building a game on the engine? [`docs/UPGRADING.md`](./docs/UPGRADING.md) explains how to take a new release and keep players' saves working.
 - Maintaining the engine? [`docs/RELEASING.md`](./docs/RELEASING.md) has the versioning policy and release checklist.
 
-Get releases from the [Releases page](https://github.com/aarondavidson/Pick-Script/releases) (notes, source, and a ready-to-host web build). Use tagged releases (`v0.4.0`), not `main`, as the base for a shipped game. To be notified of new versions: **Watch → Custom → Releases**.
+Get releases from the [Releases page](https://github.com/aarondavidson/Pick-Script/releases) (notes, source, and a ready-to-host web build). Use tagged releases (`v0.5.0`), not `main`, as the base for a shipped game. To be notified of new versions: **Watch → Custom → Releases**.
 
 ## Develop
 

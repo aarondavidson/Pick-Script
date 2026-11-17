@@ -8,6 +8,7 @@ import {
   getTextScale,
   textScaleClass,
 } from "@/utils/playPrefs";
+import { uiText } from "@/engine/uiStrings";
 
 /**
  * First-class speech UI: portrait + line + click-to-skip.
@@ -35,7 +36,7 @@ export const SpeechBar = () => {
       <button
         type="button"
         className="fixed inset-0 z-[60] cursor-default bg-transparent"
-        aria-label="Skip speech"
+        aria-label={uiText("ui.speech.skip")}
         onClick={skipSpeech}
       />
     );
@@ -46,7 +47,7 @@ export const SpeechBar = () => {
       <button
         type="button"
         className="fixed inset-0 z-[60] cursor-default bg-transparent"
-        aria-label="Skip speech"
+        aria-label={uiText("ui.speech.skip")}
         onClick={skipSpeech}
       />
     );
@@ -60,7 +61,7 @@ export const SpeechBar = () => {
       type="button"
       className="fixed bottom-20 md:bottom-24 [@media(max-height:540px)]:bottom-2 left-1/2 -translate-x-1/2 z-[60] w-[min(36rem,calc(100%-1.5rem))] bg-game-ui/95 border-2 border-primary px-3 py-2 md:px-4 md:py-3 flex gap-3 items-start text-left shadow-lg animate-in fade-in slide-in-from-bottom-2"
       onClick={skipSpeech}
-      aria-label="Speech — click to skip"
+      aria-label={uiText("ui.speech.skip_hint")}
     >
       {(portrait || def) && (
         <div
@@ -92,8 +93,9 @@ export const SpeechBar = () => {
         )}
         {currentSpeech.skippable && (
           <p className="text-[10px] text-muted-foreground mt-1 pixel-font">
-            Click / Space to skip
-            {!captionsOn ? " · captions off" : ""}
+            {captionsOn
+              ? uiText("ui.speech.skip_help")
+              : uiText("ui.speech.skip_help_captions_off")}
           </p>
         )}
       </div>

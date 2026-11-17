@@ -509,3 +509,25 @@ export function assertSafePackUrl(raw: string): string {
   }
   return trimmed;
 }
+
+/** Largest inline audio clip accepted in a pack (base64 chars ≈ 1.5 MB of audio) */
+export const MAX_INLINE_AUDIO_CHARS = 2_100_000;
+
+/**
+ * Audio a pack may play: any safe media URL, or a small inline
+ * `data:audio/…;base64,` clip (Studio voice lines / SFX).
+ */
+export function isSafeAudioUrl(url: unknown): url is string {
+  if (typeof url !== "string") return false;
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  if (trimmed.toLowerCase().startsWith("data:")) {
+    return (
+      trimmed.length <= MAX_INLINE_AUDIO_CHARS &&
+      /^data:audio\/(mpeg|mp3|ogg|wav|x-wav|wave|mp4|x-m4a|aac|webm);base64,[A-Za-z0-9+/=]+$/i.test(
+        trimmed
+      )
+    );
+  }
+  return isSafeMediaUrl(trimmed);
+}

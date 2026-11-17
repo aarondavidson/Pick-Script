@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { ComicDef } from "@/engine/specials";
 import { safePlayMediaUrl } from "@/engine/security";
+import { uiText } from "@/engine/uiStrings";
 
 interface ComicReaderProps {
   isOpen: boolean;
@@ -79,11 +80,14 @@ export const ComicReader = ({ isOpen, onClose, comic }: ComicReaderProps) => {
               className="gap-2"
             >
               <ChevronLeft className="h-4 w-4" />
-              Previous
+              {uiText("ui.common.previous")}
             </Button>
             
             <span className="pixel-font text-sm text-muted-foreground">
-              Page {currentPage + 1} of {comic.pages.length}
+              {uiText("ui.comic.page", {
+                page: currentPage + 1,
+                total: comic.pages.length,
+              })}
             </span>
             
             <Button
@@ -92,7 +96,7 @@ export const ComicReader = ({ isOpen, onClose, comic }: ComicReaderProps) => {
               disabled={currentPage === comic.pages.length - 1}
               className="gap-2"
             >
-              Next
+              {uiText("ui.common.next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

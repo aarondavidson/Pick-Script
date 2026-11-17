@@ -15,6 +15,7 @@ import type {
 import { applyStatePatch } from "../state";
 import { shouldCompleteGame } from "../winFlag";
 import type { CutsceneRuntime } from "../cutscene";
+import { uiText } from "../uiStrings";
 
 export interface UseProgressionHostArgs {
   runtime: AdventureRuntime;
@@ -121,7 +122,7 @@ export function useProgressionHost({
 
         queueMicrotask(() => {
           sfx?.success?.();
-          showMessage(`Achievement Unlocked: ${achievement.title}!`);
+          showMessage(uiText("ui.msg.achievement", { title: achievement.title }));
         });
 
         return next;
@@ -161,7 +162,7 @@ export function useProgressionHost({
         if (prev.quests.some((q) => q.id === quest.id)) return prev;
         queueMicrotask(() => {
           sfx?.pickup?.();
-          showMessage(`New Quest: ${quest.title}!`);
+          showMessage(uiText("ui.msg.quest_new", { title: quest.title }));
         });
         return applyStatePatch(prev, {
           quests: [...prev.quests, quest],
@@ -183,7 +184,7 @@ export function useProgressionHost({
         next = runtime.runEvent({ type: "questComplete", questId: id }, next);
         queueMicrotask(() => {
           sfx?.success?.();
-          showMessage(`Quest Completed: ${quest.title}!`);
+          showMessage(uiText("ui.msg.quest_done", { title: quest.title }));
         });
         return next;
       });

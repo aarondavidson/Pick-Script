@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { BookOpen, Eye } from "lucide-react";
 import { useState } from "react";
 import type { PlayDialogChromeProps } from "@/components/game/playDialogChrome";
+import { uiText } from "@/engine/uiStrings";
 
 export const JournalDialog = ({
   open: openProp,
@@ -34,20 +35,19 @@ export const JournalDialog = ({
         <DialogTrigger asChild>
           <Button variant="outline" size="sm" className="gap-2">
             <BookOpen className="h-4 w-4" />
-            Journal
+            {uiText("ui.menu.journal")}
           </Button>
         </DialogTrigger>
       )}
       <DialogContent className="max-w-2xl max-h-[80vh]">
         <DialogHeader>
-          <DialogTitle className="pixel-font text-2xl">Journal</DialogTitle>
+          <DialogTitle className="pixel-font text-2xl">{uiText("ui.menu.journal")}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="h-[60vh] pr-4">
           {sortedEntries.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
               <p>
-                Your journal is empty. Examine things in the world to record
-                your findings.
+                {uiText("ui.journal.empty")}
               </p>
             </div>
           ) : (
@@ -82,7 +82,7 @@ export const JournalDialog = ({
                           onClick={() => setExpandedEntry(null)}
                           className="text-xs"
                         >
-                          Close
+                          {uiText("ui.common.close")}
                         </Button>
                       </div>
                     ) : (
@@ -93,7 +93,7 @@ export const JournalDialog = ({
                         className="gap-2 mt-2"
                       >
                         <Eye className="h-3 w-3" />
-                        Read Entry
+                        {uiText("ui.journal.read")}
                       </Button>
                     )}
 

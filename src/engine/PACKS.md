@@ -421,6 +421,55 @@ See Tier D notes in `ENGINE.md`. Short version:
 
 ---
 
+## Translating the interface
+
+Game text is translated through `i18n.messages`. The interface — menus,
+buttons, save dialogs, system messages, screen-reader labels — uses the same
+catalogs. Add `ui.*` keys to a locale and the play screen uses them; anything
+you leave out stays English.
+
+```ts
+i18n: {
+  defaultLocale: "en",
+  messages: {
+    en: {},
+    es: {
+      "ui.exits.title": "Salidas",
+      "ui.verb.look": "Mirar",
+      "ui.sentence.verb_target": "{verb} {target}",
+      "ui.msg.achievement": "¡Logro desbloqueado: {title}!",
+    },
+  },
+},
+```
+
+- The full list (about 210 keys) with the English text: `uiStringsCsv()` from
+  `@/engine`, or read `src/engine/uiStrings.ts`.
+- `{name}`-style placeholders must be kept; you may reorder them.
+- Verb labels you set yourself on `verbs` win over the English default, and a
+  translation wins over both.
+
+## Voice acting
+
+Each spoken line (dialogue node, cutscene / script `sayLine`) has a `voiceKey`;
+dialogue lines default to `voice.<room>.<hotspot>.<lineId>`. Put a recording
+under that key in `audio.voice` and it plays when the line is spoken: music
+dips, the line stays on screen for the clip's length, skipping stops it.
+
+```ts
+audio: {
+  voice: {
+    "voice.docks.trader.hello": traderHelloMp3,
+    "voice.docks.trader.hello@es": traderHelloEsMp3, // Spanish recording
+  },
+},
+```
+
+Studio: Pack → **Voice acting** lists every spoken line with Add / Play /
+Remove. Keep clips small (MP3 or OGG, mono, under ~1.5 MB each) and ship voiced
+games with **Download for web hosting** so recordings are separate files.
+Export the script for actors with Strings → CSV.
+
 ## Save versioning
 
 Every save/autosave stores `definition.version`.

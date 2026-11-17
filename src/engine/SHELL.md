@@ -7,6 +7,31 @@ The **host shell** is the reusable UI around the portable engine: verb bar, sent
 
 ---
 
+## Keyboard and screen readers
+
+The built-in shell is playable without a pointer. A custom shell should keep:
+
+| What | How the built-in shell does it |
+|---|---|
+| Every hotspot reachable | `role="button"`, `tabIndex={0}`, `aria-label` = hotspot name (or the sentence in progress) |
+| Acting from the keyboard | Enter / Space → armed verb, else `executeSentence(hotspot, options, { verb: "look" })` (first allowed verb if the hotspot has no Look) |
+| Verb coin | Focus moves to the first face; arrows cycle; Esc closes and returns focus to the hotspot |
+| Knowing where you are | The stage is `role="region"` named after the room, with a polite live region announcing name, description and how many things are there on every room change |
+| Hearing results | The message banner is `role="status"` `aria-live="polite"` |
+| Conversations | `role="dialog"`, `aria-modal`, Esc closes, focus lands on the first reply each turn |
+| Getting past the menus | A "Skip to the scene" link is the first focusable element |
+| Zoom | No `user-scalable=no`; the stage uses `touch-action: pinch-zoom` |
+
+Not covered yet: the bundled minigames are pointer-first, walking to an
+arbitrary floor point needs a pointer (interactions walk for you), and silent
+cutscene beats show an unlabelled overlay.
+
+## Interface text
+
+Never hardcode play-screen text. Use `uiText("ui.…")` from
+`src/engine/uiStrings.ts`; add new keys to `UI_STRINGS_EN`. Text follows the
+game's language automatically (`setActiveUiLocale` is called by the provider).
+
 ## Loading room art
 
 Rooms should never appear blank. The host preloads with
