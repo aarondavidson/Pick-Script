@@ -171,15 +171,21 @@ to put in `minEngineVersion`.
 - **One naming scheme:** tags are `vMAJOR.MINOR.PATCH`, release titles are
   `Pick-Script MAJOR.MINOR.PATCH`. Do not create releases by hand in the
   GitHub UI — the workflow keeps the tag, version, notes and files in step.
-- **Pre-releases:** the early release tagged `Beta` (titled "v1.0.0 Beta")
-  predates this scheme and corresponds to **0.1.0**. Edit its title on GitHub
-  to "0.1.0 (first public beta)" so the version order reads correctly.
+- **Releases before this scheme:**
+  - **0.1.0** is the pre-release tagged `Beta` ("v0.1.0 (first public beta)").
+    The repository history was rewritten on 2026-10-27 to drop content that
+    should not have been public; `Beta` now points at the rewritten first
+    commit, "Initial public release". A clone made before that date shares no
+    history with `main` — clone again.
+  - **0.2.0** (commit `4a760f8`) was released before the Release workflow
+    existed, so it has no `v0.2.0` tag or GitHub Release. Releases from
+    **0.3.0** on follow this scheme.
 
 ## Patch releases for an older line
 
 If a fix is needed for people who cannot take the newest minor yet, branch from
-the old tag (`git switch -c release/0.2 v0.2.0`), cherry-pick the fix, and
-release `0.2.1` from that branch with the same checklist.
+the old tag (`git switch -c release/0.4 v0.4.0`), cherry-pick the fix, and
+release `0.4.1` from that branch with the same checklist.
 
 ## The package
 

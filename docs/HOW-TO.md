@@ -73,10 +73,11 @@ You do **not** need to memorize those. Just remember: **Studio = make**, **Play 
 3. Finish the **New game** wizard (the **short-mystery** starter is recommended: five rooms and a harbor key).
 4. The Pack tab scrolls to **Art handoff** — drop in your room picture and key icon (see §3 or §4).
 5. Draw clickable areas (hotspots) on the picture if the starter needs them.
-6. Open **Ship checklist** — fix anything red.
-7. Click **Play draft** to try it. When happy, **Publish to launcher** (this browser only) or **Download** the game file.
+6. Give the game an ending: **Quests & achievements → Game ends when flag**. Use the flag your last puzzle sets (picking up an item sets `got_<item id>`). Without one, players never see the win screen.
+7. Open **Ship checklist** — fix anything red.
+8. Click **Play draft** to try it — play it to the win screen. When happy, **Publish to launcher** (this browser only) or **Download** the game file.
 
-That’s the whole maker loop: **wizard → art → checklist → play**.
+That’s the whole maker loop: **wizard → art → ending → checklist → play**.
 
 More detail: [ENGINE-LANDING.md](./ENGINE-LANDING.md) · [STUDIO.md](./STUDIO.md)
 
@@ -86,9 +87,9 @@ More detail: [ENGINE-LANDING.md](./ENGINE-LANDING.md) · [STUDIO.md](./STUDIO.md
 
 **Goal:** Room backgrounds and item icons that match *your* theme.
 
-1. Open [IMAGE-GEN-STARTER.md](./IMAGE-GEN-STARTER.md).
+1. Open [IMAGE-GEN-STARTER.md](./IMAGE-GEN-STARTER.md) — or Studio → **Pixels**, pick a suggested prompt and press **Copy prompt**.
 2. Fill in the **theme card** (title, mood, colors, what must appear in the room).
-3. Paste the prompts into ChatGPT, Gemini, Midjourney, or similar.
+3. Paste the prompts into ChatGPT, Gemini, Midjourney, or similar. Pick-Script doesn't make images itself — you use your own image tool.
 4. Export:
    - Room picture: wide landscape, about **1920×1080**
    - Item icons: square, about **256×256**
@@ -108,8 +109,10 @@ You do **not** need separate pictures for every clickable object — paint the d
 2. Follow the **Free pixel art sources** links (itch.io CC0, OpenGameArt, Kenney, etc.).
 3. Download images you’re allowed to use (prefer **CC0** / clearly free).
 4. Upload in Pixels or Pack, then **Send to pack**.
+5. Mixing art from different places? In Pixels choose **Palette: Custom** and paste a palette from [Lospec](https://lospec.com/palette-list) — use the same one for every picture so they look like one game.
+6. In the art list, press **Add credit to pack** for each pack you used. Players see the credits in **Settings → Credits** and on the win screen.
 
-Always double-check the license on the download page before you publish publicly.
+Always double-check the license on the download page before you publish publicly — some free packs **require** credit (CC-BY), and the art list marks the ones that do.
 
 ---
 
@@ -239,6 +242,9 @@ Night-before-ship checklist for maintainers: [SHIP-NIGHT.md](./SHIP-NIGHT.md).
 | **Room** | A place you can stand and look around |
 | **Hotspot** | An invisible clickable box on the picture |
 | **Item** | Something in your inventory (key, locket…) |
+| **Flag** | A yes/no switch the game remembers (“door unlocked”) — puzzles set flags |
+| **Win flag** | The flag that ends the game and shows the win screen |
+| **Credits** | Who made the art/music you used — shown to players |
 | **Ship checklist** | “Is this game ready to share?” panel |
 | **Art handoff** | Where you drop AI/free art into the draft |
 | **Draft** | Your work-in-progress game in this browser |

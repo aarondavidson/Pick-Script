@@ -8,6 +8,12 @@ anything, you need to change.
 
 ## Unreleased
 
+### Fixed
+
+- **Documentation** — the README now says what the engine does and maps every guide by task; HOW-TO's first-game steps include setting an ending (Studio games never reached the win screen without one), palettes and credits; pack-field docs say which release added each feature ("since 0.x"), for `minEngineVersion`; STUDIO.md no longer lists the removed AI generation, Pixor or the Lospec gallery; SHIP-NIGHT's QA gate matches RELEASING (lint, CLI, package, browser tests, audit, keyboard play, endings); `verify` is described with lint everywhere; RELEASING records the rewritten history behind the `Beta` tag and that 0.2.0 has no tag; the 0.1.0 → 0.2.0 upgrade notes cover the removed AI generation, title modes and React Router 7
+- **Changelog** — features that shipped in the first public beta were listed as new in 0.2.0; they are now under 0.1.0, with what 0.2.0 later removed marked
+- `tsconfig.node.json` no longer lists the deleted AI-proxy files
+
 ### Security
 
 - Dev toolchain: `typescript-eslint` 8.72 → 8.73, which moves its `minimatch` dependency from 10.2.6 to 11.x and clears the glob-pattern denial-of-service advisory (GHSA-g3hv-75wg-m249). Lint tooling only — nothing shipped to players or package users was affected
@@ -110,6 +116,9 @@ No pack changes are required. Details and examples: [`docs/UPGRADING.md`](./docs
 - Loaded saves are reconciled with the pack: new achievements, quests, actors and initial flags appear in old saves. Remove hand-written workarounds in `migrateSave`
 - Re-export any TS pack produced by Studio's **Copy TS pack** / **Download game folder** under 0.1.0 — it was missing most pack content (see Fixed)
 - Requires **Node.js 22.12+** for the dev toolchain (`engines`, `.nvmrc`)
+- **Studio's AI image generation is removed** (`/api/generate`, `RD_TOKEN`, `STUDIO_API_SECRET`) — if you deployed it, delete those variables from your host; make art in your own image tool
+- **Single-title `VITE_PRODUCT` modes are removed** (and their scripts); only `engine` remains — see [`docs/PRODUCTS.md`](./docs/PRODUCTS.md)
+- **React Router 7** — only matters if your own code imports `react-router-dom`
 
 ### Added
 
@@ -129,7 +138,9 @@ No pack changes are required. Details and examples: [`docs/UPGRADING.md`](./docs
 - Saves whose `gameId` is malformed (not just different) are rejected; non-object save data is rejected
 - `flagIndex.ts` used an `@/engine` alias import inside the engine folder, breaking copies of `src/engine` in repos without that alias
 
-### Also in 0.2.0 (since 0.1.0)
+### Also in 0.2.0
+
+Changes made after the first public beta.
 
 - **Win flag** — packs (JSON + TS) can set `winFlag`; the game ends and shows the win screen when it turns on. Studio: Quests & achievements → Game ends when flag; `pack-doctor` reports packs with no ending and win flags nothing sets. Previously Studio-made packs could never reach the win screen
 - **Fix: template sticky note** — using (not looking at) the note on a fresh game said “You already took the key” while handing over the key. Responses can now be state functions that return a translation key, so gated copy stays translatable
@@ -140,6 +151,32 @@ No pack changes are required. Details and examples: [`docs/UPGRADING.md`](./docs
 - **Engine-only repo** — removed the title-product modes (`dev:*` / `build:*` / `cap:sync:*` variants, `.env.*` files) and the repo-split tooling; launcher/Studio “edit shipped titles” panels removed
 - **Bring your own art** — removed the server-side AI image proxy (`api/`, dev middleware); Studio Pixels keeps upload + pixelate and offers copyable prompt suggestions for any image tool
 - **Fix** — `npm run new-pack` / `pack-from-json` no longer emit an invalid `registry.ts` when the last catalog entry has no trailing comma
+
+## 0.1.0 — 2026-10-26
+
+First public beta of the **portable SCUMM-inspired engine** plus packs — the GitHub pre-release tagged `Beta`.
+
+### Engine (`src/engine/`)
+- `GameDefinition` packs: rooms, verbs, inventory, dialogue, actors, walkboxes, scripts, cutscenes, saves, hints, multi-ego, i18n, specials, audio
+- `createGame` + `validateGameDefinition`; React `AdventureProvider`
+- Pack `itemIcons` + host `resolveItemIcon` (no game-specific UI imports)
+- Pack `audio.sfx` URL playback; pickup/success on inventory / achievements
+
+### Packs (`src/games/`)
+- **attic-study** — 1 room, 2 puzzles, art + SFX + [WALKTHROUGH](./src/games/attic-study/WALKTHROUGH.md)
+- **_template** — starter copied by `npm run new-pack`
+
+### Tooling
+- `npm run new-pack -- <id>` — scaffold + registry
+- `npm run check-assets` — ASSETS.md hard limits (CI)
+- `npm run verify` — typecheck + test + assets
+- GitHub Actions CI; `vercel.json` SPA rewrites
+
+### License
+- **GPL-3.0-only** — see [LICENSE](./LICENSE) · copyright [COPYRIGHT](./COPYRIGHT) (Aaron Davidson)
+
+### Also in the first public beta
+
 - **Mobile play chrome** — denser phone header; Settings folded into Menu sheet; `shell.chrome` hide flags (`hideJournal` / …) via `resolvePlayChrome`
 - **Plain-language docs** — [`docs/HOW-TO.md`](./docs/HOW-TO.md) covers play / make / AI art / share / publish / iPhone; friendlier README, ENGINE-LANDING, STUDIO, IMAGE-GEN, games READMEs, RECIPES, PACKS, PICK-SCRIPT
 - **Studio refactor** — `PackMetaBar` + `artHandoff.ts`; `toastFail` / toast helpers on Pack + graph/dialogue/cutscenes; `studioTabHref({ send })` + `recipesGalleryHref`; PackTool focus helpers
@@ -162,7 +199,7 @@ No pack changes are required. Details and examples: [`docs/UPGRADING.md`](./docs
 - **Map fog & sealed exits** — optional `mapFog` (reveal/travel-by-flag, clear on visit); gated links keep visible doorways via `lockedLabel` / `showWhenBlocked`; Pack World + link authoring
 - **Newbie-robust Guided Pack** — collapse polish panels; preview starts closed; plain-language validation + scroll-to-fix; ship coach Apply; launcher drops CLI/recipes from the hero; built-in genre mechanics callout
 
-- **Free pixel galleries** — expanded Studio library (itch CC0, OpenGameArt CC0 filter, Kenney, CraftPix freebies, Pixor, Lospec + ready packs); Pack + Pixels tabs; docs drop retail-import framing
+- **Free pixel galleries** — expanded Studio library (itch CC0, OpenGameArt CC0 filter, Kenney, CraftPix freebies, Pixor, Lospec + ready packs — Pixor and the Lospec gallery were dropped in 0.2.0); Pack + Pixels tabs; docs drop retail-import framing
 - **Studio ship DX** — launcher Import `.pack.json` (no Studio); `/play?packUrl=`; post-publish funnel; `npm run pack-from-json`; Hotspots/Scene/Combines **Apply to pack**; auto-shrink uploads; CC0 pixel library links; Studio-first Guided 5-step launcher; coach **ship** tips; Pack quests & achievements UI
 - **Deploy lock (strict play)** — production player builds freeze pack data, block Studio/draft/sidecar overrides of shipped games, enforce map fast-travel policy, sanitize save/load state, optional `VITE_SAVE_INTEGRITY_KEY` sealed saves, CSP + security headers on Vercel
 - **Web-robust saves** — IndexedDB primary + localStorage mirror, checksum envelopes, tab-hide flush, Export/Import backup JSON for cross-browser restore; Save menu surfaces storage backend
@@ -174,10 +211,10 @@ No pack changes are required. Details and examples: [`docs/UPGRADING.md`](./docs
 - `linkRooms` / `mapFastTravel` for easy multi-room linking + map
 - Shared AudioContext (iOS-safe); separate music / SFX volume
 - Admin builder plan: `docs/ADMIN_BUILDER_PLAN.md`
-- **Pack pixel studio** (`/studio`): Retro Diffusion proxy + client pixelate; `docs/STUDIO.md`
+- **Pack pixel studio** (`/studio`): Retro Diffusion proxy + client pixelate; `docs/STUDIO.md` *(the AI proxy was removed in 0.2.0 — bring your own art)*
 - **Puzzle recipes** (`/recipes`, `docs/RECIPES.md`) — copy-paste patterns between Attic and full titles
 - **Author mode** — Settings or Ctrl+Shift+H: hotspot % edit, copy object, flags/exits panel
-- **Copyright / attribution** — `COPYRIGHT` (Aaron Davidson, GPL-3.0-only); credit in README, package.json, launcher
+- **Copyright / attribution** — `COPYRIGHT` (Aaron Davidson, GPL-3.0-only; the Game Exception was added in 0.4.0); credit in README, package.json, launcher
 - **Design studio tools** — hotspots drawer, scene overlays→inventory, combine recipes, character pixel preset; Author mode “Add hotspot (draw)”
 - **Studio Audio tab** — location music cues, ambient beds, interact/use-with SFX bindings + preview; hotspot `interactSound` / `useWithSound`
 - **Studio Pack handoff** — JSON pack schema + `createGameFromJson`, Pack tab (rooms/art/hotspots/`linkRooms` graph), self-contained `.pack.json` download + `/play/studio-draft`
@@ -189,29 +226,6 @@ No pack changes are required. Details and examples: [`docs/UPGRADING.md`](./docs
 - **Pack polish (Attic-parity path)** — Items catalog + icons, World (map/audio cues), Dialogue lite, IndexedDB drafts + undo/redo
 - **Private authoring gate** — Studio + Author mode off in public production unless `VITE_ENABLE_STUDIO` (optional `VITE_STUDIO_SECRET` / `?unlock=`)
 - **Design coach** — ignorable tips for pack function/feel (Pack tab + Author mode); dismiss per tip or turn off entirely
-
-## 0.1.0 — Portable adventure engine
-
-First tagged release of the **portable SCUMM-inspired engine** plus packs.
-
-### Engine (`src/engine/`)
-- `GameDefinition` packs: rooms, verbs, inventory, dialogue, actors, walkboxes, scripts, cutscenes, saves, hints, multi-ego, i18n, specials, audio
-- `createGame` + `validateGameDefinition`; React `AdventureProvider`
-- Pack `itemIcons` + host `resolveItemIcon` (no game-specific UI imports)
-- Pack `audio.sfx` URL playback; pickup/success on inventory / achievements
-
-### Packs (`src/games/`)
-- **attic-study** — 1 room, 2 puzzles, art + SFX + [WALKTHROUGH](./src/games/attic-study/WALKTHROUGH.md)
-- **_template** — starter copied by `npm run new-pack`
-
-### Tooling
-- `npm run new-pack -- <id>` — scaffold + registry
-- `npm run check-assets` — ASSETS.md hard limits (CI)
-- `npm run verify` — typecheck + test + assets
-- GitHub Actions CI; `vercel.json` SPA rewrites
-
-### License
-- **GPL-3.0-only** — see [LICENSE](./LICENSE) · copyright [COPYRIGHT](./COPYRIGHT) (Aaron Davidson)
 
 ### Add a game
 

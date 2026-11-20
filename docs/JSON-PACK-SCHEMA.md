@@ -20,7 +20,7 @@ Any image or audio field accepts:
 | Form | Example | Use |
 |---|---|---|
 | Inline data URL | `data:image/png;base64,…` | Studio drafts, small packs you pass around as one file |
-| Relative asset | `assets/hall.png` | **Hosted packs.** Resolved against the URL `pack.json` was fetched from. Must start with `assets/`, no `..` |
+| Relative asset | `assets/hall.png` | **Hosted packs.** Resolved against the URL `pack.json` was fetched from. Must start with `assets/`, no `..`. Since 0.4.0 |
 | Absolute URL | `https://cdn.example.com/hall.png` or `/art/hall.png` | Art on a CDN or on the player's own site |
 
 Relative assets only work for packs loaded by URL (`/play?packUrl=…`,
@@ -38,8 +38,8 @@ hosting (.zip)** or `npm run pack-assets -- game.pack.json out/dir`.
 | `title` / `subtitle` | string | Launcher + header |
 | `version` | string | Content semver — stamped into saves ([`UPGRADING.md`](./UPGRADING.md#updating-your-own-game-without-breaking-saves)) |
 | `minEngineVersion` | string | Optional. Oldest engine release (semver) the pack runs on; older engines refuse it. Since 0.2.0 |
-| `winFlag` | string | Optional. When this flag turns on, the game ends and shows the win screen. Set it from any action, dialogue, cutscene, pickup (`got_<itemId>`) or minigame `winFlag` |
-| `credits` | `{ work, author, license?, url? }[]` | Optional asset credits, shown in Settings → Credits and on the win screen. Non-https `url`s are dropped; max 100 rows |
+| `winFlag` | string | Optional. When this flag turns on, the game ends and shows the win screen. Set it from any action, dialogue, cutscene, pickup (`got_<itemId>`) or minigame `winFlag`. Since 0.2.0 |
+| `credits` | `{ work, author, license?, url? }[]` | Optional asset credits, shown in Settings → Credits and on the win screen. Non-https `url`s are dropped; max 100 rows. Since 0.2.0 |
 | `startRoom` | string | Must exist in `rooms` |
 | `verbMode` | `classic` \| `simple` \| `coin` | Optional |
 | `rooms` | `Record<id, JsonPackRoom>` | Required |
@@ -50,9 +50,9 @@ hosting (.zip)** or `npm run pack-assets -- game.pack.json out/dir`.
 | `cutscenes` | `JsonPackCutscene[]` | |
 | `hints` | `JsonPackHint[]` | Progressive + optional `hotspotId` pulse |
 | `quests` / `achievements` | arrays | Journal |
-| `actors` | optional | Ego / NPC art (incl. facing sheets). Each actor may set `scale` (0.25–4, default 1) to resize it on stage |
-| `audio` | `PackAudio` | Music / ambient / voice / SFX maps. `voice`: voice key → clip (URL, `assets/…`, or a small inline `data:audio/…`); `"<key>@<locale>"` for translated recordings |
-| `i18n` | `{ defaultLocale, messages }` | Locale catalogs for game text **and** interface text (`ui.*` keys) |
+| `actors` | optional | Ego / NPC art (incl. facing sheets). Each actor may set `scale` (0.25–4, default 1) to resize it on stage (since 0.3.0) |
+| `audio` | `PackAudio` | Music / ambient / voice / SFX maps. `voice`: voice key → clip (URL, `assets/…`, or a small inline `data:audio/…`); `"<key>@<locale>"` for translated recordings. Inline audio and `@<locale>` since 0.5.0 |
+| `i18n` | `{ defaultLocale, messages }` | Locale catalogs for game text **and** interface text (`ui.*` keys, since 0.5.0) |
 | `comics` | `Record<id, JsonPackComic>` | Allowlisted pages |
 | `flagCutscenes` | `{ [flag]: cutsceneId }` | Auto-start |
 | `mapGroups` / `mapFog` / `mapFastTravel` | optional | World map |
