@@ -78,8 +78,8 @@ Shared UI lives in `src/components/game/`. Engine code lives in `src/engine/` an
 | `title` / `subtitle` | title yes | Shown in launcher + in-game header |
 | `version` | yes | Content semver (independent of engine) — stamped into every save; see [Save versioning](#save-versioning) |
 | `minEngineVersion` | no | Oldest engine release the pack runs on, e.g. `"0.2.0"`. An older engine refuses the pack at boot with an "update the engine" message. Since 0.2.0 |
-| `winFlag` | no | Flag name — when it turns on, the game ends and shows the win screen (TS packs can also patch `gameComplete: true`) |
-| `credits` | no | `{ work, author, license?, url? }[]` — asset credits shown in the in-game Settings menu and on the default win screen (`url` must be https) |
+| `winFlag` | no | Flag name — when it turns on, the game ends and shows the win screen (TS packs can also patch `gameComplete: true`). Since 0.2.0 |
+| `credits` | no | `{ work, author, license?, url? }[]` — asset credits shown in the in-game Settings menu and on the default win screen (`url` must be https). Since 0.2.0 |
 | `startRoom` | yes | Must exist in `rooms` |
 | `rooms` | yes | `Record<roomId, Room>` |
 | `combinations` | yes | May be `{}` |
@@ -423,6 +423,8 @@ See Tier D notes in `ENGINE.md`. Short version:
 
 ## Translating the interface
 
+Since 0.5.0 — set `minEngineVersion: "0.5.0"` if your translation depends on it.
+
 Game text is translated through `i18n.messages`. The interface — menus,
 buttons, save dialogs, system messages, screen-reader labels — uses the same
 catalogs. Add `ui.*` keys to a locale and the play screen uses them; anything
@@ -464,6 +466,9 @@ audio: {
   },
 },
 ```
+
+Per-language recordings (`@<locale>`), inline `data:audio/…` clips and the
+Studio panel are since 0.5.0.
 
 Studio: Pack → **Voice acting** lists every spoken line with Add / Play /
 Remove. Keep clips small (MP3 or OGG, mono, under ~1.5 MB each) and ship voiced

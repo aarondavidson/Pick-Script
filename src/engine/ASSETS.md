@@ -122,7 +122,7 @@ character). For hand-authored TS packs, export a transparent PNG yourself;
 
 **Size.** Sprites are scaled with the room, so a character takes the same share of
 the scene on a phone and on a desktop (about a quarter of the room height for a
-bitmap at the default). Set `scale` on the actor (0.25–4) — or Studio → Pack →
+bitmap at the default). Set `scale` on the actor (0.25–4, since 0.3.0) — or Studio → Pack →
 Actors → **Size on stage** — when the art reads too small or too large. The
 drawing's own pixel size does not change how big it appears; keep sprites around
 128×192 with a transparent background (PNG).

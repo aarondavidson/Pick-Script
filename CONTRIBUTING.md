@@ -11,7 +11,7 @@ Node.js 22.12+ (see `.nvmrc`).
 
 ```sh
 npm install
-npm run verify       # typecheck + test + check-assets + check:release
+npm run verify       # typecheck + lint + test + check-assets + check:release
 npm run dev          # http://localhost:8080
 ```
 

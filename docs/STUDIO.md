@@ -52,9 +52,10 @@ Pixels tab → **Free pixel art sources** (also linked from Pack when you need r
 **Galleries (browse first):**
 - [itch.io CC0 Pixel Art](https://itch.io/game-assets/assets-cc0/tag-pixel-art)
 - [OpenGameArt 2D + CC0 filter](https://opengameart.org/art-search-advanced?keys=&field_art_type_tid%5B%5D=9&field_art_licenses_tid%5B%5D=14&sort_by=count&sort_order=DESC)
-- [Kenney](https://kenney.nl/assets?q=pixel) · [CraftPix freebies](https://craftpix.net/freebies/) · [Pixor CC0 packs](https://pixor.art/library/packs/) · [Lospec gallery](https://lospec.com/gallery)
+- [Kenney](https://kenney.nl/assets?q=pixel) (CC0) · [CraftPix freebies](https://craftpix.net/freebies/) (free for games, not CC0 — don't redistribute the raw files)
+- [Lospec palette list](https://lospec.com/palette-list) — palettes, not art: paste one into Pixels → **Palette: Custom** so art from different sources matches
 
-**Flow:** download PNGs → Upload in Pixels or Pack → pixelate / Send to pack. Prefer **CC0**; always re-check the license on the source page.
+**Flow:** download PNGs → Upload in Pixels or Pack → pixelate / Send to pack. Prefer **CC0**; always re-check the license on the source page, and **Add credit to pack** for what you use (see [Credits](#credits)). The in-app list marks packs whose licence is unconfirmed or needs credit.
 
 ### Play feel (quests, hints, touch)
 
@@ -86,7 +87,7 @@ Studio defaults to **Guided** (prefs in `localStorage` `studio-mode-v1`):
 | Tab | Purpose |
 |---|---|
 | **Pack** | New Game Wizard, rooms + art + Intent Wizard hotspots + items/icons + dialogue + map/audio + puzzles + checklist → **Live preview** / **Publish** / **Download .pack.json** |
-| **Pixels** | Generate/upload → pixel-clean art; **Send to pack** (room / item); prompt library; batch room+item+char |
+| **Pixels** | Upload → pixel-clean art (game, custom or adaptive palette); **Send to pack** (room / item / character / portrait); prompt suggestions with **Copy prompt** for your own image tool; free art library with **Add credit to pack** |
 | **Audio** | Music cues + SFX bindings; **Apply to pack draft** (not only Copy TS) |
 | **Hotspots** | (Advanced) Draw boxes → export hotspot TS |
 | **Scene** | (Advanced) Overlay art → pickup / characters |

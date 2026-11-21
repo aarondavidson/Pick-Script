@@ -227,6 +227,9 @@ No pack changes are required. Behaviour that changed:
 | When the browser holds two copies of a save, the one with the newer in-save timestamp wins | No |
 | "Copy TS pack" / "Download game folder" now include items, hints, cutscenes, quests, win flag and credits | Re-export any TS pack you generated from Studio with 0.1.0 — it was missing that content |
 | Node.js **22.12+** is required for the dev toolchain | Update Node (`nvm use`) |
+| Studio's built-in AI image generation is gone (`/api/generate`, `/api/status`, `RD_TOKEN`, `STUDIO_API_SECRET`, `VITE_STUDIO_API_KEY`) | Only if you deployed it: delete those variables from your host. Make art in your own image tool — Studio → Pixels → **Copy prompt** |
+| The single-title `VITE_PRODUCT` modes and their `dev:*` / `build:*` / `cap:sync:*` scripts are removed; only `engine` remains | Only if you used them: a single-title product now lives in its own repository — [`PRODUCTS.md`](./PRODUCTS.md) |
+| React Router 6 → 7 | Only if your own code imports `react-router-dom`: follow its v6 → v7 upgrade guide. Packs are unaffected |
 | New: `ENGINE_VERSION`, `minEngineVersion`, `winFlag`, `credits` | Optional |
 
 Known limit, unchanged: autosave overwrites an incompatible autosave slot.

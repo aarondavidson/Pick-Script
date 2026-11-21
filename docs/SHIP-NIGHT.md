@@ -2,6 +2,8 @@
 
 **In plain words:** a night-before release punch list for maintainers — run the checks, play the demos, don’t ship if something’s red.
 
+The authoritative release steps (versions, changelog, tagging) are in [`RELEASING.md`](./RELEASING.md). This page is the hands-on QA that goes with step 5–6 there.
+
 Everyday makers sharing a Studio pack only need the in-app **Ship checklist** — see [HOW-TO.md](./HOW-TO.md) §9.
 
 Landing context: [`ENGINE-LANDING.md`](./ENGINE-LANDING.md)
@@ -10,19 +12,19 @@ Landing context: [`ENGINE-LANDING.md`](./ENGINE-LANDING.md)
 
 ## A — Typecheck / test / build
 
+Node.js 22.12+ (`nvm use`).
+
 ```sh
 npm ci
-npm run typecheck
-npm test
-npm run build
-# optional full gate:
-npm run verify   # typecheck + test + check-assets
+npm run verify          # typecheck + lint + tests + check-assets + check:release
+npm run check:cli       # pack-doctor runs
+npm run pack:engine     # installable package builds
+npm run build           # → dist/
+npm run test:e2e        # play screen in a real browser
+npm audit --omit=dev    # nothing shipped to players has advisories
 ```
 
-- [ ] `typecheck` exit 0  
-- [ ] `test` exit 0  
-- [ ] `build` → `dist/` exit 0  
-- [ ] `verify` exit 0 (if you ran it)
+- [ ] every command above exits 0
 
 ---
 
@@ -45,13 +47,14 @@ npm run dev
 
 | Pack | Route | Smoke |
 |---|---|---|
-| **Attic Study** | `/play/attic-study` | Desk → key → chest → locket; audio unlock; save/load |
+| **Attic Study** | `/play/attic-study` | Desk → key → chest → locket; audio unlock; save/load; then once more with the **keyboard only** (Tab / Enter) |
 | **Harbor Fog** | `/play/harbor-fog` | Hub → wings → key/chest → lighthouse gate |
-| **short-mystery** | Studio → New game → `short-mystery` → Play draft | 5 rooms, gated climax, hint thread |
+| **short-mystery** | Studio → New game → `short-mystery` → set **Game ends when flag** → Play draft | 5 rooms, gated climax, hint thread, reaches the win screen |
 
-- [ ] Attic completable  
+- [ ] Attic completable (mouse and keyboard)  
 - [ ] Harbor loop + gate  
-- [ ] short-mystery draft plays from Pack → Play draft
+- [ ] short-mystery draft plays from Pack → Play draft to the **win screen**, with credits if any were added  
+- [ ] A save exported from the previous release loads and continues ([`RELEASING.md`](./RELEASING.md) step 6)
 
 ---
 
