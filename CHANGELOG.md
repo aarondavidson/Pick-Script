@@ -12,6 +12,7 @@ anything, you need to change.
 
 - **Documentation** — the README now says what the engine does and maps every guide by task; HOW-TO's first-game steps include setting an ending (Studio games never reached the win screen without one), palettes and credits; pack-field docs say which release added each feature ("since 0.x"), for `minEngineVersion`; STUDIO.md no longer lists the removed AI generation, Pixor or the Lospec gallery; SHIP-NIGHT's QA gate matches RELEASING (lint, CLI, package, browser tests, audit, keyboard play, endings); `verify` is described with lint everywhere; RELEASING records the rewritten history behind the `Beta` tag and that 0.2.0 has no tag; the 0.1.0 → 0.2.0 upgrade notes cover the removed AI generation, title modes and React Router 7
 - **Changelog** — features that shipped in the first public beta were listed as new in 0.2.0; they are now under 0.1.0, with what 0.2.0 later removed marked
+- **Art drawn in a hotspot faded in and out** — the idle discovery pulse animated the opacity of the whole hotspot, so overlay art (`frames`, `stateOverlays`) sat at 30–60% opacity, cutscenes included. The pulse now changes only the outline's colour, and the hotspot's unused `opacity-50` while input is locked is gone (the idle pulse and the active and stuck-assist styles always overrode it). Overlay art also now scales like the room picture: crisp with `presentation.crispPixels`, smooth otherwise (it always inherited `crisp-edges`)
 - `tsconfig.node.json` no longer lists the deleted AI-proxy files
 
 ### Security
