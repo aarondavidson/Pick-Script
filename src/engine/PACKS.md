@@ -336,6 +336,8 @@ JSON / Studio steps compile to `CutsceneDef`. Useful ops beyond message/wait:
 | `juice` on a line | Shake/flash/burst when the beat starts |
 | `mouthCues` on `sayLine` | Live lip-sync while the line plays |
 
+**Skipping** (Esc or **Skip**) ends the cutscene but still sets every flag its remaining lines would have set, so a skipped scene leaves the game where watching it would have. Set `skippable: false` on a cutscene to turn skipping off.
+
 Script opcodes (named scripts): `cameraPan`, `cameraZoom`, `cameraFollow`.
 
 ---
