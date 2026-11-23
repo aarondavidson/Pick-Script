@@ -16,6 +16,7 @@ import {
   currentCutsceneLine,
   cutsceneLineReadyToAdvance,
   cutsceneLineWaitRequirements,
+  flagsSetByRemainingLines,
   skipCutscene,
   startCutscene,
   type CutsceneDef,
@@ -121,12 +122,18 @@ export function useCutsceneHost({
       if (!prev) return null;
       const next = skipCutscene(prev);
       if (!next) {
-        queueMicrotask(() => endCutsceneInternal(prev.def.id));
+        // Skipping skips the show, not the story: set the flags the rest of
+        // the scene would have set before its end event runs.
+        const flags = flagsSetByRemainingLines(prev);
+        queueMicrotask(() => {
+          if (Object.keys(flags).length > 0) updateGameState({ flags });
+          endCutsceneInternal(prev.def.id);
+        });
         return null;
       }
       return next;
     });
-  }, [endCutsceneInternal]);
+  }, [endCutsceneInternal, updateGameState]);
 
   const cutsceneLine: CutsceneLine | null = currentCutsceneLine(cutscene);
 

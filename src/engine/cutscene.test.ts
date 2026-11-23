@@ -4,6 +4,7 @@ import {
   advanceCutscene,
   cutsceneLineReadyToAdvance,
   findCutsceneLabelIndex,
+  flagsSetByRemainingLines,
   sanitizeCutsceneLabel,
   startCutscene,
   type CutsceneDef,
@@ -159,5 +160,69 @@ describe("compilePackCutscenes timeline sync", () => {
     expect(lines[2]?.waitForWalk).toBe(true);
     expect(lines[3]?.waitForSpeech).toBe(true);
     expect(lines[4]?.goto).toBe("intro");
+  });
+});
+
+describe("flagsSetByRemainingLines (skipping a cutscene)", () => {
+  it("collects the flags later lines set, following goto, with the last value winning", () => {
+    const def: CutsceneDef = {
+      id: "skippable",
+      lines: [
+        { text: "one", setFlag: { flag: "already_set" } },
+        { text: "two", setFlag: { flag: "door_open" }, goto: "end" },
+        { text: "never reached", setFlag: { flag: "unreached" } },
+        { text: "three", label: "end", setFlag: { flag: "door_open", value: false } },
+        { text: "four", setFlag: { flag: "finale" } },
+      ],
+    };
+    expect(flagsSetByRemainingLines(startCutscene(def))).toEqual({
+      door_open: false,
+      finale: true,
+    });
+  });
+
+  it("starts from the line being shown when the player skips", () => {
+    const def: CutsceneDef = {
+      id: "midway",
+      lines: [
+        { text: "one", setFlag: { flag: "first" } },
+        { text: "two", setFlag: { flag: "second" } },
+        { text: "three", setFlag: { flag: "third" } },
+      ],
+    };
+    const atSecondLine = advanceCutscene(startCutscene(def))!;
+    expect(flagsSetByRemainingLines(atSecondLine)).toEqual({ third: true });
+  });
+
+  it("is empty on the last line", () => {
+    const def: CutsceneDef = { id: "short", lines: [{ text: "only", setFlag: { flag: "done" } }] };
+    expect(flagsSetByRemainingLines(startCutscene(def))).toEqual({});
+  });
+
+  it("ends on a looping cutscene, as playing it would", () => {
+    const def: CutsceneDef = {
+      id: "loop",
+      lines: [
+        { text: "a", label: "top" },
+        { text: "b", setFlag: { flag: "looped" }, goto: "top" },
+      ],
+    };
+    expect(flagsSetByRemainingLines(startCutscene(def))).toEqual({ looped: true });
+  });
+
+  it("picks up setFlag steps from JSON pack cutscenes", () => {
+    const cutscenes = compilePackCutscenes({
+      gate: {
+        id: "gate",
+        steps: [
+          { op: "message", text: "The gate creaks." },
+          { op: "message", text: "It swings open." },
+          { op: "setFlag", flag: "gate_open" },
+        ],
+      },
+    });
+    expect(flagsSetByRemainingLines(startCutscene(cutscenes.gate!))).toEqual({
+      gate_open: true,
+    });
   });
 });

@@ -153,6 +153,28 @@ export function skipCutscene(
   return null;
 }
 
+/**
+ * The flags the rest of a cutscene would have set, so skipping it leaves the
+ * game where watching it would have. Follows `goto` and the visit caps the
+ * same way advancing does; when a flag is set more than once, the last value
+ * wins. The current line's flag is not included: it was set when the line
+ * started.
+ */
+export function flagsSetByRemainingLines(
+  runtime: CutsceneRuntime
+): Record<string, boolean> {
+  const flags: Record<string, boolean> = {};
+  let current = advanceCutscene(runtime);
+  while (current) {
+    const setFlag = current.def.lines[current.lineIndex]?.setFlag;
+    if (setFlag?.flag) {
+      flags[setFlag.flag] = setFlag.value !== false;
+    }
+    current = advanceCutscene(current);
+  }
+  return flags;
+}
+
 export function currentCutsceneLine(
   runtime: CutsceneRuntime | null
 ): CutsceneLine | null {
