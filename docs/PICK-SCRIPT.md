@@ -48,7 +48,7 @@ labels so both acronyms stay visible on launcher, `/pick`, recipes, and settings
 
 | Pillar | Module | Host wiring |
 |---|---|---|
-| **2D Framebuffer & Pixel Scaler** | `src/engine/script/pixelScale.ts` | `LocationView` + pack `presentation.crispPixels` |
+| **2D Framebuffer & Pixel Scaler** | `src/engine/script/pixelScale.ts` | `LocationView` (room picture), `Hotspot` (overlay art) + pack `presentation.crispPixels` |
 | **Pathfinding & Walkmasks** | `src/engine/walkboxes.ts` (re-exported) | Ego walk / approach points |
 | **Cursor State Machine** | `src/engine/script/cursorMachine.ts` | `ItemCursor` + body CSS cursor |
 | **State System** | `src/engine/script/stateStore.ts` | `flags` / `vars` / `objectStates` on `GameState` |
@@ -63,7 +63,7 @@ presentation: {
 }
 ```
 
-Attic Study enables this; photographic packs leave it off.
+Attic Study enables this; photographic packs leave it off. The room picture and art drawn in hotspots follow the same setting.
 
 ## P.I.C.K. surfaces
 

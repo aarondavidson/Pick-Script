@@ -7,6 +7,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { isPhoneLayout, usePlayLayout } from "@/hooks/usePlayLayout";
 import { isSafePlayMediaUrl } from "@/engine/security";
 import { sceneAnimClassName, useFrameCycle } from "@/hooks/useFrameCycle";
+import { pixelBackgroundStyle } from "@/engine/script";
 
 interface HotspotProps {
   hotspot: HotspotType;
@@ -46,6 +47,7 @@ export const Hotspot = ({
     sentenceLine,
     gameState,
     stuckAssistHotspotId,
+    definition,
   } = useGame();
   const [isHovered, setIsHovered] = useState(false);
   const [animationClass, setAnimationClass] = useState("");
@@ -75,6 +77,10 @@ export const Hotspot = ({
   const frameOverlay = useFrameCycle(safeFrames, hotspot.fps ?? 4);
   const overlayImage = frameOverlay || stateOverlay;
   const overlayAnimCls = sceneAnimClassName(hotspot.animClass);
+  // Overlay art scales like the room picture: crisp in pixel-art packs, smooth otherwise
+  const overlayRendering = pixelBackgroundStyle({
+    crisp: !!definition.presentation?.crispPixels,
+  });
 
   useEffect(() => {
     if (!isCharacter) return;
@@ -241,7 +247,7 @@ export const Hotspot = ({
             } ${
               forceReveal && !isHovered && !isTouching ? "hotspot-reveal-all" : ""
             } ${
-              inputLocked ? "pointer-events-none opacity-50" : ""
+              inputLocked ? "pointer-events-none" : ""
             }`}
             style={{
               left: `${hotspot.x}%`,
@@ -274,6 +280,7 @@ export const Hotspot = ({
                 src={overlayImage}
                 alt=""
                 className={`absolute inset-0 w-full h-full object-contain pointer-events-none ${overlayAnimCls}`.trim()}
+                style={overlayRendering}
                 draggable={false}
                 data-object-state={objectState}
                 data-anim-frames={safeFrames.length || undefined}

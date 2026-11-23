@@ -2,10 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Hotspot discovery animations */
+/* Hotspot discovery animations. The idle pulse changes the outline's colour,
+   not the hotspot's opacity, so art drawn in a hotspot (characters, props that
+   change) stays solid. Same strength as the old 0.3–0.6 opacity pulse on the
+   0.3-alpha outline. */
 @keyframes hotspot-pulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
+  0%, 100% { border-color: hsl(var(--game-hotspot) / 0.09); }
+  50% { border-color: hsl(var(--game-hotspot) / 0.18); }
 }
 
 .hotspot-idle {
