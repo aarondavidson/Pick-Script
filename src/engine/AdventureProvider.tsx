@@ -161,6 +161,11 @@ export interface AdventureContextValue {
   acceptStuckAssist: () => string | null;
   /** Dismiss stuck assist (starts cooldown) */
   dismissStuckAssist: () => void;
+  /**
+   * Tell the host a minigame, comic, or conversation is open over the scene.
+   * Stuck assist waits while one is open (and during cutscenes).
+   */
+  setSceneOverlayOpen: (open: boolean) => void;
   /** Pending irreversible item consume confirm */
   pendingConsumeConfirm: {
     hotspot: Hotspot;
@@ -310,6 +315,7 @@ export const AdventureProvider: React.FC<AdventureProviderProps> = ({
   const pendingArriveRef = useRef<PendingArrive | null>(null);
   const egoWalkRef = useRef<WalkMotion | null>(null);
   const lastActivityAtRef = useRef(Date.now());
+  const sceneOverlayOpenRef = useRef(false);
   const failedStreakRef = useRef(0);
   const stuckDismissedUntilRef = useRef(0);
   const ACTION_LOG_MAX = 40;
@@ -669,11 +675,19 @@ export const AdventureProvider: React.FC<AdventureProviderProps> = ({
       Date.now() + stuckConfig.dismissCooldownMs;
   }, [stuckConfig.dismissCooldownMs]);
 
+  const setSceneOverlayOpen = useCallback((open: boolean) => {
+    sceneOverlayOpenRef.current = open;
+  }, []);
+
   // Poll idle / failed-interact thresholds for stuck assist
   useEffect(() => {
     if (!stuckConfig.enabled) return;
     const id = window.setInterval(() => {
       const now = Date.now();
+      // Time in a cutscene, minigame, comic, or conversation isn't idle time:
+      // hold the idle clock so it starts fresh back in the room.
+      const paused = cutsceneActiveRef.current || sceneOverlayOpenRef.current;
+      if (paused) lastActivityAtRef.current = now;
       const hints = runtime.listActiveHints(gameStateRef.current);
       const hasActiveHint = hints.some((h) => !h.exhausted);
       const offer = shouldOfferStuckAssist({
@@ -683,6 +697,7 @@ export const AdventureProvider: React.FC<AdventureProviderProps> = ({
         failedStreak: failedStreakRef.current,
         dismissedUntil: stuckDismissedUntilRef.current,
         hasActiveHint,
+        paused,
       });
       setStuckAssistOffer((prev) => (prev === offer ? prev : offer));
     }, 2000);
@@ -809,6 +824,7 @@ export const AdventureProvider: React.FC<AdventureProviderProps> = ({
       stuckAssistHotspotId,
       acceptStuckAssist,
       dismissStuckAssist,
+      setSceneOverlayOpen,
       pendingConsumeConfirm,
       confirmConsume,
       cancelConsume,
@@ -869,6 +885,7 @@ export const AdventureProvider: React.FC<AdventureProviderProps> = ({
       stuckAssistHotspotId,
       acceptStuckAssist,
       dismissStuckAssist,
+      setSceneOverlayOpen,
       pendingConsumeConfirm,
       confirmConsume,
       cancelConsume,

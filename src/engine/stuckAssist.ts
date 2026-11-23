@@ -69,8 +69,14 @@ export function shouldOfferStuckAssist(opts: {
   failedStreak: number;
   dismissedUntil: number;
   hasActiveHint: boolean;
+  /**
+   * A cutscene, minigame, comic, or conversation is open: the player is busy,
+   * not stuck, so no offer.
+   */
+  paused?: boolean;
 }): boolean {
   if (!opts.config.enabled || !opts.hasActiveHint) return false;
+  if (opts.paused) return false;
   if (opts.now < opts.dismissedUntil) return false;
   if (opts.failedStreak >= opts.config.failedInteracts) return true;
   if (opts.now - opts.lastActivityAt >= opts.config.idleMs) return true;

@@ -407,7 +407,7 @@ See Tier D notes in `ENGINE.md`. Short version:
 - `playableActors` + `switchEgo` / `setEgo` opcode — per-ego inventories
 - `verbMode: "classic" | "simple" | "coin"` — Settings can override (localStorage); classic includes **Give**
 - `hints: [untilFlagHint(…)]` — progressive tiers in the Hints dialog; optional `hotspotId` for stuck pulse
-- `stuckAssist` — after idle / failed interacts, banner offers the next hint **and** pulses that hotspot when `hotspotId` is set
+- `stuckAssist` — after idle / failed interacts, banner offers the next hint **and** pulses that hotspot when `hotspotId` is set. It waits while a cutscene, minigame, comic, or conversation is open, and time spent in one doesn't count as idle
 - `autosave: true` — debounced to `adventure_<id>_autosave`
 
 ---
