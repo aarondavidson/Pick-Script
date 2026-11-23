@@ -33,6 +33,7 @@ export const LocationView = () => {
     pendingModality,
     clearModality,
     completeModality,
+    setSceneOverlayOpen,
     showMessage,
     walkEgoTo,
     inputLocked,
@@ -110,6 +111,15 @@ export const LocationView = () => {
     clearModality();
   }, [pendingModality, clearModality, showMessage]);
 
+  const comic = lookupComic(definition.comics, comicId);
+  // While a minigame, comic, or conversation is open the player is busy, so
+  // stuck assist waits.
+  const sceneOverlayOpen = !!activeMinigameId || !!comic || !!activeDialogue;
+  useEffect(() => {
+    setSceneOverlayOpen(sceneOverlayOpen);
+    return () => setSceneOverlayOpen(false);
+  }, [sceneOverlayOpen, setSceneOverlayOpen]);
+
   if (!location) {
     return <div>{uiText("ui.room.not_found")}</div>;
   }
@@ -137,8 +147,6 @@ export const LocationView = () => {
       treeKey: hotspotId || actorId || hotspotName,
     });
   };
-
-  const comic = lookupComic(definition.comics, comicId);
 
   const stageClass =
     layout === "desktop"

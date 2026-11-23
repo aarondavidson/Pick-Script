@@ -59,6 +59,20 @@ describe("stuckAssist", () => {
     ).toBe(false);
   });
 
+  it("never offers while a cutscene, minigame, comic, or conversation is open", () => {
+    const config = DEFAULT_STUCK_ASSIST;
+    const stuck = {
+      config,
+      now: 100_000,
+      lastActivityAt: 100_000 - config.idleMs - 1,
+      failedStreak: config.failedInteracts,
+      dismissedUntil: 0,
+      hasActiveHint: true,
+    };
+    expect(shouldOfferStuckAssist(stuck)).toBe(true);
+    expect(shouldOfferStuckAssist({ ...stuck, paused: true })).toBe(false);
+  });
+
   it("resolves pulse hotspot from active hint or objective fallback", () => {
     expect(
       resolveStuckAssistHotspotId({

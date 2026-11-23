@@ -11,6 +11,7 @@ anything, you need to change.
 ### Fixed
 
 - **Documentation** — the README now says what the engine does and maps every guide by task; HOW-TO's first-game steps include setting an ending (Studio games never reached the win screen without one), palettes and credits; pack-field docs say which release added each feature ("since 0.x"), for `minEngineVersion`; STUDIO.md no longer lists the removed AI generation, Pixor or the Lospec gallery; SHIP-NIGHT's QA gate matches RELEASING (lint, CLI, package, browser tests, audit, keyboard play, endings); `verify` is described with lint everywhere; RELEASING records the rewritten history behind the `Beta` tag and that 0.2.0 has no tag; the 0.1.0 → 0.2.0 upgrade notes cover the removed AI generation, title modes and React Router 7
+- **The hint offer interrupted minigames and cutscenes** — time spent in a cutscene, minigame, comic, or conversation counted as idle, so "Need a hint?" could pop up in the middle of one. Stuck assist now waits while one is open, and its idle clock starts fresh when the player is back in the room
 - **Changelog** — features that shipped in the first public beta were listed as new in 0.2.0; they are now under 0.1.0, with what 0.2.0 later removed marked
 - `tsconfig.node.json` no longer lists the deleted AI-proxy files
 
